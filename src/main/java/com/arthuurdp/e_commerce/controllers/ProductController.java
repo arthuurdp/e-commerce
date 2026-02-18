@@ -1,8 +1,8 @@
 package com.arthuurdp.e_commerce.controllers;
 
 import com.arthuurdp.e_commerce.entities.Product;
-import com.arthuurdp.e_commerce.entities.dtos.RegisterProductRequest;
-import com.arthuurdp.e_commerce.entities.dtos.RegisterProductResponse;
+import com.arthuurdp.e_commerce.entities.dtos.product.RegisterProductRequest;
+import com.arthuurdp.e_commerce.entities.dtos.product.RegisterProductResponse;
 import com.arthuurdp.e_commerce.services.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -35,13 +35,14 @@ public class ProductController {
 
     @PostMapping
     public ResponseEntity<RegisterProductResponse> registerProduct(@RequestBody @Valid RegisterProductRequest req) {
-        RegisterProductResponse response = service.registerProduct(req);
+        RegisterProductResponse response = service.register(req);
 
         URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(req.name())
                 .toUri();
-        return ResponseEntity.created(uri).body()
+
+        return ResponseEntity.created(uri).body(response);
     }
 }
