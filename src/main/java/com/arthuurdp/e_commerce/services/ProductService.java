@@ -86,7 +86,7 @@ public class ProductService {
             p.addCategories(product.categoryIds().stream().map(categoryService::findById).toList());
         }
 
-        return entityMapperService.toProductUpdateResponse(productRepository.save(p));
+        return entityMapperService.toUpdateProductResponse(productRepository.save(p));
     }
 
     @PreAuthorize("hasRole('ADMIN')")

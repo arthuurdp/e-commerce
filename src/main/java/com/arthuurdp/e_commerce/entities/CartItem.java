@@ -63,6 +63,20 @@ public class CartItem {
         this.quantity = quantity;
     }
 
+    public void incrementQuantity() {
+        if (quantity <= 0) {
+            throw new IllegalStateException("Quantity cannot be negative");
+        }
+        this.quantity++;
+    }
+
+    public void decrementQuantity() {
+        if (quantity <= 0) {
+            throw new IllegalStateException("Quantity cannot be negative");
+        }
+        quantity--;
+    }
+
     public Double getSubtotal() {
         return product.getPrice() * quantity;
     }

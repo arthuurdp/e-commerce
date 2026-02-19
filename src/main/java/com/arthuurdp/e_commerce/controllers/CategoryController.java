@@ -1,13 +1,12 @@
 package com.arthuurdp.e_commerce.controllers;
 
-import com.arthuurdp.e_commerce.entities.Category;
 import com.arthuurdp.e_commerce.entities.dtos.category.CategoryRequest;
 import com.arthuurdp.e_commerce.entities.dtos.category.CategoryResponse;
-import com.arthuurdp.e_commerce.entities.dtos.category.CreateCategoryResponse;
 import com.arthuurdp.e_commerce.services.CategoryService;
-import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -33,8 +32,9 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<CreateCategoryResponse> create(@RequestBody CategoryRequest req) {
-        CreateCategoryResponse response = categoryService.create(req);
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<CategoryResponse> create(@RequestBody @Valid CategoryRequest req) {
+        CategoryResponse response = categoryService.create(req);
 
         URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -45,13 +45,14 @@ public class CategoryController {
         return ResponseEntity.created(uri).body(response);
     }
 
-    @Transactional
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryResponse> update(@PathVariable Long id, @RequestBody CategoryRequest req) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<CategoryResponse> update(@PathVariable Long id, @RequestBody @Valid CategoryRequest req) {
         return ResponseEntity.ok().body(categoryService.update(id, req));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         categoryService.delete(id);
         return ResponseEntity.noContent().build();

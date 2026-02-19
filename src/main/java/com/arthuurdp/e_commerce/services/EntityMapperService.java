@@ -1,13 +1,13 @@
 package com.arthuurdp.e_commerce.services;
 
 import com.arthuurdp.e_commerce.entities.*;
-import com.arthuurdp.e_commerce.entities.cart_item.CartItemResponse;
+import com.arthuurdp.e_commerce.entities.dtos.cart_item.CartItemResponse;
 import com.arthuurdp.e_commerce.entities.dtos.auth.RegisterResponse;
 import com.arthuurdp.e_commerce.entities.dtos.category.CategoryResponse;
-import com.arthuurdp.e_commerce.entities.dtos.category.CreateCategoryResponse;
 import com.arthuurdp.e_commerce.entities.dtos.product.ProductDTO;
 import com.arthuurdp.e_commerce.entities.dtos.product.CreateProductResponse;
 import com.arthuurdp.e_commerce.entities.dtos.product.UpdateProductResponse;
+import com.arthuurdp.e_commerce.entities.dtos.user.UserResponse;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -24,7 +24,7 @@ public class EntityMapperService {
         );
     }
 
-    public UpdateProductResponse toProductUpdateResponse(Product product) {
+    public UpdateProductResponse toUpdateProductResponse(Product product) {
         return new UpdateProductResponse(
                 product.getId(),
                 product.getName(),
@@ -46,15 +46,9 @@ public class EntityMapperService {
         );
     }
 
-    public CreateCategoryResponse toCreateCategoryResponse(Category category) {
-        return new CreateCategoryResponse(
-                category.getId(),
-                category.getName()
-        );
-    }
-
     public CategoryResponse toCategoryResponse(Category category) {
         return new CategoryResponse(
+                category.getId(),
                 category.getName()
         );
     }
@@ -69,8 +63,8 @@ public class EntityMapperService {
         return new RegisterResponse(
                 user.getId(),
                 user.getFirstName(),
-                user.getEmail(),
-                user.getPassword()
+                user.getLastName(),
+                user.getEmail()
         );
     }
 
@@ -82,5 +76,13 @@ public class EntityMapperService {
                 cartItem.getQuantity(),
                 cartItem.getSubtotal()
         );
+    }
+
+    public UserResponse toUserResponse(User user) {
+        return new UserResponse(
+                user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail());
     }
 }
