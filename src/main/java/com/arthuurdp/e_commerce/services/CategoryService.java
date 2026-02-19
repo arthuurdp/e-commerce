@@ -1,7 +1,9 @@
 package com.arthuurdp.e_commerce.services;
 
 import com.arthuurdp.e_commerce.entities.Category;
-import com.arthuurdp.e_commerce.entities.dtos.category.CategoryDAO;
+import com.arthuurdp.e_commerce.entities.dtos.category.CategoryRequest;
+import com.arthuurdp.e_commerce.entities.dtos.category.CategoryResponse;
+import com.arthuurdp.e_commerce.entities.dtos.category.CreateCategoryResponse;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.CategoryRepository;
 import org.springframework.data.domain.Page;
@@ -26,23 +28,26 @@ public class CategoryService {
         return categoryRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
     }
 
-    public Page<CategoryDAO> findAllResponse(int page, int size) {
+    public Page<CategoryResponse> findAllResponse(int page, int size) {
         return categoryRepository.findAll(PageRequest.of(page, size)).map(entityMapperService::toCategoryResponse);
     }
 
-    public CategoryDAO findByIdResponse(Long id) {
+    public CategoryResponse findByIdResponse(Long id) {
         return entityMapperService.toCategoryResponse(findById(id));
     }
 
-    public CategoryDAO create(Category category) {
-        return entityMapperService.toCategoryResponse(categoryRepository.save(category));
+    public CreateCategoryResponse create(CategoryRequest category) {
+        Category c = new Category(
+                category.name()
+        );
+        return entityMapperService.toCreateCategoryResponse(categoryRepository.save(c));
     }
 
-    public CategoryDAO update(Long id, Category category) {
+    public CategoryResponse update(Long id, CategoryRequest category) {
         Category existingCategory = categoryRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
 
-        if (category.getName() != null && !category.getName().isBlank()) {
-            existingCategory.setName(category.getName());
+        if (category.name() != null && !category.name().isBlank()) {
+            existingCategory.setName(category.name());
         }
 
         return entityMapperService.toCategoryResponse(categoryRepository.save(existingCategory));

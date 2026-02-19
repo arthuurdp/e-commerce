@@ -30,18 +30,18 @@ public class ProductService {
         return productRepository.findAll(PageRequest.of(page, size));
     }
 
-    public Page<ProductDAO> findAllResponse(int page, int size) {
-        return productRepository.findAll(PageRequest.of(page, size)).map(entityMapperService::toProductDAO);
+    public Page<ProductDTO> findAllResponse(int page, int size) {
+        return productRepository.findAll(PageRequest.of(page, size)).map(entityMapperService::toProductDTO);
     }
 
-    public ProductDAO findByIdResponse(Long id) {
+    public ProductDTO findByIdResponse(Long id) {
         Product p = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        return entityMapperService.toProductDAO(p);
+        return entityMapperService.toProductDTO(p);
     }
 
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
-    public RegisterProductResponse register(RegisterProductRequest product) {
+    public CreateProductResponse register(CreateProductRequest product) {
         Product p = new Product(
                 product.name(),
                 product.description(),
@@ -88,7 +88,6 @@ public class ProductService {
 
         return entityMapperService.toProductUpdateResponse(productRepository.save(p));
     }
-
 
     @PreAuthorize("hasRole('ADMIN')")
     public void delete(Long id) {

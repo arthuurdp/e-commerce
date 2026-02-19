@@ -40,13 +40,22 @@ public class User implements UserDetails {
     public User() {
     }
 
-    public User(String firstName, String lastName, String email, String password, Role role, ShoppingCart cart) {
+    public User(String firstName, String lastName, String email, String password) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.role = Role.ROLE_USER;
+        this.cart = new ShoppingCart();
+    }
+
+    public User(String firstName, String lastName, String email, String password, Role role) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
         this.role = role;
-        this.cart = cart;
+        this.cart = new ShoppingCart();
     }
 
     public Long getId() {

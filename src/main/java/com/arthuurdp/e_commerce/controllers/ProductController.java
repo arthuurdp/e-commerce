@@ -1,8 +1,6 @@
 package com.arthuurdp.e_commerce.controllers;
 
-import com.arthuurdp.e_commerce.entities.Product;
-import com.arthuurdp.e_commerce.entities.dtos.product.RegisterProductRequest;
-import com.arthuurdp.e_commerce.entities.dtos.product.RegisterProductResponse;
+import com.arthuurdp.e_commerce.entities.dtos.product.*;
 import com.arthuurdp.e_commerce.services.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -21,28 +19,40 @@ public class ProductController {
         this.service = service;
     }
 
-    public ResponseEntity<Page<Product>> findAll(
+    @GetMapping
+    public ResponseEntity<Page<ProductDTO>> findAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return ResponseEntity.ok().body(service.findAll(page, size));
+        return ResponseEntity.ok().body(service.findAllResponse(page, size));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> findById(@PathVariable Long id) {
-        return ResponseEntity.ok().body(service.findById(id));
+    public ResponseEntity<ProductDTO> findById(@PathVariable Long id) {
+        return ResponseEntity.ok().body(service.findByIdResponse(id));
     }
 
     @PostMapping
-    public ResponseEntity<RegisterProductResponse> registerProduct(@RequestBody @Valid RegisterProductRequest req) {
-        RegisterProductResponse response = service.register(req);
+    public ResponseEntity<CreateProductResponse> create(@RequestBody @Valid CreateProductRequest req) {
+        CreateProductResponse response = service.register(req);
 
         URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(req.name())
+                .buildAndExpand(response.id())
                 .toUri();
 
         return ResponseEntity.created(uri).body(response);
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<UpdateProductResponse> update(@PathVariable Long id, @RequestBody UpdateProductRequest req) {
+        return ResponseEntity.ok().body(service.update(id, req));
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        service.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
