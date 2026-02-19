@@ -4,5 +4,5 @@ import com.arthuurdp.e_commerce.entities.ProductImage;
 
 import java.util.List;
 
-public record ProductDAO(String name, String description, Double price, List<ProductImage> imgs) {
+public record ProductDTO(String name, String description, Double price, List<ProductImage> imgs) {
 }

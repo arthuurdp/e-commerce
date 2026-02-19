@@ -3,7 +3,7 @@ package com.arthuurdp.e_commerce.entities;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "cart_item")
+@Table(name = "cart_items")
 public class CartItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,13 +18,14 @@ public class CartItem {
     @JoinColumn(name = "product_id")
     private Product product;
 
+    @Column(name = "quantity")
     private Integer quantity;
+
 
     public CartItem() {
     }
 
-    public CartItem(Long id, ShoppingCart cart, Product product, Integer quantity) {
-        this.id = id;
+    public CartItem(ShoppingCart cart, Product product, Integer quantity) {
         this.cart = cart;
         this.product = product;
         this.quantity = quantity;
@@ -60,5 +61,9 @@ public class CartItem {
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
+    }
+
+    public Double getSubtotal() {
+        return product.getPrice() * quantity;
     }
 }

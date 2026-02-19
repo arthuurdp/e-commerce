@@ -8,7 +8,7 @@ import java.util.List;
 
 import jakarta.validation.constraints.*;
 
-public record RegisterProductRequest(
+public record CreateProductRequest(
         @NotBlank @Size(min = 2, max = 150)
         String name,
 
