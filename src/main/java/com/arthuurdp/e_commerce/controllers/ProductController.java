@@ -5,6 +5,7 @@ import com.arthuurdp.e_commerce.services.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -33,6 +34,7 @@ public class ProductController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CreateProductResponse> create(@RequestBody @Valid CreateProductRequest req) {
         CreateProductResponse response = service.register(req);
 
@@ -46,11 +48,13 @@ public class ProductController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<UpdateProductResponse> update(@PathVariable Long id, @RequestBody UpdateProductRequest req) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<UpdateProductResponse> update(@PathVariable Long id, @RequestBody @Valid UpdateProductRequest req) {
         return ResponseEntity.ok().body(service.update(id, req));
     }
 
     @DeleteMapping("{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();

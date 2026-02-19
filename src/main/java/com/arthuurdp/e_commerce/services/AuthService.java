@@ -6,7 +6,6 @@ import com.arthuurdp.e_commerce.entities.enums.Role;
 import com.arthuurdp.e_commerce.exceptions.ConflictException;
 import com.arthuurdp.e_commerce.infrastructure.security.TokenService;
 import com.arthuurdp.e_commerce.repositories.UserRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -67,7 +66,6 @@ public class AuthService {
         repo.save(user);
         return entityMapper.toRegisterResponse(user);
     }
-
 
     public User getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
