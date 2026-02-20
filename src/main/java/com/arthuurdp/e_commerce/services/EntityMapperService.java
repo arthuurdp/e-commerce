@@ -4,10 +4,9 @@ import com.arthuurdp.e_commerce.entities.*;
 import com.arthuurdp.e_commerce.entities.dtos.cart_item.CartItemResponse;
 import com.arthuurdp.e_commerce.entities.dtos.auth.RegisterResponse;
 import com.arthuurdp.e_commerce.entities.dtos.category.CategoryResponse;
-import com.arthuurdp.e_commerce.entities.dtos.product.ProductDTO;
-import com.arthuurdp.e_commerce.entities.dtos.product.CreateProductResponse;
-import com.arthuurdp.e_commerce.entities.dtos.product.UpdateProductResponse;
+import com.arthuurdp.e_commerce.entities.dtos.product.*;
 import com.arthuurdp.e_commerce.entities.dtos.user.UserResponse;
+import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -19,6 +18,7 @@ public class EntityMapperService {
                 product.getDescription(),
                 product.getPrice(),
                 product.getStock(),
+                product.getImages().stream().map(this::toProductImageResponse).toList(),
                 product.getCategories().stream().map(this::toCategoryResponse).toList(),
                 product.getCreatedAt()
         );
@@ -31,7 +31,7 @@ public class EntityMapperService {
                 product.getDescription(),
                 product.getPrice(),
                 product.getStock(),
-                product.getImages(),
+                product.getImages().stream().map(this::toProductImageResponse).toList(),
                 product.getCategories().stream().map(this::toCategoryResponse).toList(),
                 product.getLastUpdatedAt()
         );
@@ -39,10 +39,30 @@ public class EntityMapperService {
 
     public ProductDTO toProductDTO(Product product) {
         return new ProductDTO(
+                product.getId(),
                 product.getName(),
                 product.getDescription(),
                 product.getPrice(),
-                product.getImages()
+                product.getMainImageUrl()
+                );
+    }
+
+    public ProductDetails toProductDetails(Product product) {
+        return new ProductDetails(
+                product.getId(),
+                product.getName(),
+                product.getDescription(),
+                product.getPrice(),
+                product.getStock(),
+                product.getImages().stream().map(this::toProductImageResponse).toList()
+        );
+    }
+
+    public ProductImageResponse toProductImageResponse(ProductImage productImage) {
+        return new ProductImageResponse(
+                productImage.getId(),
+                productImage.getUrl(),
+                productImage.isMainImage()
         );
     }
 

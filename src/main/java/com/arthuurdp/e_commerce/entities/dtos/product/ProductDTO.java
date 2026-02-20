@@ -1,8 +1,6 @@
 package com.arthuurdp.e_commerce.entities.dtos.product;
 
-import com.arthuurdp.e_commerce.entities.ProductImage;
+import java.math.BigDecimal;
 
-import java.util.List;
-
-public record ProductDTO(String name, String description, Double price, List<ProductImage> imgs) {
+public record ProductDTO(Long id, String name, String description, BigDecimal price, String mainImage) {
 }

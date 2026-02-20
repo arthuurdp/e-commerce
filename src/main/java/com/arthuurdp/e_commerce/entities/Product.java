@@ -2,14 +2,15 @@ package com.arthuurdp.e_commerce.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.*;
 
 @Entity
 @Table(name = "products")
 public class Product {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -18,11 +19,11 @@ public class Product {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "desc", nullable = false)
+    @Column(name = "description", nullable = false)
     private String description;
 
     @Column(name = "price", nullable = false)
-    private Double price;
+    private BigDecimal price;
 
     @Column(name = "stock", nullable = false)
     private Integer stock;
@@ -52,7 +53,7 @@ public class Product {
 
     public Product() {}
 
-    public Product(String name, String description, Double price, Integer stock) {
+    public Product(String name, String description, BigDecimal price, Integer stock) {
         this.name = name;
         this.description = description;
         this.price = price;
@@ -79,11 +80,11 @@ public class Product {
         this.description = description;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
@@ -111,11 +112,13 @@ public class Product {
         return categories;
     }
 
-    public Optional<ProductImage> getMainImage() {
-        return images.stream().filter(ProductImage::isMainImage).findFirst();
+    public String getMainImageUrl() {
+        return images.stream().filter(ProductImage::isMainImage).map(ProductImage::getUrl).findFirst().orElse(null);
     }
 
     public void setMainImage(ProductImage img) {
+        if (img == null) return;
+
         if (!images.contains(img)) {
             throw new IllegalArgumentException("Image does not belong to this product");
         }

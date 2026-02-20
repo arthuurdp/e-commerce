@@ -16,7 +16,7 @@ public class DataInitializer {
         this.userRepository = userRepository;
         this.authService = authService;
     }
-    
+
     @Bean
     CommandLineRunner initUsers() {
         return args -> {

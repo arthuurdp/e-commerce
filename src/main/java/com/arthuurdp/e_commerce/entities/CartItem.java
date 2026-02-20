@@ -2,6 +2,8 @@ package com.arthuurdp.e_commerce.entities;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "cart_items")
 public class CartItem {
@@ -15,12 +17,11 @@ public class CartItem {
     private ShoppingCart cart;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
     @Column(name = "quantity")
     private Integer quantity;
-
 
     public CartItem() {
     }
@@ -77,7 +78,7 @@ public class CartItem {
         quantity--;
     }
 
-    public Double getSubtotal() {
-        return product.getPrice() * quantity;
+    public BigDecimal getSubtotal() {
+        return product.getPrice().multiply(BigDecimal.valueOf(quantity));
     }
 }
