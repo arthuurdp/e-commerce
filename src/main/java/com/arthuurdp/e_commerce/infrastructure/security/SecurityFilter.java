@@ -16,11 +16,11 @@ import java.io.IOException;
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
     private final TokenService tokenService;
-    private final UserRepository userRespository;
+    private final UserRepository userRepository;
 
-    public SecurityFilter(TokenService tokenService, UserRepository userRespository) {
+    public SecurityFilter(TokenService tokenService, UserRepository userRepository) {
         this.tokenService = tokenService;
-        this.userRespository = userRespository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -28,7 +28,7 @@ public class SecurityFilter extends OncePerRequestFilter {
         var token = this.recoverToken(req);
         if (token != null) {
             var login = tokenService.validateToken(token);
-            UserDetails user = userRespository.findByEmail(login);
+            UserDetails user = userRepository.findByEmail(login);
 
             if (user != null) {
 

@@ -25,12 +25,12 @@ public class ProductController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return ResponseEntity.ok().body(service.findAllResponse(page, size));
+        return ResponseEntity.ok().body(service.findAll(page, size));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDTO> findById(@PathVariable Long id) {
-        return ResponseEntity.ok().body(service.findByIdResponse(id));
+    public ResponseEntity<ProductDetails> findById(@PathVariable Long id) {
+        return ResponseEntity.ok().body(service.findById(id));
     }
 
     @PostMapping
@@ -47,13 +47,13 @@ public class ProductController {
         return ResponseEntity.created(uri).body(response);
     }
 
-    @PutMapping("{id}")
+    @PatchMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UpdateProductResponse> update(@PathVariable Long id, @RequestBody @Valid UpdateProductRequest req) {
         return ResponseEntity.ok().body(service.update(id, req));
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);

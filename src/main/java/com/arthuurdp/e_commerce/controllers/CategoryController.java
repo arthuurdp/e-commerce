@@ -45,7 +45,7 @@ public class CategoryController {
         return ResponseEntity.created(uri).body(response);
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoryResponse> update(@PathVariable Long id, @RequestBody @Valid CategoryRequest req) {
         return ResponseEntity.ok().body(categoryService.update(id, req));

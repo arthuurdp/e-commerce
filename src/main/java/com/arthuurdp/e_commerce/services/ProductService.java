@@ -22,21 +22,15 @@ public class ProductService {
         this.entityMapperService = entityMapperService;
     }
 
-    public Product findById(Long id) {
-        return productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
-    }
-
-    public Page<Product> findAll(int page, int size) {
-        return productRepository.findAll(PageRequest.of(page, size));
-    }
-
-    public Page<ProductDTO> findAllResponse(int page, int size) {
+    @Transactional
+    public Page<ProductDTO> findAll(int page, int size) {
         return productRepository.findAll(PageRequest.of(page, size)).map(entityMapperService::toProductDTO);
     }
 
-    public ProductDTO findByIdResponse(Long id) {
+    @Transactional
+    public ProductDetails findById(Long id) {
         Product p = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        return entityMapperService.toProductDTO(p);
+        return entityMapperService.toProductDetails(p);
     }
 
     @Transactional
@@ -50,6 +44,9 @@ public class ProductService {
         );
         p.addCategories(product.categoryIds().stream().map(categoryService::findById).toList());
         p.addImages(product.images().stream().map(entityMapperService::toProductImage).toList());
+        if (!p.getImages().isEmpty()) {
+            p.setMainImage(p.getImages().get(0));
+        }
 
         productRepository.save(p);
         return entityMapperService.toRegisterProductResponse(p);

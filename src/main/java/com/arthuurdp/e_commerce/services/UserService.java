@@ -3,6 +3,7 @@ package com.arthuurdp.e_commerce.services;
 import com.arthuurdp.e_commerce.entities.User;
 import com.arthuurdp.e_commerce.entities.dtos.user.UpdateUserRequest;
 import com.arthuurdp.e_commerce.entities.dtos.user.UserResponse;
+import com.arthuurdp.e_commerce.exceptions.BadRequestException;
 import com.arthuurdp.e_commerce.exceptions.ConflictException;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.UserRepository;
@@ -35,19 +36,35 @@ public class UserService {
     @Transactional
     public UserResponse update(Long id, UpdateUserRequest req) {
         User user = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        boolean updated = false;
+
         if (req.firstName() != null) {
             user.setFirstName(req.firstName());
+            updated = true;
         }
+
         if (req.lastName() != null) {
             user.setLastName(req.lastName());
+            updated = true;
         }
-        if (req.email() != null && !req.email().equals(user.getEmail())) {
-            if (!repo.existsByEmail(req.email())) {
+
+        if (req.email() != null) {
+            if (req.email().isBlank()) {
+                throw new BadRequestException("Email cannot be blank");
+            }
+            if (!req.email().equals(user.getEmail())) {
+                if (repo.existsByEmail(req.email())) {
+                    throw new ConflictException("Email already in use");
+                }
                 user.setEmail(req.email());
-            } else {
-                throw new ConflictException("Email already in use");
+                updated = true;
             }
         }
+
+        if (!updated) {
+            throw new BadRequestException("No valid fields provided");
+        }
+
         return entityMapperService.toUserResponse(repo.save(user));
     }
 

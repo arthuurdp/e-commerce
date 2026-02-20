@@ -8,6 +8,7 @@ import com.arthuurdp.e_commerce.repositories.CategoryRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -29,9 +30,11 @@ public class CategoryService {
     }
 
     public CategoryResponse findByIdResponse(Long id) {
+        Category category = categoryRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
         return entityMapperService.toCategoryResponse(findById(id));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public CategoryResponse create(CategoryRequest category) {
         Category c = new Category(
                 category.name()
@@ -40,6 +43,7 @@ public class CategoryService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public CategoryResponse update(Long id, CategoryRequest category) {
         Category existingCategory = categoryRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
 
@@ -50,6 +54,7 @@ public class CategoryService {
         return entityMapperService.toCategoryResponse(categoryRepository.save(existingCategory));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public void delete(Long id) {
         Category category = categoryRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
         categoryRepository.deleteById(id);

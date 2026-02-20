@@ -1,31 +1,31 @@
 package com.arthuurdp.e_commerce.entities.dtos.product;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-
-import java.util.List;
-
 import jakarta.validation.constraints.*;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 public record CreateProductRequest(
-        @NotBlank @Size(min = 2, max = 150)
+        @NotBlank(message = "Name is required")
+        @Size(min = 2, max = 50, message = "Name must be between 2 and 50 chars")
         String name,
 
-        @NotBlank @Size(max = 500)
+        @NotBlank(message = "Description is required")
+        @Size(max = 500, message = "Description must be under 500 chars")
         String description,
 
-        @NotNull @DecimalMin(value = "0.0", inclusive = true)
-        Double price,
+        @NotNull(message = "Price is required")
+        @Positive(message = "Price must be greater than zero")
+        BigDecimal price,
 
-        @NotNull @Min(0)
+        @NotNull(message = "Stock is required")
+        @Min(value = 1, message = "Stock must be 1 or greater")
         Integer stock,
 
-        @NotEmpty
-        List<@NotBlank String> images,
+        @NotEmpty(message = "Images are required")
+        List<@NotBlank(message = "Image URL cannot be blank") String> images,
 
-        @NotEmpty
-        List<@NotNull Long> categoryIds
-
+        @NotEmpty(message = "Categories are required")
+        List<@NotNull(message = "Category cannot be null") Long> categoryIds
 ) {}
 

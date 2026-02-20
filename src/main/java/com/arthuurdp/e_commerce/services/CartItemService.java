@@ -31,6 +31,7 @@ public class CartItemService {
         this.entityMapperService = entityMapperService;
     }
 
+    @Transactional
     public Page<CartItemResponse> findAllItems(Long id, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return cartItemRepository.findByCartId(id, pageable).map(entityMapperService::toCartItemResponse);
