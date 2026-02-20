@@ -44,6 +44,7 @@ public class ProductService {
         );
         p.addCategories(product.categoryIds().stream().map(categoryService::findById).toList());
         p.addImages(product.images().stream().map(entityMapperService::toProductImage).toList());
+
         if (!p.getImages().isEmpty()) {
             p.setMainImage(p.getImages().get(0));
         }
@@ -83,7 +84,8 @@ public class ProductService {
             p.addCategories(product.categoryIds().stream().map(categoryService::findById).toList());
         }
 
-        return entityMapperService.toUpdateProductResponse(productRepository.save(p));
+        productRepository.saveAndFlush(p);
+        return entityMapperService.toUpdateProductResponse(p);
     }
 
     @PreAuthorize("hasRole('ADMIN')")

@@ -1,12 +1,12 @@
 package com.arthuurdp.e_commerce.services;
 
 import com.arthuurdp.e_commerce.entities.*;
-import com.arthuurdp.e_commerce.entities.dtos.cart_item.CartItemResponse;
+import com.arthuurdp.e_commerce.entities.dtos.cart.CartItemResponse;
 import com.arthuurdp.e_commerce.entities.dtos.auth.RegisterResponse;
+import com.arthuurdp.e_commerce.entities.dtos.cart.CartResponse;
 import com.arthuurdp.e_commerce.entities.dtos.category.CategoryResponse;
 import com.arthuurdp.e_commerce.entities.dtos.product.*;
 import com.arthuurdp.e_commerce.entities.dtos.user.UserResponse;
-import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -88,9 +88,19 @@ public class EntityMapperService {
         );
     }
 
+    public CartResponse toCartResponse(ShoppingCart cart) {
+        return new CartResponse(
+                cart.getId(),
+                cart.quantity(),
+                cart.getItems().stream().map(this::toCartItemResponse).toList(),
+                cart.total()
+        );
+    }
+
     public CartItemResponse toCartItemResponse(CartItem cartItem) {
         return  new CartItemResponse(
-                cartItem.getId(),
+                cartItem.getProduct().getId(),
+                cartItem.getProduct().getMainImageUrl(),
                 cartItem.getProduct().getName(),
                 cartItem.getProduct().getPrice(),
                 cartItem.getQuantity(),
