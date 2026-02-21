@@ -6,11 +6,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,8 +33,11 @@ public class User implements UserDetails {
     private Role role;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "cart_id", referencedColumnName = "id")
+    @JoinColumn(name = "cart_id", nullable = false)
     private ShoppingCart cart;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<Address> addresses = new HashSet<>();
 
     public User() {
     }
@@ -99,6 +101,32 @@ public class User implements UserDetails {
 
     public void setCart(ShoppingCart cart) {
         this.cart = cart;
+    }
+
+    public Set<Address> getAddresses() {
+        return addresses;
+    }
+
+    public void addAddress(Address address) {
+        address.setUser(this);
+        addresses.add(address);
+    }
+
+    public void removeAddress(Address address) {
+        address.setUser(null);
+        addresses.remove(address);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 
     @Override
