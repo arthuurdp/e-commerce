@@ -30,16 +30,12 @@ public class CategoryService {
     }
 
     public CategoryResponse findByIdResponse(Long id) {
-        Category category = categoryRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
         return entityMapperService.toCategoryResponse(findById(id));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     public CategoryResponse create(CategoryRequest category) {
-        Category c = new Category(
-                category.name()
-        );
-        return entityMapperService.toCategoryResponse(categoryRepository.save(c));
+        return entityMapperService.toCategoryResponse(categoryRepository.save(new Category(category.name())));
     }
 
     @Transactional

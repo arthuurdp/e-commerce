@@ -1,6 +1,7 @@
 package com.arthuurdp.e_commerce.services;
 
 import com.arthuurdp.e_commerce.entities.*;
+import com.arthuurdp.e_commerce.entities.dtos.address.AddressResponse;
 import com.arthuurdp.e_commerce.entities.dtos.cart.CartItemResponse;
 import com.arthuurdp.e_commerce.entities.dtos.auth.RegisterResponse;
 import com.arthuurdp.e_commerce.entities.dtos.cart.CartResponse;
@@ -113,6 +114,19 @@ public class EntityMapperService {
                 user.getId(),
                 user.getFirstName(),
                 user.getLastName(),
-                user.getEmail());
+                user.getEmail()
+        );
+    }
+
+    public AddressResponse toAddressResponse(Address address) {
+        return new AddressResponse(
+                address.getId(),
+                address.getStreet(),
+                address.getNumber(),
+                address.getNeighborhood(),
+                address.getCity().getId(),
+                address.getCity().getName(),
+                address.getCity().getState()
+        );
     }
 }

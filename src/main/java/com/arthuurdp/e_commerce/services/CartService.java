@@ -33,8 +33,7 @@ public class CartService {
 
     @Transactional
     public CartResponse findById(Long cartId) {
-        ShoppingCart cart = cartRepository.findById(cartId).orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
-        return entityMapperService.toCartResponse(cart);
+        return entityMapperService.toCartResponse(cartRepository.findById(cartId).orElseThrow(() -> new ResourceNotFoundException("Cart not found")));
     }
 
     @Transactional
