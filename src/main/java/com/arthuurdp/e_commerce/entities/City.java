@@ -1,6 +1,5 @@
 package com.arthuurdp.e_commerce.entities;
 
-import com.arthuurdp.e_commerce.entities.enums.StateUF;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
@@ -18,9 +17,9 @@ public class City {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "state", nullable = false, length = 2)
-    private StateUF state;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "state_id", nullable = false)
+    private State state;
 
     @OneToMany(mappedBy = "city", fetch = FetchType.LAZY)
     private Set<Address> addresses = new HashSet<>();
@@ -28,7 +27,7 @@ public class City {
     public City() {
     }
 
-    public City(String name, StateUF state) {
+    public City(String name, State state) {
         this.name = name;
         this.state = state;
     }
@@ -49,11 +48,11 @@ public class City {
         this.name = name;
     }
 
-    public StateUF getState() {
+    public State getState() {
         return state;
     }
 
-    public void setState(StateUF state) {
+    public void setState(State state) {
         this.state = state;
     }
 

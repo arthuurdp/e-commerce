@@ -2,6 +2,8 @@ package com.arthuurdp.e_commerce.services;
 
 import com.arthuurdp.e_commerce.entities.*;
 import com.arthuurdp.e_commerce.entities.dtos.address.AddressResponse;
+import com.arthuurdp.e_commerce.entities.dtos.address.CityResponse;
+import com.arthuurdp.e_commerce.entities.dtos.address.StateResponse;
 import com.arthuurdp.e_commerce.entities.dtos.cart.CartItemResponse;
 import com.arthuurdp.e_commerce.entities.dtos.auth.RegisterResponse;
 import com.arthuurdp.e_commerce.entities.dtos.cart.CartResponse;
@@ -54,7 +56,6 @@ public class EntityMapperService {
                 product.getName(),
                 product.getDescription(),
                 product.getPrice(),
-                product.getStock(),
                 product.getImages().stream().map(this::toProductImageResponse).toList()
         );
     }
@@ -118,15 +119,38 @@ public class EntityMapperService {
         );
     }
 
+    public StateResponse toStateResponse(State state) {
+        return new StateResponse(
+                state.getId(),
+                state.getName(),
+                state.getUf()
+        );
+    }
+
+    public CityResponse toCityResponse(City city) {
+        return new CityResponse(
+                city.getId(),
+                city.getName()
+        );
+    }
+
     public AddressResponse toAddressResponse(Address address) {
         return new AddressResponse(
                 address.getId(),
+                address.getName(),
                 address.getStreet(),
                 address.getNumber(),
+                address.getComplement(),
                 address.getNeighborhood(),
-                address.getCity().getId(),
-                address.getCity().getName(),
-                address.getCity().getState()
+                new CityResponse(
+                        address.getCity().getId(),
+                        address.getCity().getName()
+                ),
+                new StateResponse(
+                        address.getCity().getState().getId(),
+                        address.getCity().getState().getName(),
+                        address.getCity().getState().getUf()
+                )
         );
     }
 }
