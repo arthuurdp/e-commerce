@@ -10,6 +10,7 @@ import com.arthuurdp.e_commerce.exceptions.BadRequestException;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.AddressRepository;
 import com.arthuurdp.e_commerce.repositories.CityRepository;
+import com.arthuurdp.e_commerce.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,12 +22,14 @@ import org.springframework.stereotype.Service;
 public class AddressService {
     private final AddressRepository addressRepository;
     private final CityRepository cityRepository;
+    private final UserRepository userRepository;
     private final EntityMapperService entityMapperService;
     private final AuthService authService;
 
-    public AddressService(AddressRepository addressRepository, CityRepository cityRepository, EntityMapperService entityMapperService, AuthService authService) {
+    public AddressService(AddressRepository addressRepository, CityRepository cityRepository, UserRepository userRepository, EntityMapperService entityMapperService, AuthService authService) {
         this.addressRepository = addressRepository;
         this.cityRepository = cityRepository;
+        this.userRepository = userRepository;
         this.entityMapperService = entityMapperService;
         this.authService = authService;
     }
@@ -50,14 +53,15 @@ public class AddressService {
         User user = authService.getCurrentUser();
         City city = cityRepository.findById(req.cityId()).orElseThrow(() -> new ResourceNotFoundException("City not found"));
 
-        Address address = new Address(
-                req.street(),
-                req.number(),
-                req.neighborhood()
-        );
-
+        Address address = new Address();
+        address.setName((req.name() != null) ? req.name() : "Default");
+        address.setStreet(req.street());
+        address.setNumber(req.number());
+        address.setComplement(req.complement());
+        address.setNeighborhood(req.neighborhood());
         address.setCity(city);
-        user.addAddress(address);
+        address.setUser(user);
+
         return entityMapperService.toAddressResponse(addressRepository.save(address));
     }
 
@@ -68,6 +72,10 @@ public class AddressService {
         Address address = addressRepository.findByIdAndUserId(id, user.getId()).orElseThrow(() -> new ResourceNotFoundException("Address not found"));
         boolean updated = false;
 
+        if (req.name() != null) {
+            address.setName(req.name());
+            updated = true;
+        }
         if (req.street() != null) {
             address.setStreet(req.street());
             updated = true;
@@ -76,11 +84,14 @@ public class AddressService {
             address.setNumber(req.number());
             updated = true;
         }
+        if (req.complement() != null) {
+            address.setComplement(req.complement());
+            updated = true;
+        }
         if (req.neighborhood() != null) {
             address.setNeighborhood(req.neighborhood());
             updated = true;
         }
-
         if (!updated) {
             throw new BadRequestException("No valid fields provided");
         }

@@ -2,6 +2,7 @@ package com.arthuurdp.e_commerce.entities;
 
 import com.arthuurdp.e_commerce.entities.enums.Role;
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -35,6 +36,9 @@ public class User implements UserDetails {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "cart_id", nullable = false)
     private ShoppingCart cart;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private Set<Order> orders = new HashSet<>();
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Address> addresses = new HashSet<>();
@@ -107,14 +111,8 @@ public class User implements UserDetails {
         return addresses;
     }
 
-    public void addAddress(Address address) {
-        address.setUser(this);
-        addresses.add(address);
-    }
-
-    public void removeAddress(Address address) {
-        address.setUser(null);
-        addresses.remove(address);
+    public Set<Order> getOrders() {
+        return orders;
     }
 
     @Override

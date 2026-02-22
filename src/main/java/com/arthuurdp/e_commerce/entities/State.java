@@ -2,7 +2,6 @@ package com.arthuurdp.e_commerce.entities;
 
 import jakarta.persistence.*;
 
-import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -13,16 +12,20 @@ public class State {
     @Column(name = "id")
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "uf", nullable = false, length = 2)
+    private String uf;
+
     @OneToMany(mappedBy = "state", fetch = FetchType.LAZY)
-    private Set<City> cities = new HashSet<>();
+    private Set<City> cities;
 
     public State() {}
 
-    public State(String name) {
+    public State(String name, String uf) {
         this.name = name;
+        this.uf = uf;
     }
 
     public Long getId() {
@@ -39,6 +42,14 @@ public class State {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getUf() {
+        return uf;
+    }
+
+    public void setUf(String uf) {
+        this.uf = uf;
     }
 
     public Set<City> getCities() {

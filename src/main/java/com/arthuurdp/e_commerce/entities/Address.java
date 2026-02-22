@@ -10,11 +10,17 @@ public class Address {
     @Column(name = "id")
     private Long id;
 
+    @Column(name = "name")
+    private String name;
+
     @Column(name = "street", nullable = false)
     private String street;
 
     @Column(name = "number", nullable = false)
     private Integer number;
+
+    @Column(name = "complement", nullable = false)
+    private String complement;
 
     @Column(name = "neighborhood", nullable = false)
     private String neighborhood;
@@ -30,9 +36,11 @@ public class Address {
     public Address() {
     }
 
-    public Address(String street, Integer number, String neighborhood) {
+    public Address(String name, String street, Integer number, String complement, String neighborhood) {
+        this.name = name;
         this.street = street;
         this.number = number;
+        this.complement = complement;
         this.neighborhood = neighborhood;
     }
 
@@ -42,6 +50,14 @@ public class Address {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getStreet() {
@@ -58,6 +74,14 @@ public class Address {
 
     public void setNumber(Integer number) {
         this.number = number;
+    }
+
+    public String getComplement() {
+        return complement;
+    }
+
+    public void setComplement(String complement) {
+        this.complement = complement;
     }
 
     public String getNeighborhood() {

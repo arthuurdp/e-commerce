@@ -34,22 +34,26 @@ public class Product {
     @Column(name = "last_updated_at")
     private Instant lastUpdatedAt;
 
-    @OneToMany(
-            mappedBy = "product",
-            fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImage> images = new ArrayList<>();
+
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    private Set<OrderItem> orderItems = new HashSet<>();
 
     @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "product_category",
-            joinColumns = @JoinColumn(name = "product_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id")
-    )
+    @JoinTable(name = "product_category", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
     private Set<Category> categories = new HashSet<>();
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = Instant.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.lastUpdatedAt = Instant.now();
+    }
 
     public Product() {}
 
@@ -112,6 +116,10 @@ public class Product {
         return categories;
     }
 
+    public Set<OrderItem> getOrderItems() {
+        return orderItems;
+    }
+
     public String getMainImageUrl() {
         return images.stream().filter(ProductImage::isMainImage).map(ProductImage::getUrl).findFirst().orElse(null);
     }
@@ -168,16 +176,6 @@ public class Product {
     public void removeAllCategories() {
         categories.forEach(c -> c.getProducts().remove(this));
         categories.clear();
-    }
-
-    @PrePersist
-    public void prePersist() {
-        this.createdAt = Instant.now();
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        this.lastUpdatedAt = Instant.now();
     }
 
     @Override
