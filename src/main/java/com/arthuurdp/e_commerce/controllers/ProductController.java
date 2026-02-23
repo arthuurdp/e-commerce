@@ -60,10 +60,10 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{id}/main-image")
+    @PatchMapping("/{productId}/main-image")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> setMainImage(@PathVariable Long id, @RequestBody SetMainImageRequest req) {
-        service.setMainImage(id, req);
+    public ResponseEntity<Void> setMainImage(@PathVariable Long productId, @RequestBody SetMainImageRequest req) {
+        service.setMainImage(productId, req);
         return ResponseEntity.noContent().build();
     }
 }

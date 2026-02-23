@@ -1,4 +1,4 @@
 package com.arthuurdp.e_commerce.entities.dtos.product;
 
-public record SetMainImageRequest(String url) {
+public record SetMainImageRequest(Long id) {
 }

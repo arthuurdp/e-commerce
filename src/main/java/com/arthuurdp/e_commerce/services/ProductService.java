@@ -119,7 +119,7 @@ public class ProductService {
     public void setMainImage(Long productId, SetMainImageRequest req) {
         Product p = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         ProductImage image = p.getImages().stream()
-                .filter(img -> img.getUrl().equals(req.url()))
+                .filter(img -> img.getId().equals(req.id()))
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("Image not found for this product"));
 
@@ -127,4 +127,3 @@ public class ProductService {
         productRepository.save(p);
     }
 }
-
