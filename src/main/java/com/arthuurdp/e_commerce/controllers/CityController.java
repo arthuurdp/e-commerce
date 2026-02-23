@@ -1,6 +1,5 @@
 package com.arthuurdp.e_commerce.controllers;
 
-import com.arthuurdp.e_commerce.entities.State;
 import com.arthuurdp.e_commerce.entities.dtos.address.CityResponse;
 import com.arthuurdp.e_commerce.services.CityService;
 import org.springframework.data.domain.Page;

@@ -32,7 +32,7 @@ public class CartService {
     }
 
     @Transactional
-    public CartResponse findById() {
+    public CartResponse display() {
         User user = authService.getCurrentUser();
         Cart cart = cartRepository.findById(user.getCart().getId()).orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
         return entityMapperService.toCartResponse(cart);
@@ -59,7 +59,7 @@ public class CartService {
     }
 
     @Transactional
-    public void removeAllItems() {
+    public void clear() {
         User user = authService.getCurrentUser();
         Cart cart = cartRepository.findById(user.getCart().getId()).orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
         cart.clear();

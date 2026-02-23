@@ -1,7 +1,9 @@
 package com.arthuurdp.e_commerce.services;
 
+import com.arthuurdp.e_commerce.entities.dtos.address.AddressResponse;
 import com.arthuurdp.e_commerce.entities.dtos.address.CityResponse;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
+import com.arthuurdp.e_commerce.repositories.AddressRepository;
 import com.arthuurdp.e_commerce.repositories.CityRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,20 +12,22 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CityService {
-    private CityRepository repo;
+    private CityRepository cityRepo;
+    private AddressRepository addressRepo;
     private EntityMapperService entityMapperService;
 
-    public CityService(CityRepository repo, EntityMapperService entityMapperService) {
-        this.repo = repo;
+    public CityService(CityRepository cityRepo, AddressRepository addressRepo, EntityMapperService entityMapperService) {
+        this.cityRepo = cityRepo;
+        this.addressRepo = addressRepo;
         this.entityMapperService = entityMapperService;
     }
 
     public Page<CityResponse> searchCities(Long stateId, String query, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return repo.findByStateIdAndNameContainingIgnoreCase(pageable, stateId, query).map(entityMapperService::toCityResponse);
+        return cityRepo.findByStateIdAndNameContainingIgnoreCase(pageable, stateId, query).map(entityMapperService::toCityResponse);
     }
 
     public CityResponse findById(Long id) {
-        return repo.findById(id).map(entityMapperService::toCityResponse).orElseThrow(() -> new ResourceNotFoundException("City not found"));
+        return cityRepo.findById(id).map(entityMapperService::toCityResponse).orElseThrow(() -> new ResourceNotFoundException("City not found"));
     }
 }

@@ -9,34 +9,34 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/cart")
-@PreAuthorize("isAuthenticated()")
+@PreAuthorize("hasRole('USER')")
 public class CartController {
-    private final CartService cartService;
+    private final CartService service;
 
-    public CartController(CartService cartService) {
-        this.cartService = cartService;
+    public CartController(CartService service) {
+        this.service = service;
     }
 
     @GetMapping
-    public ResponseEntity<CartResponse> displayCart() {
-        return ResponseEntity.ok().body(cartService.findById());
+    public ResponseEntity<CartResponse> display() {
+        return ResponseEntity.ok().body(service.display());
     }
 
     @PatchMapping("/{productId}/increment")
     public ResponseEntity<CartItemResponse> addProduct(@PathVariable Long productId) {
-        return ResponseEntity.ok().body(cartService.addProduct(productId));
+        return ResponseEntity.ok().body(service.addProduct(productId));
     }
 
     @PatchMapping("/{productId}/decrement")
     public ResponseEntity<CartItemResponse> removeProduct(@PathVariable Long productId) {
-        return cartService.removeProduct( productId)
+        return service.removeProduct(productId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> removeAllItems() {
-        cartService.removeAllItems();
+    public ResponseEntity<Void> clear() {
+        service.clear();
         return ResponseEntity.noContent().build();
     }
 }
