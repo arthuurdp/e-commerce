@@ -34,7 +34,7 @@ public class User implements UserDetails {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "cart_id", nullable = false)
-    private ShoppingCart cart;
+    private Cart cart;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<Order> orders = new HashSet<>();
@@ -51,7 +51,7 @@ public class User implements UserDetails {
         this.email = email;
         this.password = password;
         this.role = role;
-        this.cart = new ShoppingCart();
+        this.cart = new Cart();
     }
 
     public Long getId() {
@@ -98,11 +98,11 @@ public class User implements UserDetails {
         this.role = role;
     }
 
-    public ShoppingCart getCart() {
+    public Cart getCart() {
         return cart;
     }
 
-    public void setCart(ShoppingCart cart) {
+    public void setCart(Cart cart) {
         this.cart = cart;
     }
 

@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Entity
 @Table(name = "cart")
-public class ShoppingCart {
+public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -28,7 +28,7 @@ public class ShoppingCart {
             orphanRemoval = true)
     private List<CartItem> items;
 
-    public ShoppingCart() {
+    public Cart() {
     }
 
     public Long getId() {

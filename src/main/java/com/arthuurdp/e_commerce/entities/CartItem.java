@@ -1,5 +1,6 @@
 package com.arthuurdp.e_commerce.entities;
 
+import com.arthuurdp.e_commerce.exceptions.BadRequestException;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -14,7 +15,7 @@ public class CartItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id")
-    private ShoppingCart cart;
+    private Cart cart;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
@@ -26,7 +27,7 @@ public class CartItem {
     public CartItem() {
     }
 
-    public CartItem(ShoppingCart cart, Product product, Integer quantity) {
+    public CartItem(Cart cart, Product product, Integer quantity) {
         this.cart = cart;
         this.product = product;
         this.quantity = quantity;
@@ -40,11 +41,11 @@ public class CartItem {
         this.id = id;
     }
 
-    public ShoppingCart getCart() {
+    public Cart getCart() {
         return cart;
     }
 
-    public void setCart(ShoppingCart cart) {
+    public void setCart(Cart cart) {
         this.cart = cart;
     }
 
@@ -66,14 +67,14 @@ public class CartItem {
 
     public void incrementQuantity() {
         if (quantity <= 0) {
-            throw new IllegalStateException("Quantity cannot be negative");
+            throw new BadRequestException("Quantity cannot be negative");
         }
         this.quantity++;
     }
 
     public void decrementQuantity() {
         if (quantity <= 0) {
-            throw new IllegalStateException("Quantity cannot be negative");
+            throw new BadRequestException("Quantity cannot be negative");
         }
         quantity--;
     }

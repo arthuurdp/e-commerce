@@ -2,7 +2,7 @@ package com.arthuurdp.e_commerce.services;
 
 import com.arthuurdp.e_commerce.entities.CartItem;
 import com.arthuurdp.e_commerce.entities.Product;
-import com.arthuurdp.e_commerce.entities.ShoppingCart;
+import com.arthuurdp.e_commerce.entities.Cart;
 import com.arthuurdp.e_commerce.entities.User;
 import com.arthuurdp.e_commerce.entities.dtos.cart.CartItemResponse;
 import com.arthuurdp.e_commerce.entities.dtos.cart.CartResponse;
@@ -34,15 +34,17 @@ public class CartService {
     @Transactional
     public CartResponse findById() {
         User user = authService.getCurrentUser();
-        return entityMapperService.toCartResponse(cartRepository.findById(user.getCart().getId()).orElseThrow(() -> new ResourceNotFoundException("Cart not found")));
+        Cart cart = cartRepository.findById(user.getCart().getId()).orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
+        return entityMapperService.toCartResponse(cart);
     }
 
     @Transactional
     public CartItemResponse addProduct(Long productId) {
         User user = authService.getCurrentUser();
-        ShoppingCart cart = cartRepository.findById(user.getCart().getId()).orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
+        Cart cart = cartRepository.findById(user.getCart().getId()).orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
         Product product = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         CartItem item = cart.addProduct(product);
+
         cartItemRepository.save(item);
 
         return entityMapperService.toCartItemResponse(item);
@@ -51,7 +53,7 @@ public class CartService {
     @Transactional
     public Optional<CartItemResponse> removeProduct(Long productId) {
         User user = authService.getCurrentUser();
-        ShoppingCart cart = cartRepository.findById(user.getCart().getId()).orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
+        Cart cart = cartRepository.findById(user.getCart().getId()).orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
         Product product = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         return cart.removeProduct(product).map(entityMapperService::toCartItemResponse);
     }
@@ -59,7 +61,7 @@ public class CartService {
     @Transactional
     public void removeAllItems() {
         User user = authService.getCurrentUser();
-        ShoppingCart cart = cartRepository.findById(user.getCart().getId()).orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
+        Cart cart = cartRepository.findById(user.getCart().getId()).orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
         cart.clear();
     }
 }

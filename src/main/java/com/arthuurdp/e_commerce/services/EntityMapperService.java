@@ -90,7 +90,7 @@ public class EntityMapperService {
         );
     }
 
-    public CartResponse toCartResponse(ShoppingCart cart) {
+    public CartResponse toCartResponse(Cart cart) {
         return new CartResponse(
                 cart.getId(),
                 cart.quantity(),
