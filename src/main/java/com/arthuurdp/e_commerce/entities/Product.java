@@ -2,7 +2,6 @@ package com.arthuurdp.e_commerce.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.transaction.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -126,10 +125,6 @@ public class Product {
 
     public void setMainImage(ProductImage img) {
         if (img == null) return;
-
-        if (!images.contains(img)) {
-            throw new IllegalArgumentException("Image does not belong to this product");
-        }
 
         images.forEach(i -> i.setMainImage(false));
         img.setMainImage(true);

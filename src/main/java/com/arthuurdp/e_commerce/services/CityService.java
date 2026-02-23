@@ -1,6 +1,5 @@
 package com.arthuurdp.e_commerce.services;
 
-import com.arthuurdp.e_commerce.entities.State;
 import com.arthuurdp.e_commerce.entities.dtos.address.CityResponse;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.CityRepository;

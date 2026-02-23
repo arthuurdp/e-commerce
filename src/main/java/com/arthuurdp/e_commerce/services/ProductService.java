@@ -1,6 +1,7 @@
 package com.arthuurdp.e_commerce.services;
 
 import com.arthuurdp.e_commerce.entities.Product;
+import com.arthuurdp.e_commerce.entities.ProductImage;
 import com.arthuurdp.e_commerce.entities.dtos.product.*;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.ProductRepository;
@@ -29,7 +30,7 @@ public class ProductService {
 
     @Transactional
     public ProductDetails findById(Long id) {
-        Product p = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        Product p = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         return entityMapperService.toProductDetails(p);
     }
 
@@ -45,7 +46,12 @@ public class ProductService {
         p.addCategories(product.categoryIds().stream().map(categoryService::findById).toList());
         p.addImages(product.images().stream().map(entityMapperService::toProductImage).toList());
 
-        if (!p.getImages().isEmpty()) {
+        if (product.mainImageUrl() != null) {
+            p.getImages().stream()
+                    .filter(img -> img.getUrl().equals(product.mainImageUrl()))
+                    .findFirst()
+                    .ifPresent(p::setMainImage);
+        } else if (!p.getImages().isEmpty()) {
             p.setMainImage(p.getImages().get(0));
         }
 
@@ -74,9 +80,23 @@ public class ProductService {
             p.setStock(product.stock());
         }
 
-        if (product.images() != null) {
+        if (product.imageUrls() != null) {
             p.removeAllImages();
-            p.addImages(product.images().stream().map(entityMapperService::toProductImage).toList());
+            p.addImages(product.imageUrls().stream().map(entityMapperService::toProductImage).toList());
+
+            if (product.mainImageUrl() != null) {
+                p.getImages().stream()
+                        .filter(img -> img.getUrl().equals(product.mainImageUrl()))
+                        .findFirst()
+                        .ifPresent(p::setMainImage);
+            } else if (!p.getImages().isEmpty()) {
+                p.setMainImage(p.getImages().get(0));
+            }
+        } else if (product.mainImageUrl() != null) {
+            p.getImages().stream()
+                    .filter(img -> img.getUrl().equals(product.mainImageUrl()))
+                    .findFirst()
+                    .ifPresent(p::setMainImage);
         }
 
         if (product.categoryIds() != null) {
@@ -92,6 +112,19 @@ public class ProductService {
     public void delete(Long id) {
         Product product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         productRepository.delete(product);
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
+    public void setMainImage(Long productId, SetMainImageRequest req) {
+        Product p = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+        ProductImage image = p.getImages().stream()
+                .filter(img -> img.getUrl().equals(req.url()))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Image not found for this product"));
+
+        p.setMainImage(image);
+        productRepository.save(p);
     }
 }
 

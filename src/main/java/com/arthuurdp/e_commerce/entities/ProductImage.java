@@ -2,6 +2,8 @@ package com.arthuurdp.e_commerce.entities;
 
 import jakarta.persistence.*;
 
+import java.util.Objects;
+
 @Entity
 @Table(name = "product_images")
 public class ProductImage {
@@ -55,15 +57,14 @@ public class ProductImage {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ProductImage that = (ProductImage) o;
-        return java.util.Objects.equals(id, that.id) && java.util.Objects.equals(url, that.url);
+        return Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(id, url);
+        return Objects.hashCode(id);
     }
 }
 

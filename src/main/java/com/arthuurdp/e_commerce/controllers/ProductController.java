@@ -59,4 +59,11 @@ public class ProductController {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{id}/main-image")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> setMainImage(@PathVariable Long id, @RequestBody SetMainImageRequest req) {
+        service.setMainImage(id, req);
+        return ResponseEntity.noContent().build();
+    }
 }
