@@ -13,6 +13,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 
 @RestController
+@PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("/categories")
 public class CategoryController {
     private final CategoryService categoryService;

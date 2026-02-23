@@ -12,6 +12,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 
 @RestController
+@PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("/products")
 public class ProductController {
     private final ProductService service;
@@ -34,7 +35,6 @@ public class ProductController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CreateProductResponse> create(@RequestBody @Valid CreateProductRequest req) {
         CreateProductResponse response = service.register(req);
 
@@ -48,20 +48,17 @@ public class ProductController {
     }
 
     @PatchMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UpdateProductResponse> update(@PathVariable Long id, @RequestBody @Valid UpdateProductRequest req) {
         return ResponseEntity.ok().body(service.update(id, req));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{productId}/main-image")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> setMainImage(@PathVariable Long productId, @RequestBody SetMainImageRequest req) {
         service.setMainImage(productId, req);
         return ResponseEntity.noContent().build();

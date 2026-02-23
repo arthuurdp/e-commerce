@@ -34,13 +34,11 @@ public class AddressService {
         this.authService = authService;
     }
 
-    @PreAuthorize("hasRole('USER')")
     public AddressResponse findById(Long id) {
         User user = authService.getCurrentUser();
         return addressRepository.findByIdAndUserId(id, user.getId()).map(entityMapperService::toAddressResponse).orElseThrow(() -> new ResourceNotFoundException("Address not found"));
     }
 
-    @PreAuthorize("hasRole('USER')")
     public Page<AddressResponse> findAll(int page, int size) {
         User user = authService.getCurrentUser();
         Pageable pageable = PageRequest.of(page, size);
@@ -48,7 +46,6 @@ public class AddressService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('USER')")
     public AddressResponse create(CreateAddressRequest req) {
         User user = authService.getCurrentUser();
         City city = cityRepository.findById(req.cityId()).orElseThrow(() -> new ResourceNotFoundException("City not found"));
@@ -66,7 +63,6 @@ public class AddressService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('USER')")
     public AddressResponse update(Long id, UpdateAddressRequest req) {
         User user = authService.getCurrentUser();
         Address address = addressRepository.findByIdAndUserId(id, user.getId()).orElseThrow(() -> new ResourceNotFoundException("Address not found"));
@@ -99,7 +95,6 @@ public class AddressService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('USER')")
     public void delete(Long id) {
         User user = authService.getCurrentUser();
         Address address = addressRepository.findByIdAndUserId(id, user.getId()).orElseThrow(() -> new ResourceNotFoundException("Address not found"));

@@ -2,6 +2,7 @@ package com.arthuurdp.e_commerce.controllers;
 
 import com.arthuurdp.e_commerce.entities.dtos.user.UpdateUserRequest;
 import com.arthuurdp.e_commerce.entities.dtos.user.UserResponse;
+import com.arthuurdp.e_commerce.infrastructure.security.annotations.AdminOrSelf;
 import com.arthuurdp.e_commerce.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -25,19 +26,19 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
+    @AdminOrSelf
     public ResponseEntity<UserResponse> findById(@PathVariable Long id) {
         return ResponseEntity.ok().body(service.findById(id));
     }
 
     @PatchMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
+    @AdminOrSelf
     public ResponseEntity<UserResponse> update(@PathVariable Long id, @RequestBody @Valid UpdateUserRequest req) {
         return ResponseEntity.ok().body(service.update(id, req));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
+    @AdminOrSelf
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();

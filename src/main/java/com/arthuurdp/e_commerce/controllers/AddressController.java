@@ -6,12 +6,14 @@ import com.arthuurdp.e_commerce.entities.dtos.address.UpdateAddressRequest;
 import com.arthuurdp.e_commerce.services.AddressService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 
 @RestController
+@PreAuthorize("hasRole('USER')")
 @RequestMapping("/addresses")
 public class AddressController {
     private final AddressService service;

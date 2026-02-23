@@ -35,7 +35,6 @@ public class ProductService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN')")
     public CreateProductResponse register(CreateProductRequest product) {
         Product p = new Product(
                 product.name(),
@@ -60,7 +59,6 @@ public class ProductService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN')")
     public UpdateProductResponse update(Long id, UpdateProductRequest product) {
         Product p = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
@@ -108,14 +106,12 @@ public class ProductService {
         return entityMapperService.toUpdateProductResponse(p);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     public void delete(Long id) {
         Product product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         productRepository.delete(product);
     }
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN')")
     public void setMainImage(Long productId, SetMainImageRequest req) {
         Product p = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         ProductImage image = p.getImages().stream()
