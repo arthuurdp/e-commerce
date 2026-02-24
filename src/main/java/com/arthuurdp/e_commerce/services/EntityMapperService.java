@@ -115,7 +115,11 @@ public class EntityMapperService {
                 user.getId(),
                 user.getFirstName(),
                 user.getLastName(),
-                user.getEmail()
+                user.getEmail(),
+                user.getCpf(),
+                user.getPhone(),
+                user.getBirthDate(),
+                user.getGender()
         );
     }
 

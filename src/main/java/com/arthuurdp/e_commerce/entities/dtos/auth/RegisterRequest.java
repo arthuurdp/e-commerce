@@ -1,8 +1,11 @@
 package com.arthuurdp.e_commerce.entities.dtos.auth;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import com.arthuurdp.e_commerce.entities.enums.Gender;
+import com.arthuurdp.e_commerce.infrastructure.security.annotations.ValidCpf;
+import com.arthuurdp.e_commerce.infrastructure.security.annotations.ValidPhone;
+import jakarta.validation.constraints.*;
+
+import java.time.LocalDate;
 
 public record RegisterRequest(
         @NotBlank(message = "First name is required")
@@ -20,6 +23,21 @@ public record RegisterRequest(
 
         @NotBlank(message = "Password is required")
         @Size(min = 6, message = "Password must have at least 6 chars")
-        String password
+        String password,
+
+        @NotBlank(message = "CPF is required")
+        @ValidCpf(message = "Please enter a valid CPF")
+        String cpf,
+
+        @NotBlank(message = "Phone is required")
+        @ValidPhone(message = "Please enter a valid phone")
+        String phone,
+
+        @NotNull(message = "Birth date is required")
+        @Past(message = "Birth date must be in the past")
+        LocalDate birthDate,
+
+        @NotNull(message = "Gender is required")
+        Gender gender
 ) {}
 

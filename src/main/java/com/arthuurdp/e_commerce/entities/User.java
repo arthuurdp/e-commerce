@@ -1,11 +1,13 @@
 package com.arthuurdp.e_commerce.entities;
 
+import com.arthuurdp.e_commerce.entities.enums.Gender;
 import com.arthuurdp.e_commerce.entities.enums.Role;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Entity
@@ -28,6 +30,22 @@ public class User implements UserDetails {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @Column(name = "cpf", unique = true, length = 11)
+    private String cpf;
+
+    @Column(name = "phone", length = 11)
+    private String phone;
+
+    @Column(name = "birth_date")
+    private LocalDate birthDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "gender")
+    private Gender gender;
+
+    @Column(name = "email_verified", nullable = false)
+    private boolean emailVerified = false;
+
     @Column(name = "role", nullable = false)
     @Enumerated(value = EnumType.STRING)
     private Role role;
@@ -42,14 +60,21 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Address> addresses = new HashSet<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<EmailVerificationToken> tokens = new ArrayList<>();
+
     public User() {
     }
 
-    public User(String firstName, String lastName, String email, String password, Role role) {
+    public User(String firstName, String lastName, String email, String password, String cpf, String phone, LocalDate birthDate, Gender gender, Role role) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
+        this.cpf = cpf;
+        this.phone = phone;
+        this.birthDate = birthDate;
+        this.gender = gender;
         this.role = role;
         this.cart = new Cart();
     }
@@ -90,6 +115,46 @@ public class User implements UserDetails {
         this.password = password;
     }
 
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public LocalDate getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public boolean isEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(boolean emailVerified) {
+        this.emailVerified = emailVerified;
+    }
+
     public Role getRole() {
         return role;
     }
@@ -112,6 +177,10 @@ public class User implements UserDetails {
 
     public Set<Order> getOrders() {
         return orders;
+    }
+
+    public List<EmailVerificationToken> getTokens() {
+        return tokens;
     }
 
     @Override

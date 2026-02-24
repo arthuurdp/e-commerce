@@ -60,6 +60,10 @@ public class AuthService {
                 req.lastName(),
                 req.email(),
                 passwordEncoder.encode(req.password()),
+                req.cpf(),
+                req.phone(),
+                req.birthDate(),
+                req.gender(),
                 role
         );
 
