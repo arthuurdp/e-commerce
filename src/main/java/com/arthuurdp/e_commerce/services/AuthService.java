@@ -10,6 +10,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +37,7 @@ public class AuthService {
     }
 
     public LoginResponse login(LoginRequest dto) {
-        var tokenAuth = new UsernamePasswordAuthenticationToken(dto.email(), dto.password());
+        var tokenAuth = new UsernamePasswordAuthenticationToken(dto.credential(), dto.password());
         var auth = authManager.authenticate(tokenAuth);
         var token = tokenService.generateToken((User) auth.getPrincipal());
         return new LoginResponse(token);
