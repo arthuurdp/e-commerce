@@ -1,8 +1,8 @@
 package com.arthuurdp.e_commerce.controllers;
 
 import com.arthuurdp.e_commerce.entities.dtos.email.ChangeEmailRequest;
-import com.arthuurdp.e_commerce.entities.dtos.email.ConfirmEmailChangeRequest;
-import com.arthuurdp.e_commerce.entities.dtos.email.VerifyEmailRequest;
+import com.arthuurdp.e_commerce.entities.dtos.email.ChangePasswordRequest;
+import com.arthuurdp.e_commerce.entities.dtos.email.VerifyCodeRequest;
 import com.arthuurdp.e_commerce.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +24,7 @@ public class EmailController {
     }
 
     @PostMapping("/verify-email/confirm")
-    public ResponseEntity<Void> verifyEmail(@RequestBody @Valid VerifyEmailRequest req) {
+    public ResponseEntity<Void> verifyEmail(@RequestBody @Valid VerifyCodeRequest req) {
         userService.verifyEmail(req.code());
         return ResponseEntity.noContent().build();
     }
@@ -36,8 +36,20 @@ public class EmailController {
     }
 
     @PostMapping("/email/confirm")
-    public ResponseEntity<Void> confirmEmailChange(@RequestBody @Valid ConfirmEmailChangeRequest req) {
+    public ResponseEntity<Void> confirmEmailChange(@RequestBody @Valid VerifyCodeRequest req) {
         userService.confirmEmailChange(req.code());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/password/change")
+    public ResponseEntity<Void> requestPasswordChange(@RequestBody @Valid ChangePasswordRequest req) {
+        userService.requestPasswordChange(req.newPassword());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/password/confirm")
+    public ResponseEntity<Void> confirmPasswordChange(@RequestBody @Valid VerifyCodeRequest req) {
+        userService.confirmPasswordChange(req.code());
         return ResponseEntity.noContent().build();
     }
 

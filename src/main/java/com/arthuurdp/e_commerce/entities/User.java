@@ -46,6 +46,9 @@ public class User implements UserDetails {
     @Column(name = "email_verified", nullable = false)
     private boolean emailVerified = false;
 
+    @Column(name = "password_change_verified", nullable = false)
+    private boolean passwordChangeVerified = false;
+
     @Column(name = "role", nullable = false)
     @Enumerated(value = EnumType.STRING)
     private Role role;
@@ -61,7 +64,10 @@ public class User implements UserDetails {
     private Set<Address> addresses = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<EmailVerificationToken> tokens = new ArrayList<>();
+    private List<EmailVerificationToken> emailTokens = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PasswordVerificationToken> passwordTokens = new ArrayList<>();
 
     public User() {
     }
@@ -155,6 +161,14 @@ public class User implements UserDetails {
         this.emailVerified = emailVerified;
     }
 
+    public boolean isPasswordChangeVerified() {
+        return passwordChangeVerified;
+    }
+
+    public void setPasswordChangeVerified(boolean passwordChangeVerified) {
+        this.passwordChangeVerified = passwordChangeVerified;
+    }
+
     public Role getRole() {
         return role;
     }
@@ -179,8 +193,12 @@ public class User implements UserDetails {
         return orders;
     }
 
-    public List<EmailVerificationToken> getTokens() {
-        return tokens;
+    public List<EmailVerificationToken> getEmailTokens() {
+        return emailTokens;
+    }
+
+    public List<PasswordVerificationToken> getPasswordTokens() {
+        return passwordTokens;
     }
 
     @Override
