@@ -11,6 +11,8 @@ import com.arthuurdp.e_commerce.entities.dtos.cart.CartResponse;
 import com.arthuurdp.e_commerce.entities.dtos.category.CategoryResponse;
 import com.arthuurdp.e_commerce.entities.dtos.product.*;
 import com.arthuurdp.e_commerce.entities.dtos.user.UserResponse;
+import com.arthuurdp.e_commerce.entities.enums.PaymentMethod;
+import com.arthuurdp.e_commerce.entities.enums.PaymentStatus;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -157,5 +159,22 @@ public class EntityMapperService {
                         address.getCity().getState().getUf()
                 )
         );
+    }
+
+    public String toMercadoPagoPaymentMethodId(PaymentMethod method) {
+        return switch (method) {
+            case CREDIT_CARD -> "visa";
+            case PIX -> "pix";
+            case BOLETO -> "bolbradesco";
+        };
+    }
+
+    public PaymentStatus fromMercadoPagoStatus(String status) {
+        return switch (status) {
+            case "approved" -> PaymentStatus.APPROVED;
+            case "rejected" -> PaymentStatus.REJECTED;
+            case "refunded" -> PaymentStatus.REFUNDED;
+            default -> PaymentStatus.PENDING;
+        };
     }
 }
