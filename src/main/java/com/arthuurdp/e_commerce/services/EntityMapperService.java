@@ -1,6 +1,7 @@
 package com.arthuurdp.e_commerce.services;
 
 import com.arthuurdp.e_commerce.entities.*;
+import com.arthuurdp.e_commerce.entities.dtos.PaymentResponse;
 import com.arthuurdp.e_commerce.entities.dtos.address.AddressResponse;
 import com.arthuurdp.e_commerce.entities.dtos.address.CityResponse;
 import com.arthuurdp.e_commerce.entities.dtos.address.StateResponse;

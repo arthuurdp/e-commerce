@@ -53,7 +53,7 @@ public class User implements UserDetails {
     @Enumerated(value = EnumType.STRING)
     private Role role;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id", nullable = false)
     private Cart cart;
 
@@ -69,6 +69,10 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PasswordVerificationToken> passwordTokens = new ArrayList<>();
 
+    @PrePersist void prePersist() {
+        this.cart = new Cart();
+    }
+
     public User() {
     }
 
@@ -82,7 +86,6 @@ public class User implements UserDetails {
         this.birthDate = birthDate;
         this.gender = gender;
         this.role = role;
-        this.cart = new Cart();
     }
 
     public Long getId() {

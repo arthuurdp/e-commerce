@@ -32,14 +32,19 @@ public class Order {
     @Column(name = "total", nullable = false)
     private BigDecimal total;
 
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "payment_id")
+    private Payment payment;
+
     @OneToMany(mappedBy = "order", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<OrderItem> items = new HashSet<>();
 
     private LocalDateTime createdAt;
 
     @PrePersist
-    public void initCreatedAt() {
+    public void prePersist() {
         this.createdAt = LocalDateTime.now();
+        this.payment = new Payment();
     }
 
     public Order() {
@@ -83,6 +88,18 @@ public class Order {
 
     public BigDecimal getTotal() {
         return total;
+    }
+
+    public void setTotal(BigDecimal total) {
+        this.total = total;
+    }
+
+    public Payment getPayment() {
+        return payment;
+    }
+
+    public void setPayment(Payment payment) {
+        this.payment = payment;
     }
 
     public Set<OrderItem> getItems() {

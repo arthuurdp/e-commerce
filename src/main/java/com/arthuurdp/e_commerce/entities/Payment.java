@@ -12,34 +12,38 @@ import java.time.LocalDateTime;
 public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", nullable = false, unique = true)
+    @OneToOne(mappedBy = "payment")
     private Order order;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "method", nullable = false)
     private PaymentMethod method;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     private PaymentStatus status;
 
-    @Column(nullable = false)
+    @Column(name = "amount", nullable = false)
     private BigDecimal amount;
 
+    @Column(name = "transaction_id")
     private String transactionId;
 
+    @Column(name = "paid_at")
     private LocalDateTime paidAt;
 
-    @Column(nullable = false)
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
-        this.status = PaymentStatus.PENDING;
+        if (this.status == null) {
+            this.status = PaymentStatus.PENDING;
+        }
     }
 
     public Payment() {
