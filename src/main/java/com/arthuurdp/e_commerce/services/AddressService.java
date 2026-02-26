@@ -10,12 +10,10 @@ import com.arthuurdp.e_commerce.exceptions.BadRequestException;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.AddressRepository;
 import com.arthuurdp.e_commerce.repositories.CityRepository;
-import com.arthuurdp.e_commerce.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 @Service
