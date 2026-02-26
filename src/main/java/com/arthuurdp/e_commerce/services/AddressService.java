@@ -22,14 +22,12 @@ import org.springframework.stereotype.Service;
 public class AddressService {
     private final AddressRepository addressRepository;
     private final CityRepository cityRepository;
-    private final UserRepository userRepository;
     private final EntityMapperService entityMapperService;
     private final AuthService authService;
 
-    public AddressService(AddressRepository addressRepository, CityRepository cityRepository, UserRepository userRepository, EntityMapperService entityMapperService, AuthService authService) {
+    public AddressService(AddressRepository addressRepository, CityRepository cityRepository, EntityMapperService entityMapperService, AuthService authService) {
         this.addressRepository = addressRepository;
         this.cityRepository = cityRepository;
-        this.userRepository = userRepository;
         this.entityMapperService = entityMapperService;
         this.authService = authService;
     }

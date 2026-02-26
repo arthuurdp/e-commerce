@@ -10,20 +10,20 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CityService {
-    private CityRepository repo;
+    private CityRepository cityRepository;
     private EntityMapperService entityMapperService;
 
-    public CityService(CityRepository repo, EntityMapperService entityMapperService) {
-        this.repo = repo;
+    public CityService(CityRepository cityRepository, EntityMapperService entityMapperService) {
+        this.cityRepository = cityRepository;
         this.entityMapperService = entityMapperService;
     }
 
     public Page<CityResponse> searchCities(Long stateId, String query, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return repo.findByStateIdAndNameContainingIgnoreCase(pageable, stateId, query).map(entityMapperService::toCityResponse);
+        return cityRepository.findByStateIdAndNameContainingIgnoreCase(pageable, stateId, query).map(entityMapperService::toCityResponse);
     }
 
     public CityResponse findById(Long id) {
-        return repo.findById(id).map(entityMapperService::toCityResponse).orElseThrow(() -> new ResourceNotFoundException("City not found"));
+        return cityRepository.findById(id).map(entityMapperService::toCityResponse).orElseThrow(() -> new ResourceNotFoundException("City not found"));
     }
 }

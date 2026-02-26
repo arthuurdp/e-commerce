@@ -10,7 +10,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,21 +17,21 @@ import org.springframework.stereotype.Service;
 public class AuthService {
     private final AuthenticationManager authManager;
     private final TokenService tokenService;
-    private final UserRepository repo;
-    private final EntityMapperService entityMapper;
+    private final UserRepository userRepository;
+    private final EntityMapperService entityMapperService;
     private final PasswordEncoder passwordEncoder;
 
     public AuthService(
             AuthenticationManager authManager,
             TokenService tokenService,
-            UserRepository repo,
-            EntityMapperService entityMapper,
+            UserRepository userRepository,
+            EntityMapperService entityMapperService,
             PasswordEncoder passwordEncoder
     ) {
         this.authManager = authManager;
         this.tokenService = tokenService;
-        this.repo = repo;
-        this.entityMapper = entityMapper;
+        this.userRepository = userRepository;
+        this.entityMapperService = entityMapperService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -52,7 +51,7 @@ public class AuthService {
     }
 
     private RegisterResponse createUser(RegisterRequest req, Role role) {
-        if (repo.existsByEmail(req.email())) {
+        if (userRepository.existsByEmail(req.email())) {
             throw new ConflictException("E-mail already in use");
         }
 
@@ -68,8 +67,8 @@ public class AuthService {
                 role
         );
 
-        repo.save(user);
-        return entityMapper.toRegisterResponse(user);
+        userRepository.save(user);
+        return entityMapperService.toRegisterResponse(user);
     }
 
     public User getCurrentUser() {

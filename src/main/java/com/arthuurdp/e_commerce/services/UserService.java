@@ -23,18 +23,18 @@ import java.util.Random;
 
 @Service
 public class UserService {
-    private final UserRepository userRepo;
-    private final EmailVerificationTokenRepository emailTokenRepo;
-    private final PasswordVerificationTokenRepository passwordTokenRepo;
+    private final UserRepository userRepository;
+    private final EmailVerificationTokenRepository emailVerificationTokenRepository;
+    private final PasswordVerificationTokenRepository passwordVerificationTokenRepository;
     private final EmailService emailService;
     private final EntityMapperService entityMapperService;
     private final PasswordEncoder passwordEncoder;
     private final AuthService authService;
 
-    public UserService(UserRepository userRepo, EmailVerificationTokenRepository emailTokenRepo, PasswordVerificationTokenRepository passwordTokenRepo, EmailService emailService, EntityMapperService entityMapperService, PasswordEncoder passwordEncoder, AuthService authService) {
-        this.userRepo = userRepo;
-        this.emailTokenRepo = emailTokenRepo;
-        this.passwordTokenRepo = passwordTokenRepo;
+    public UserService(UserRepository userRepository, EmailVerificationTokenRepository emailVerificationTokenRepository, PasswordVerificationTokenRepository passwordVerificationTokenRepository, EmailService emailService, EntityMapperService entityMapperService, PasswordEncoder passwordEncoder, AuthService authService) {
+        this.userRepository = userRepository;
+        this.emailVerificationTokenRepository = emailVerificationTokenRepository;
+        this.passwordVerificationTokenRepository = passwordVerificationTokenRepository;
         this.emailService = emailService;
         this.entityMapperService = entityMapperService;
         this.passwordEncoder = passwordEncoder;
@@ -42,18 +42,18 @@ public class UserService {
     }
 
     public UserResponse findById(Long id) {
-        User user = userRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         return entityMapperService.toUserResponse(user);
     }
 
     public Page<UserResponse> findAll(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return userRepo.findAll(pageable).map(entityMapperService::toUserResponse);
+        return userRepository.findAll(pageable).map(entityMapperService::toUserResponse);
     }
 
     @Transactional
     public UserResponse update(Long id, UpdateUserRequest req) {
-        User user = userRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         boolean updated = false;
 
         if (req.firstName() != null) {
@@ -71,7 +71,7 @@ public class UserService {
                 throw new BadRequestException("Email cannot be blank");
             }
             if (!req.email().equals(user.getEmail())) {
-                if (userRepo.existsByEmail(req.email())) {
+                if (userRepository.existsByEmail(req.email())) {
                     throw new ConflictException("Email already in use");
                 }
                 user.setEmail(req.email());
@@ -80,7 +80,7 @@ public class UserService {
         }
 
         if (req.cpf() != null) {
-            if (userRepo.existsByCpf(req.cpf()) && req.cpf().equals(user.getCpf())) {
+            if (userRepository.existsByCpf(req.cpf()) && req.cpf().equals(user.getCpf())) {
                 throw new ConflictException("CPF already in use");
             }
             user.setCpf(req.cpf());
@@ -106,12 +106,12 @@ public class UserService {
             throw new BadRequestException("No valid fields provided");
         }
 
-        return entityMapperService.toUserResponse(userRepo.save(user));
+        return entityMapperService.toUserResponse(userRepository.save(user));
     }
 
     public void delete(Long id) {
-        User user = userRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        userRepo.delete(user);
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        userRepository.delete(user);
     }
 
     @Transactional
@@ -125,18 +125,18 @@ public class UserService {
             throw new BadRequestException("Email already verified");
         }
 
-        emailTokenRepo.deleteByUserId(user.getId());
+        emailVerificationTokenRepository.deleteByUserId(user.getId());
 
         String code = String.format("%06d", new Random().nextInt(999999));
         EmailVerificationToken token = new EmailVerificationToken(code, user, user.getEmail());
-        emailTokenRepo.save(token);
+        emailVerificationTokenRepository.save(token);
 
         emailService.sendVerificationCode(user.getEmail(), code);
     }
 
     @Transactional
     public void verifyEmail(String code) {
-        EmailVerificationToken token = emailTokenRepo.findByCodeAndUsedFalse(code).orElseThrow(() -> new ResourceNotFoundException("Invalid or already used code"));
+        EmailVerificationToken token = emailVerificationTokenRepository.findByCodeAndUsedFalse(code).orElseThrow(() -> new ResourceNotFoundException("Invalid or already used code"));
 
         if (token.isExpired()) {
             throw new BadRequestException("Code has expired");
@@ -147,8 +147,8 @@ public class UserService {
         user.setEmailVerified(true);
         token.setUsed(true);
 
-        userRepo.save(user);
-        emailTokenRepo.save(token);
+        userRepository.save(user);
+        emailVerificationTokenRepository.save(token);
         emailService.sendWelcome(user.getEmail(), user.getFirstName());
     }
 
@@ -162,15 +162,15 @@ public class UserService {
         if (newEmail.equals(user.getEmail())) {
             throw new BadRequestException("New email is the same as current");
         }
-        if (userRepo.existsByEmail(newEmail)) {
+        if (userRepository.existsByEmail(newEmail)) {
             throw new ConflictException("Email already in use");
         }
 
-        emailTokenRepo.deleteByUserId(user.getId());
+        emailVerificationTokenRepository.deleteByUserId(user.getId());
 
         String code = String.format("%06d", new Random().nextInt(999999));
         EmailVerificationToken token = new EmailVerificationToken(code, user, newEmail);
-        emailTokenRepo.save(token);
+        emailVerificationTokenRepository.save(token);
 
         emailService.sendVerificationCode(newEmail, code);
     }
@@ -181,7 +181,7 @@ public class UserService {
         if (user == null) {
             throw new AccessDeniedException("User not authenticated");
         }
-        EmailVerificationToken token = emailTokenRepo.findByCodeAndUsedFalse(code).orElseThrow(() -> new ResourceNotFoundException("Invalid or already used code"));
+        EmailVerificationToken token = emailVerificationTokenRepository.findByCodeAndUsedFalse(code).orElseThrow(() -> new ResourceNotFoundException("Invalid or already used code"));
 
         if (!token.getUser().getId().equals(user.getId())) {
             throw new AccessDeniedException("Invalid code");
@@ -197,8 +197,8 @@ public class UserService {
         user.setEmailVerified(true);
         token.setUsed(true);
 
-        userRepo.save(user);
-        emailTokenRepo.save(token);
+        userRepository.save(user);
+        emailVerificationTokenRepository.save(token);
         emailService.sendEmailChanged(user.getEmail());
     }
 
@@ -216,12 +216,12 @@ public class UserService {
             throw new AccessDeniedException("Email not verified");
         }
 
-        passwordTokenRepo.deleteByUserId(user.getId());
+        passwordVerificationTokenRepository.deleteByUserId(user.getId());
 
         String code = String.format("%06d", new Random().nextInt(999999));
         PasswordVerificationToken token = new PasswordVerificationToken(code, user, newPassword);
 
-        passwordTokenRepo.save(token);
+        passwordVerificationTokenRepository.save(token);
 
         emailService.sendPasswordVerificationCode(user.getEmail(), code);
     }
@@ -232,7 +232,7 @@ public class UserService {
         if (user == null) {
             throw new AccessDeniedException("User not authenticated");
         }
-        PasswordVerificationToken token = passwordTokenRepo.findByCodeAndUsedFalse(code).orElseThrow(() -> new ResourceNotFoundException("Invalid or already used code"));
+        PasswordVerificationToken token = passwordVerificationTokenRepository.findByCodeAndUsedFalse(code).orElseThrow(() -> new ResourceNotFoundException("Invalid or already used code"));
 
         if (!token.getUser().getId().equals(user.getId())) {
             throw new AccessDeniedException("Invalid code");
@@ -245,8 +245,8 @@ public class UserService {
         user.setPasswordChangeVerified(true);
         token.setUsed(true);
 
-        userRepo.save(user);
-        passwordTokenRepo.save(token);
+        userRepository.save(user);
+        passwordVerificationTokenRepository.save(token);
         emailService.sendPasswordChanged(user.getEmail());
     }
 

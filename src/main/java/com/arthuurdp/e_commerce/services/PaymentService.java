@@ -12,17 +12,17 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class PaymentService {
-    private final EntityMapperService mapper;
+    private final EntityMapperService entityMapperService;
 
-    public PaymentService(EntityMapperService mapper) {
-        this.mapper = mapper;
+    public PaymentService(EntityMapperService entityMapperService) {
+        this.entityMapperService = entityMapperService;
     }
 
     public PaymentResponse createPayment(PaymentRequest req) throws MPException, MPApiException {
         PaymentCreateRequest request = PaymentCreateRequest.builder()
                 .transactionAmount(req.amount())
                 .description(req.description())
-                .paymentMethodId(mapper.toMercadoPagoPaymentMethodId(req.paymentMethod()))
+                .paymentMethodId(entityMapperService.toMercadoPagoPaymentMethodId(req.paymentMethod()))
                 .payer(PaymentPayerRequest.builder()
                         .email(req.payerEmail())
                         .build())
@@ -46,7 +46,7 @@ public class PaymentService {
 
         return new PaymentResponse(
                 payment.getId(),
-                mapper.fromMercadoPagoStatus(payment.getStatus()),
+                entityMapperService.fromMercadoPagoStatus(payment.getStatus()),
                 payment.getStatusDetail(),
                 qrCode,
                 qrCodeBase64,

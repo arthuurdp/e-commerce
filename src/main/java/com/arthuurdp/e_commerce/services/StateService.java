@@ -10,20 +10,20 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class StateService {
-    private final StateRepository repo;
+    private final StateRepository stateRepository;
     private final EntityMapperService entityMapperService;
 
-    public StateService(StateRepository repo, EntityMapperService entityMapperService) {
-        this.repo = repo;
+    public StateService(StateRepository stateRepository, EntityMapperService entityMapperService) {
+        this.stateRepository = stateRepository;
         this.entityMapperService = entityMapperService;
     }
 
     public StateResponse findById(Long id) {
-        return entityMapperService.toStateResponse(repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("State not found")));
+        return entityMapperService.toStateResponse(stateRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("State not found")));
     }
 
     public Page<StateResponse> findAll(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return repo.findAll(pageable).map(entityMapperService::toStateResponse);
+        return stateRepository.findAll(pageable).map(entityMapperService::toStateResponse);
     }
 }
