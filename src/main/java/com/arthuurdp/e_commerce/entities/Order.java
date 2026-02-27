@@ -44,7 +44,6 @@ public class Order {
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
-        this.payment = new Payment();
     }
 
     public Order() {

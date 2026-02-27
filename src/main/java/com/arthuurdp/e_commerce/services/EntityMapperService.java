@@ -1,6 +1,8 @@
 package com.arthuurdp.e_commerce.services;
 
 import com.arthuurdp.e_commerce.entities.*;
+import com.arthuurdp.e_commerce.entities.dtos.OrderItemResponse;
+import com.arthuurdp.e_commerce.entities.dtos.OrderResponse;
 import com.arthuurdp.e_commerce.entities.dtos.address.AddressResponse;
 import com.arthuurdp.e_commerce.entities.dtos.address.CityResponse;
 import com.arthuurdp.e_commerce.entities.dtos.address.StateResponse;
@@ -10,8 +12,8 @@ import com.arthuurdp.e_commerce.entities.dtos.cart.CartResponse;
 import com.arthuurdp.e_commerce.entities.dtos.category.CategoryResponse;
 import com.arthuurdp.e_commerce.entities.dtos.product.*;
 import com.arthuurdp.e_commerce.entities.dtos.user.UserResponse;
-import com.arthuurdp.e_commerce.entities.enums.PaymentMethod;
 import com.arthuurdp.e_commerce.entities.enums.PaymentStatus;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -160,20 +162,31 @@ public class EntityMapperService {
         );
     }
 
-    public String toMercadoPagoPaymentMethodId(PaymentMethod method) {
-        return switch (method) {
-            case CREDIT_CARD -> "visa";
-            case PIX -> "pix";
-            case BOLETO -> "bolbradesco";
+    public PaymentStatus fromMercadoPagoStatus(String mpStatus) {
+        return switch (mpStatus) {
+            case "approved" -> PaymentStatus.APPROVED;
+            case "rejected" -> PaymentStatus.REJECTED;
+            default -> PaymentStatus.PENDING;
         };
     }
 
-    public PaymentStatus fromMercadoPagoStatus(String status) {
-        return switch (status) {
-            case "approved" -> PaymentStatus.APPROVED;
-            case "rejected" -> PaymentStatus.REJECTED;
-            case "refunded" -> PaymentStatus.REFUNDED;
-            default -> PaymentStatus.PENDING;
-        };
+    public OrderResponse toOrderResponse(Order order) {
+        return new OrderResponse(
+                order.getId(),
+                order.getStatus(),
+                order.getTotal(),
+                order.getCreatedAt(),
+                order.getItems().stream().map(this::toOrderItemResponse).toList()
+        );
+        }
+
+    public OrderItemResponse toOrderItemResponse(OrderItem orderItem) {
+        return new OrderItemResponse(
+                orderItem.getProduct().getId(),
+                orderItem.getProduct().getName(),
+                orderItem.getQuantity(),
+                orderItem.getUnitPrice(),
+                orderItem.getSubtotal()
+        );
     }
 }
