@@ -2,7 +2,6 @@ package com.arthuurdp.e_commerce.controllers;
 
 import com.arthuurdp.e_commerce.entities.dtos.checkout.CheckoutRequest;
 import com.arthuurdp.e_commerce.entities.dtos.checkout.CheckoutResponse;
-import com.arthuurdp.e_commerce.services.CheckoutService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
