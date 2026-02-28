@@ -29,19 +29,26 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        return httpSecurity.csrf(csrf -> csrf.disable())
+        return httpSecurity
+                .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
+                        // Auth
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
                         .requestMatchers(HttpMethod.GET, "/auth/**").permitAll()
+                        // Produtos e categorias — leitura pública
                         .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()
+                        // Webhook — precisa ser público para o MP chamar
                         .requestMatchers(HttpMethod.POST, "/webhook/mercadopago").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/checkout/preference").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/orders").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/orders/**").authenticated()
-                        .anyRequest().authenticated())
+                        // Retorno do MP após pagamento — público pois MP redireciona o browser
+                        .requestMatchers(HttpMethod.GET, "/checkout/success").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/checkout/failure").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/checkout/pending").permitAll()
+                        // Todo o resto exige autenticação
+                        .anyRequest().authenticated()
+                )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
