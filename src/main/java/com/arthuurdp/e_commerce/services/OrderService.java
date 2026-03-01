@@ -1,18 +1,13 @@
 package com.arthuurdp.e_commerce.services;
 
 import com.arthuurdp.e_commerce.entities.*;
-import com.arthuurdp.e_commerce.entities.dtos.OrderItemResponse;
-import com.arthuurdp.e_commerce.entities.dtos.OrderResponse;
-import com.arthuurdp.e_commerce.entities.enums.OrderStatus;
+import com.arthuurdp.e_commerce.entities.dtos.order_item.OrderItemResponse;
+import com.arthuurdp.e_commerce.entities.dtos.order_item.OrderResponse;
 import com.arthuurdp.e_commerce.exceptions.AccessDeniedException;
-import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.*;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class OrderService {

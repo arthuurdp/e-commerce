@@ -1,8 +1,8 @@
 package com.arthuurdp.e_commerce.services;
 
 import com.arthuurdp.e_commerce.entities.*;
-import com.arthuurdp.e_commerce.entities.dtos.OrderItemResponse;
-import com.arthuurdp.e_commerce.entities.dtos.OrderResponse;
+import com.arthuurdp.e_commerce.entities.dtos.order_item.OrderItemResponse;
+import com.arthuurdp.e_commerce.entities.dtos.order_item.OrderResponse;
 import com.arthuurdp.e_commerce.entities.dtos.address.AddressResponse;
 import com.arthuurdp.e_commerce.entities.dtos.address.CityResponse;
 import com.arthuurdp.e_commerce.entities.dtos.address.StateResponse;
@@ -13,7 +13,6 @@ import com.arthuurdp.e_commerce.entities.dtos.category.CategoryResponse;
 import com.arthuurdp.e_commerce.entities.dtos.product.*;
 import com.arthuurdp.e_commerce.entities.dtos.user.UserResponse;
 import com.arthuurdp.e_commerce.entities.enums.PaymentStatus;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -160,14 +159,6 @@ public class EntityMapperService {
                         address.getCity().getState().getUf()
                 )
         );
-    }
-
-    public PaymentStatus fromMercadoPagoStatus(String mpStatus) {
-        return switch (mpStatus) {
-            case "approved" -> PaymentStatus.APPROVED;
-            case "rejected" -> PaymentStatus.REJECTED;
-            default -> PaymentStatus.PENDING;
-        };
     }
 
     public OrderResponse toOrderResponse(Order order) {

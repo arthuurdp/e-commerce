@@ -1,4 +1,4 @@
-package com.arthuurdp.e_commerce.entities.dtos;
+package com.arthuurdp.e_commerce.entities.dtos.order_item;
 
 import com.arthuurdp.e_commerce.entities.enums.OrderStatus;
 

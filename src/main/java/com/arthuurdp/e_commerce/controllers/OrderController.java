@@ -1,8 +1,7 @@
 package com.arthuurdp.e_commerce.controllers;
 
-import com.arthuurdp.e_commerce.entities.dtos.OrderResponse;
+import com.arthuurdp.e_commerce.entities.dtos.order_item.OrderResponse;
 import com.arthuurdp.e_commerce.services.OrderService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
