@@ -1,10 +1,12 @@
 package com.arthuurdp.e_commerce.services;
 
 import com.arthuurdp.e_commerce.entities.*;
-import com.arthuurdp.e_commerce.entities.dtos.order_item.OrderItemResponse;
-import com.arthuurdp.e_commerce.entities.dtos.order_item.OrderResponse;
+import com.arthuurdp.e_commerce.entities.dtos.order.OrderDetailsResponse;
+import com.arthuurdp.e_commerce.entities.dtos.order.OrderResponse;
 import com.arthuurdp.e_commerce.exceptions.AccessDeniedException;
+import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.*;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,49 +16,30 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final EntityMapperService entityMapperService;
+    private final AuthService authService;
 
-    public OrderService(OrderRepository orderRepository, UserRepository userRepository, EntityMapperService entityMapperService) {
+    public OrderService(OrderRepository orderRepository, UserRepository userRepository, EntityMapperService entityMapperService, AuthService authService) {
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.entityMapperService = entityMapperService;
+        this.authService = authService;
     }
 
-    public OrderResponse findById(Long id, String userEmail) {
-        Order order = orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
+    @Transactional
+    public OrderDetailsResponse findById(Long id) {
+        User user = authService.getCurrentUser();
+        Order order = orderRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
-        if (!order.getUser().getEmail().equals(userEmail)) {
+        if (!order.getUser().getEmail().equals(user.getEmail())) {
             throw new AccessDeniedException("Access denied");
         }
 
-        return entityMapperService.toOrderResponse(order);
+        return entityMapperService.toOrderDetailsResponse(order);
     }
 
-    public List<OrderResponse> findByUser(String userEmail) {
-        User user = (User) userRepository.findByEmail(userEmail);
-
-        return orderRepository.findByUserId(user.getId())
-                .stream()
-                .map(this::toResponseDTO)
-                .toList();
-    }
-
-    private OrderResponse toResponseDTO(Order order) {
-        List<OrderItemResponse> items = order.getItems().stream()
-                .map(item -> new OrderItemResponse(
-                        item.getProduct().getId(),
-                        item.getProduct().getName(),
-                        item.getQuantity(),
-                        item.getUnitPrice(),
-                        item.getSubtotal()
-                ))
-                .toList();
-
-        return new OrderResponse(
-                order.getId(),
-                order.getStatus(),
-                order.getTotal(),
-                order.getCreatedAt(),
-                items
-        );
+    @Transactional
+    public List<OrderResponse> findByUser() {
+        User user = authService.getCurrentUser();
+        return orderRepository.findByUserId(user.getId()).stream().map(entityMapperService::toOrderResponse).toList();
     }
 }

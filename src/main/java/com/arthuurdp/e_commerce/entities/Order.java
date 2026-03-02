@@ -109,6 +109,14 @@ public class Order {
         return createdAt;
     }
 
+    public Integer getTotalItems() {
+        Integer value = 0;
+        for (OrderItem oi : items) {
+            value += oi.getQuantity();
+        }
+        return value;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;

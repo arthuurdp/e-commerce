@@ -1,10 +1,9 @@
 package com.arthuurdp.e_commerce.controllers;
 
-import com.arthuurdp.e_commerce.entities.dtos.order_item.OrderResponse;
+import com.arthuurdp.e_commerce.entities.dtos.order.OrderDetailsResponse;
+import com.arthuurdp.e_commerce.entities.dtos.order.OrderResponse;
 import com.arthuurdp.e_commerce.services.OrderService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,12 +18,12 @@ public class OrderController {
     }
 
     @GetMapping
-    public ResponseEntity<List<OrderResponse>> findByUser(@AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(orderService.findByUser(userDetails.getUsername()));
+    public ResponseEntity<List<OrderResponse>> findByUser() {
+        return ResponseEntity.ok(orderService.findByUser());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrderResponse> findById(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(orderService.findById(id, userDetails.getUsername()));
+    public ResponseEntity<OrderDetailsResponse> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(orderService.findById(id));
     }
 }
