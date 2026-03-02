@@ -12,10 +12,6 @@ import org.springframework.web.util.ContentCachingRequestWrapper;
 
 import java.io.IOException;
 
-/**
- * O Stripe valida a assinatura do webhook contra o body RAW da requisição.
- * Este filtro garante que o body pode ser lido mais de uma vez sem ser consumido.
- */
 @Configuration
 public class WebhookConfig {
 

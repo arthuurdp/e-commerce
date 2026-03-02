@@ -3,6 +3,7 @@ package com.arthuurdp.e_commerce.controllers;
 import com.arthuurdp.e_commerce.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -51,11 +52,21 @@ public class GlobalExceptionHandlerController {
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<StandardError> handleProductOutOfStockException(ResourceNotFoundException ex) {
+    public ResponseEntity<StandardError> handleResourceNotFoundException(ResourceNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StandardError(
                 Instant.now(),
                 HttpStatus.NOT_FOUND.value(),
                 "Not Found",
+                ex.getMessage()
+        ));
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<StandardError> handleAuthenticationException(AuthenticationException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new StandardError(
+                Instant.now(),
+                HttpStatus.FORBIDDEN.value(),
+                "Forbidden",
                 ex.getMessage()
         ));
     }

@@ -8,6 +8,9 @@ import com.arthuurdp.e_commerce.exceptions.AccessDeniedException;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.*;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -40,9 +43,10 @@ public class OrderService {
     }
 
     @Transactional
-    public List<OrderResponse> findByUser() {
+    public Page<OrderResponse> findByUser(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
         User user = authService.getCurrentUser();
-        return orderRepository.findByUserId(user.getId()).stream().map(entityMapperService::toOrderResponse).toList();
+        return orderRepository.findByUserId(pageable, user.getId()).map(entityMapperService::toOrderResponse);
     }
 
     @Transactional
@@ -66,7 +70,6 @@ public class OrderService {
             orderItem.setSubtotal(product.getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
             order.getItems().add(orderItem);
         }
-
         return orderRepository.save(order);
     }
 }

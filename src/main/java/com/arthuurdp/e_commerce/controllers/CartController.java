@@ -27,11 +27,12 @@ public class CartController {
         return ResponseEntity.ok().body(service.addProduct(productId));
     }
 
+    @PreAuthorize("principal.emailVerified")
     @PatchMapping("/{productId}/decrement")
     public ResponseEntity<CartItemResponse> removeProduct(@PathVariable Long productId) {
         return service.removeProduct(productId)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .orElse(ResponseEntity.noContent().build());
     }
 
     @DeleteMapping

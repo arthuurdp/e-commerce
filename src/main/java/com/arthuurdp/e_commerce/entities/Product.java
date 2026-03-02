@@ -141,12 +141,6 @@ public class Product {
         imgs.forEach(this::addImage);
     }
 
-    public void removeImage(ProductImage img) {
-        if (images.remove(img)) {
-            img.setProduct(null);
-        }
-    }
-
     public void removeAllImages() {
         images.forEach(img -> img.setProduct(null));
         images.clear();
@@ -160,12 +154,6 @@ public class Product {
 
     public void addCategories(List<Category> categories) {
         categories.forEach(this::addCategory);
-    }
-
-    public void removeCategory(Category category) {
-        if (categories.remove(category)) {
-            category.getProducts().remove(this);
-        }
     }
 
     public void removeAllCategories() {

@@ -3,6 +3,7 @@ package com.arthuurdp.e_commerce.controllers;
 import com.arthuurdp.e_commerce.entities.dtos.order.OrderDetailsResponse;
 import com.arthuurdp.e_commerce.entities.dtos.order.OrderResponse;
 import com.arthuurdp.e_commerce.services.OrderService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,8 +19,11 @@ public class OrderController {
     }
 
     @GetMapping
-    public ResponseEntity<List<OrderResponse>> findByUser() {
-        return ResponseEntity.ok(orderService.findByUser());
+    public ResponseEntity<Page<OrderResponse>> findByUser(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(orderService.findByUser(page, size));
     }
 
     @GetMapping("/{id}")

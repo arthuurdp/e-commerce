@@ -6,6 +6,7 @@ import com.arthuurdp.e_commerce.entities.Cart;
 import com.arthuurdp.e_commerce.entities.User;
 import com.arthuurdp.e_commerce.entities.dtos.cart.CartItemResponse;
 import com.arthuurdp.e_commerce.entities.dtos.cart.CartResponse;
+import com.arthuurdp.e_commerce.exceptions.AuthenticationException;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.CartItemRepository;
 import com.arthuurdp.e_commerce.repositories.CartRepository;
@@ -41,6 +42,11 @@ public class CartService {
     @Transactional
     public CartItemResponse addProduct(Long productId) {
         User user = authService.getCurrentUser();
+
+        if (!user.isEmailVerified()) {
+            throw new AuthenticationException("Please verify your email before adding products to the cart");
+        }
+
         Cart cart = cartRepository.findById(user.getCart().getId()).orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
         Product product = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         CartItem item = cart.addProduct(product);
