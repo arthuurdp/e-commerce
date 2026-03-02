@@ -43,8 +43,8 @@ public class EntityMapperService {
         );
     }
 
-    public ProductDTO toProductDTO(Product product) {
-        return new ProductDTO(
+    public ProductResponse toProductDTO(Product product) {
+        return new ProductResponse(
                 product.getId(),
                 product.getName(),
                 product.getDescription(),
@@ -53,8 +53,8 @@ public class EntityMapperService {
                 );
     }
 
-    public ProductDetails toProductDetails(Product product) {
-        return new ProductDetails(
+    public ProductDetailsResponse toProductDetails(Product product) {
+        return new ProductDetailsResponse(
                 product.getId(),
                 product.getName(),
                 product.getDescription(),

@@ -22,7 +22,7 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<ProductDTO>> findAll(
+    public ResponseEntity<Page<ProductResponse>> findAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
@@ -30,7 +30,7 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDetails> findById(@PathVariable Long id) {
+    public ResponseEntity<ProductDetailsResponse> findById(@PathVariable Long id) {
         return ResponseEntity.ok().body(service.findById(id));
     }
 
