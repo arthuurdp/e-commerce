@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class CheckoutController {
-
     private final CheckoutService checkoutService;
     private final WebhookService webhookService;
 
@@ -21,10 +20,6 @@ public class CheckoutController {
         this.webhookService = webhookService;
     }
 
-    /**
-     * Cria o pedido e retorna a URL da página de checkout do Stripe.
-     * O frontend deve redirecionar o usuário para checkoutUrl.
-     */
     @PostMapping("/orders/checkout")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<CheckoutResponse> checkout(@RequestBody @Valid CheckoutRequest req)
@@ -32,12 +27,6 @@ public class CheckoutController {
         return ResponseEntity.ok(checkoutService.checkout(req));
     }
 
-    /**
-     * Recebe eventos do Stripe.
-     * IMPORTANTE: O Stripe envia o body como raw string — não pode ser deserializado pelo Spring.
-     * Por isso recebemos como String e passamos direto ao WebhookService.
-     * Configure esta URL no painel do Stripe: https://dashboard.stripe.com/webhooks
-     */
     @PostMapping("/webhook/stripe")
     public ResponseEntity<Void> handleWebhook(
             @RequestBody String payload,
@@ -46,7 +35,6 @@ public class CheckoutController {
         return ResponseEntity.ok().build();
     }
 
-    // Páginas de retorno — Stripe redireciona o usuário para cá após o pagamento
     @GetMapping("/checkout/success")
     public ResponseEntity<String> success(@RequestParam String session_id) {
         return ResponseEntity.ok("Pagamento realizado com sucesso! Session: " + session_id);

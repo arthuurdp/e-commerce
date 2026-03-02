@@ -4,6 +4,7 @@ import com.arthuurdp.e_commerce.entities.Order;
 import com.arthuurdp.e_commerce.entities.Payment;
 import com.arthuurdp.e_commerce.entities.enums.OrderStatus;
 import com.arthuurdp.e_commerce.entities.enums.PaymentStatus;
+import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.OrderRepository;
 import com.arthuurdp.e_commerce.repositories.PaymentRepository;
 import com.stripe.exception.SignatureVerificationException;
@@ -22,7 +23,6 @@ import java.time.LocalDateTime;
 
 @Service
 public class WebhookService {
-
     private static final Logger log = LoggerFactory.getLogger(WebhookService.class);
 
     @Value("${stripe.webhook-secret}")
@@ -58,7 +58,6 @@ public class WebhookService {
     private Session deserializeSession(Event event) {
         EventDataObjectDeserializer deserializer = event.getDataObjectDeserializer();
 
-        // Tenta deserializar normalmente
         if (deserializer.getObject().isPresent()) {
             StripeObject stripeObject = deserializer.getObject().get();
             if (stripeObject instanceof Session session) {
@@ -66,7 +65,6 @@ public class WebhookService {
             }
         }
 
-        // Fallback: resolve incompatibilidade entre versão da SDK e versão da API do Stripe
         try {
             StripeObject stripeObject = deserializer.deserializeUnsafe();
             if (stripeObject instanceof Session session) {
@@ -90,11 +88,7 @@ public class WebhookService {
             return;
         }
 
-        Order order = orderRepository.findById(Long.parseLong(orderId)).orElse(null);
-        if (order == null) {
-            log.warn("Order {} not found", orderId);
-            return;
-        }
+        Order order = orderRepository.findById(Long.parseLong(orderId)).orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
         Payment payment = order.getPayment();
         if (payment == null) {
@@ -105,7 +99,7 @@ public class WebhookService {
         String paymentStatus = session.getPaymentStatus();
         log.info("Session {} paymentStatus: {}", session.getId(), paymentStatus);
 
-        if ("paid".equals(paymentStatus)) {
+        if ("paid".equals(session.getPaymentStatus()) || "succeeded".equals(session.getStatus())) {
             payment.setStatus(PaymentStatus.APPROVED);
             payment.setPaidAt(LocalDateTime.now());
             payment.setTransactionId(session.getPaymentIntent());
