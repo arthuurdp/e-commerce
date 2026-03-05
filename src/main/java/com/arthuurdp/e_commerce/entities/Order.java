@@ -29,6 +29,10 @@ public class Order {
     @Column(name = "status", nullable = false)
     private OrderStatus status;
 
+    @OneToOne(mappedBy = "order")
+    @JoinColumn(name = "shipping_id")
+    private Shipping shipping;
+
     @Column(name = "total", nullable = false)
     private BigDecimal total;
 
@@ -99,6 +103,14 @@ public class Order {
 
     public void setPayment(Payment payment) {
         this.payment = payment;
+    }
+
+    public Shipping getShipping() {
+        return shipping;
+    }
+
+    public void setShipping(Shipping shipping) {
+        this.shipping = shipping;
     }
 
     public Set<OrderItem> getItems() {

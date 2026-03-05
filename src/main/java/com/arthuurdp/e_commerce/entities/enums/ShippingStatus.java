@@ -1,9 +1,7 @@
 package com.arthuurdp.e_commerce.entities.enums;
 
-public enum OrderStatus {
+public enum ShippingStatus {
     PENDING,
-    PAID,
-    CANCELED,
     SHIPPED,
     DELIVERED
 }

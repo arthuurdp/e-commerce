@@ -12,6 +12,7 @@ import com.arthuurdp.e_commerce.entities.dtos.auth.RegisterResponse;
 import com.arthuurdp.e_commerce.entities.dtos.cart.CartResponse;
 import com.arthuurdp.e_commerce.entities.dtos.category.CategoryResponse;
 import com.arthuurdp.e_commerce.entities.dtos.product.*;
+import com.arthuurdp.e_commerce.entities.dtos.shipping.ShippingResponse;
 import com.arthuurdp.e_commerce.entities.dtos.user.UserResponse;
 import org.springframework.stereotype.Component;
 
@@ -188,6 +189,19 @@ public class EntityMapperService {
                 orderItem.getQuantity(),
                 orderItem.getUnitPrice(),
                 orderItem.getSubtotal()
+        );
+    }
+
+    public ShippingResponse toShippingResponse(Shipping shipping) {
+        return new ShippingResponse(
+                shipping.getId(),
+                shipping.getOrder().getId(),
+                shipping.getStatus(),
+                shipping.getCarrier(),
+                shipping.getTrackingCode(),
+                shipping.getShippedAt(),
+                shipping.getDeliveredAt(),
+                shipping.getCreatedAt()
         );
     }
 }
