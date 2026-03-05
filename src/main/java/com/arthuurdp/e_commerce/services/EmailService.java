@@ -12,11 +12,11 @@ import com.arthuurdp.e_commerce.repositories.PasswordVerificationTokenRepository
 import com.arthuurdp.e_commerce.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.Random;
 
-@Component
+@Service
 public class EmailService {
     private final EmailVerificationTokenRepository emailVerificationTokenRepository;
     private final PasswordVerificationTokenRepository passwordVerificationTokenRepository;
@@ -55,9 +55,6 @@ public class EmailService {
     @Transactional
     public void sendEmailVerification() {
         User user = authService.getCurrentUser();
-        if (user == null) {
-            throw new AccessDeniedException("User not authenticated");
-        }
 
         if (user.isEmailVerified()) {
             throw new BadRequestException("Email already verified");
@@ -75,9 +72,7 @@ public class EmailService {
     @Transactional
     public void requestEmailChange(String newEmail) {
         User user = authService.getCurrentUser();
-        if (user == null) {
-            throw new AccessDeniedException("User not authenticated");
-        }
+
         if (newEmail.equals(user.getEmail())) {
             throw new BadRequestException("New email is the same as current");
         }
@@ -97,9 +92,6 @@ public class EmailService {
     @Transactional
     public void confirmEmailChange(String code) {
         User user = authService.getCurrentUser();
-        if (user == null) {
-            throw new AccessDeniedException("User not authenticated");
-        }
         EmailVerificationToken token = emailVerificationTokenRepository.findByCodeAndUsedFalse(code).orElseThrow(() -> new ResourceNotFoundException("Invalid or already used code"));
 
         if (!token.getUser().getId().equals(user.getId())) {
@@ -124,15 +116,13 @@ public class EmailService {
     @Transactional
     public void requestPasswordChange(String newPassword) {
         User user = authService.getCurrentUser();
-        if (user == null) {
-            throw new AccessDeniedException("User not authenticated");
+
+        if (!user.isEmailVerified()) {
+            throw new AccessDeniedException("Email not verified");
         }
 
         if (passwordEncoder.matches(newPassword, user.getPassword())) {
             throw new BadRequestException("Password can't be the same as current");
-        }
-        if (!user.isEmailVerified()) {
-            throw new AccessDeniedException("Email not verified");
         }
 
         passwordVerificationTokenRepository.deleteByUserId(user.getId());
@@ -148,9 +138,6 @@ public class EmailService {
     @Transactional
     public void confirmPasswordChange(String code) {
         User user = authService.getCurrentUser();
-        if (user == null) {
-            throw new AccessDeniedException("User not authenticated");
-        }
         PasswordVerificationToken token = passwordVerificationTokenRepository.findByCodeAndUsedFalse(code).orElseThrow(() -> new ResourceNotFoundException("Invalid or already used code"));
 
         if (!token.getUser().getId().equals(user.getId())) {

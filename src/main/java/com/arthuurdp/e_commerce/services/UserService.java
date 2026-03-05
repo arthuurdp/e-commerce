@@ -57,7 +57,7 @@ public class UserService {
         }
 
         if (req.cpf() != null) {
-            if (userRepository.existsByCpf(req.cpf()) && req.cpf().equals(user.getCpf())) {
+            if (!req.cpf().equals(user.getCpf()) && userRepository.existsByCpf(req.cpf())) {
                 throw new ConflictException("CPF already in use");
             }
             user.setCpf(req.cpf());
