@@ -1,53 +1,171 @@
 package com.arthuurdp.e_commerce.services;
 
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.stereotype.Service;
+import com.arthuurdp.e_commerce.entities.EmailVerificationToken;
+import com.arthuurdp.e_commerce.entities.PasswordVerificationToken;
+import com.arthuurdp.e_commerce.entities.User;
+import com.arthuurdp.e_commerce.exceptions.AccessDeniedException;
+import com.arthuurdp.e_commerce.exceptions.BadRequestException;
+import com.arthuurdp.e_commerce.exceptions.ConflictException;
+import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
+import com.arthuurdp.e_commerce.repositories.EmailVerificationTokenRepository;
+import com.arthuurdp.e_commerce.repositories.PasswordVerificationTokenRepository;
+import com.arthuurdp.e_commerce.repositories.UserRepository;
+import jakarta.transaction.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 
-@Service
+import java.util.Random;
+
+@Component
 public class EmailService {
-    private JavaMailSender sender;
+    private final EmailVerificationTokenRepository emailVerificationTokenRepository;
+    private final PasswordVerificationTokenRepository passwordVerificationTokenRepository;
+    private final UserRepository userRepository;
+    private final AuthService authService;
+    private final EmailSenderService emailSenderService;
+    private final PasswordEncoder passwordEncoder;
 
-    public EmailService(JavaMailSender sender) {
-        this.sender = sender;
+    public EmailService(EmailVerificationTokenRepository emailVerificationTokenRepository, PasswordVerificationTokenRepository passwordVerificationTokenRepository, UserRepository userRepository, AuthService authService, EmailSenderService emailSenderService, PasswordEncoder passwordEncoder) {
+        this.emailVerificationTokenRepository = emailVerificationTokenRepository;
+        this.passwordVerificationTokenRepository = passwordVerificationTokenRepository;
+        this.userRepository = userRepository;
+        this.authService = authService;
+        this.emailSenderService = emailSenderService;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    public void sendVerificationCode(String to, String code) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(to);
-        message.setSubject("Email verification code");
-        message.setText("Your verification code is: " + code + "\n\nThis code expires in 15 minutes.");
-        sender.send(message);
+    @Transactional
+    public void verifyEmail(String code) {
+        EmailVerificationToken token = emailVerificationTokenRepository.findByCodeAndUsedFalse(code).orElseThrow(() -> new ResourceNotFoundException("Invalid or already used code"));
+
+        if (token.isExpired()) {
+            throw new BadRequestException("Code has expired");
+        }
+
+        User user = token.getUser();
+
+        user.setEmailVerified(true);
+        token.setUsed(true);
+
+        userRepository.save(user);
+        emailVerificationTokenRepository.save(token);
+        emailSenderService.sendWelcome(user.getEmail(), user.getFirstName());
     }
 
-    public void sendPasswordVerificationCode(String to, String code) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(to);
-        message.setSubject("Password verification code");
-        message.setText("Your password verification code is: " + code + "\n\nThis code expires in 15 minutes.");
-        sender.send(message);
+    @Transactional
+    public void sendEmailVerification() {
+        User user = authService.getCurrentUser();
+        if (user == null) {
+            throw new AccessDeniedException("User not authenticated");
+        }
+
+        if (user.isEmailVerified()) {
+            throw new BadRequestException("Email already verified");
+        }
+
+        emailVerificationTokenRepository.deleteByUserId(user.getId());
+
+        String code = String.format("%06d", new Random().nextInt(999999));
+        EmailVerificationToken token = new EmailVerificationToken(code, user, user.getEmail());
+        emailVerificationTokenRepository.save(token);
+
+        emailSenderService.sendVerificationCode(user.getEmail(), code);
     }
 
-    public void sendWelcome(String to, String firstName) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(to);
-        message.setSubject("Welcome to our store!");
-        message.setText("Hello " + firstName + ", welcome! Your account has been created successfully.");
-        sender.send(message);
+    @Transactional
+    public void requestEmailChange(String newEmail) {
+        User user = authService.getCurrentUser();
+        if (user == null) {
+            throw new AccessDeniedException("User not authenticated");
+        }
+        if (newEmail.equals(user.getEmail())) {
+            throw new BadRequestException("New email is the same as current");
+        }
+        if (userRepository.existsByEmail(newEmail)) {
+            throw new ConflictException("Email already in use");
+        }
+
+        emailVerificationTokenRepository.deleteByUserId(user.getId());
+
+        String code = String.format("%06d", new Random().nextInt(999999));
+        EmailVerificationToken token = new EmailVerificationToken(code, user, newEmail);
+        emailVerificationTokenRepository.save(token);
+
+        emailSenderService.sendVerificationCode(newEmail, code);
     }
 
-    public void sendEmailChanged(String to) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(to);
-        message.setSubject("Email changed successfully");
-        message.setText("Your email has been changed successfully.");
+    @Transactional
+    public void confirmEmailChange(String code) {
+        User user = authService.getCurrentUser();
+        if (user == null) {
+            throw new AccessDeniedException("User not authenticated");
+        }
+        EmailVerificationToken token = emailVerificationTokenRepository.findByCodeAndUsedFalse(code).orElseThrow(() -> new ResourceNotFoundException("Invalid or already used code"));
+
+        if (!token.getUser().getId().equals(user.getId())) {
+            throw new AccessDeniedException("Invalid code");
+        }
+        if (token.isExpired()) {
+            throw new BadRequestException("Code has expired");
+        }
+        if (token.getPendingEmail().equals(user.getEmail())) {
+            throw new BadRequestException("This code was for a different purpose or email is already set");
+        }
+
+        user.setEmail(token.getPendingEmail());
+        user.setEmailVerified(true);
+        token.setUsed(true);
+
+        userRepository.save(user);
+        emailVerificationTokenRepository.save(token);
+        emailSenderService.sendEmailChanged(user.getEmail());
     }
 
-    public void sendPasswordChanged(String to) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(to);
-        message.setSubject("Password changed successfully");
-        message.setText("Your password has been changed successfully.");
-        sender.send(message);
+    @Transactional
+    public void requestPasswordChange(String newPassword) {
+        User user = authService.getCurrentUser();
+        if (user == null) {
+            throw new AccessDeniedException("User not authenticated");
+        }
+
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
+            throw new BadRequestException("Password can't be the same as current");
+        }
+        if (!user.isEmailVerified()) {
+            throw new AccessDeniedException("Email not verified");
+        }
+
+        passwordVerificationTokenRepository.deleteByUserId(user.getId());
+
+        String code = String.format("%06d", new Random().nextInt(999999));
+        PasswordVerificationToken token = new PasswordVerificationToken(code, user, newPassword);
+
+        passwordVerificationTokenRepository.save(token);
+
+        emailSenderService.sendPasswordVerificationCode(user.getEmail(), code);
+    }
+
+    @Transactional
+    public void confirmPasswordChange(String code) {
+        User user = authService.getCurrentUser();
+        if (user == null) {
+            throw new AccessDeniedException("User not authenticated");
+        }
+        PasswordVerificationToken token = passwordVerificationTokenRepository.findByCodeAndUsedFalse(code).orElseThrow(() -> new ResourceNotFoundException("Invalid or already used code"));
+
+        if (!token.getUser().getId().equals(user.getId())) {
+            throw new AccessDeniedException("Invalid code");
+        }
+        if (token.isExpired()) {
+            throw new BadRequestException("Code has expired");
+        }
+
+        user.setPassword(passwordEncoder.encode(token.getPendingPassword()));
+        user.setPasswordChangeVerified(true);
+        token.setUsed(true);
+
+        userRepository.save(user);
+        passwordVerificationTokenRepository.save(token);
+        emailSenderService.sendPasswordChanged(user.getEmail());
     }
 }
