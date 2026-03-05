@@ -7,6 +7,7 @@ import com.arthuurdp.e_commerce.entities.dtos.shipping.ShippingResponse;
 import com.arthuurdp.e_commerce.entities.dtos.shipping.UpdateShippingRequest;
 import com.arthuurdp.e_commerce.entities.enums.OrderStatus;
 import com.arthuurdp.e_commerce.entities.enums.ShippingStatus;
+import com.arthuurdp.e_commerce.exceptions.BadRequestException;
 import com.arthuurdp.e_commerce.exceptions.ConflictException;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.OrderRepository;
@@ -48,6 +49,9 @@ public class ShippingService {
     public ShippingResponse update(Long shippingId, UpdateShippingRequest req) {
         Shipping shipping = shippingRepository.findById(shippingId).orElseThrow(() -> new ResourceNotFoundException("Shipping not found"));
 
+        if (req.status().ordinal() < shipping.getStatus().ordinal()) {
+            throw new BadRequestException("Invalid status transition");
+        }
         if (req.carrier() != null) {
             shipping.setCarrier(req.carrier());
         }

@@ -18,6 +18,7 @@ public class ShippingController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ShippingResponse> findByOrderId(@PathVariable Long orderId) {
         return ResponseEntity.ok().body(shippingService.findByOrderId(orderId));
     }

@@ -30,7 +30,6 @@ public class Order {
     private OrderStatus status;
 
     @OneToOne(mappedBy = "order", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "shipping_id")
     private Shipping shipping;
 
     @Column(name = "total", nullable = false)
