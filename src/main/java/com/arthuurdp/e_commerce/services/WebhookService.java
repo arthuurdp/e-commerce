@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 @Service
 public class WebhookService {
     private static final Logger log = LoggerFactory.getLogger(WebhookService.class);
+    private final ShippingService shippingService;
 
     @Value("${stripe.webhook-secret}")
     private String webhookSecret;
@@ -31,9 +32,10 @@ public class WebhookService {
     private final OrderRepository orderRepository;
     private final PaymentRepository paymentRepository;
 
-    public WebhookService(OrderRepository orderRepository, PaymentRepository paymentRepository) {
+    public WebhookService(OrderRepository orderRepository, PaymentRepository paymentRepository, ShippingService shippingService) {
         this.orderRepository = orderRepository;
         this.paymentRepository = paymentRepository;
+        this.shippingService = shippingService;
     }
 
     @Transactional
@@ -91,10 +93,6 @@ public class WebhookService {
         Order order = orderRepository.findById(Long.parseLong(orderId)).orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
         Payment payment = order.getPayment();
-        if (payment == null) {
-            log.warn("Order {} has no payment entity", orderId);
-            return;
-        }
 
         String paymentStatus = session.getPaymentStatus();
         log.info("Session {} paymentStatus: {}", session.getId(), paymentStatus);
@@ -104,6 +102,7 @@ public class WebhookService {
             payment.setPaidAt(LocalDateTime.now());
             payment.setTransactionId(session.getPaymentIntent());
             order.setStatus(OrderStatus.PAID);
+            shippingService.createForOrder(order);
             log.info("Order {} marked as PAID", orderId);
         } else {
             payment.setStatus(PaymentStatus.PENDING);

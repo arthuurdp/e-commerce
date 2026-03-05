@@ -29,7 +29,7 @@ public class Order {
     @Column(name = "status", nullable = false)
     private OrderStatus status;
 
-    @OneToOne(mappedBy = "order")
+    @OneToOne(mappedBy = "order", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "shipping_id")
     private Shipping shipping;
 

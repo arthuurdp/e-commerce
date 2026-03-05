@@ -25,10 +25,9 @@ public class ShippingController {
     @PatchMapping("/{shippingId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ShippingResponse> update(
-            @PathVariable Long orderId,
             @PathVariable Long shippingId,
-            @RequestBody @Valid UpdateShippingRequest req
-    ) {
+            @RequestBody @Valid UpdateShippingRequest req,
+            @PathVariable String orderId) {
         return ResponseEntity.ok(shippingService.update(shippingId, req));
     }
 }

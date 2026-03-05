@@ -7,7 +7,6 @@ import com.arthuurdp.e_commerce.entities.dtos.shipping.ShippingResponse;
 import com.arthuurdp.e_commerce.entities.dtos.shipping.UpdateShippingRequest;
 import com.arthuurdp.e_commerce.entities.enums.OrderStatus;
 import com.arthuurdp.e_commerce.entities.enums.ShippingStatus;
-import com.arthuurdp.e_commerce.exceptions.BadRequestException;
 import com.arthuurdp.e_commerce.exceptions.ConflictException;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.OrderRepository;
@@ -34,7 +33,7 @@ public class ShippingService {
     @Transactional
     public Shipping createForOrder(Order order) {
         if (shippingRepository.existsByOrderId(order.getId())) {
-            throw new ConflictException("Shipping already exists for another order");
+            throw new ConflictException("Shipping already exists");
         }
         return shippingRepository.save(new Shipping(order));
     }
