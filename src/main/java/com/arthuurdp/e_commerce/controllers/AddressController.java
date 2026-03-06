@@ -1,12 +1,16 @@
 package com.arthuurdp.e_commerce.controllers;
 
+import com.arthuurdp.e_commerce.entities.User;
 import com.arthuurdp.e_commerce.entities.dtos.address.AddressResponse;
 import com.arthuurdp.e_commerce.entities.dtos.address.CreateAddressRequest;
 import com.arthuurdp.e_commerce.entities.dtos.address.UpdateAddressRequest;
+import com.arthuurdp.e_commerce.infrastructure.security.CustomUserDetailsService;
 import com.arthuurdp.e_commerce.services.AddressService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -23,18 +27,28 @@ public class AddressController {
     }
 
     @GetMapping
-    public Page<AddressResponse> findAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
-        return service.findAll(page, size);
+    public Page<AddressResponse> findAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @AuthenticationPrincipal User user
+            ) {
+        return service.findAll(page, size, user.getId());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AddressResponse> findById(@PathVariable Long id) {
-        return ResponseEntity.ok().body(service.findById(id));
+    public ResponseEntity<AddressResponse> findById(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User user
+            ) {
+        return ResponseEntity.ok().body(service.findById(id, user.getId()));
     }
 
     @PostMapping
-    public ResponseEntity<AddressResponse> create(@RequestBody CreateAddressRequest req) {
-        AddressResponse response = service.create(req);
+    public ResponseEntity<AddressResponse> create(
+            @RequestBody CreateAddressRequest req,
+            @AuthenticationPrincipal User user
+    ) {
+        AddressResponse response = service.create(req, user);
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")

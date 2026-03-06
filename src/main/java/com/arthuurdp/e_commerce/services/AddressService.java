@@ -30,20 +30,17 @@ public class AddressService {
         this.authService = authService;
     }
 
-    public AddressResponse findById(Long id) {
-        User user = authService.getCurrentUser();
-        return addressRepository.findByIdAndUserId(id, user.getId()).map(entityMapperService::toAddressResponse).orElseThrow(() -> new ResourceNotFoundException("Address not found"));
+    public AddressResponse findById(Long id, Long userId) {
+        return addressRepository.findByIdAndUserId(id, userId).map(entityMapperService::toAddressResponse).orElseThrow(() -> new ResourceNotFoundException("Address not found"));
     }
 
-    public Page<AddressResponse> findAll(int page, int size) {
-        User user = authService.getCurrentUser();
+    public Page<AddressResponse> findAll(int page, int size, Long userId) {
         Pageable pageable = PageRequest.of(page, size);
-        return addressRepository.findByUserId(pageable, user.getId()).map(entityMapperService::toAddressResponse);
+        return addressRepository.findByUserId(pageable, userId).map(entityMapperService::toAddressResponse);
     }
 
     @Transactional
-    public AddressResponse create(CreateAddressRequest req) {
-        User user = authService.getCurrentUser();
+    public AddressResponse create(CreateAddressRequest req, User user) {
         City city = cityRepository.findById(req.cityId()).orElseThrow(() -> new ResourceNotFoundException("City not found"));
 
         Address address = new Address();
