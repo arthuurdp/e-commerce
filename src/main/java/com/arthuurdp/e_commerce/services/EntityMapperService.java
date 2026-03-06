@@ -13,6 +13,7 @@ import com.arthuurdp.e_commerce.entities.dtos.auth.RegisterResponse;
 import com.arthuurdp.e_commerce.entities.dtos.cart.CartResponse;
 import com.arthuurdp.e_commerce.entities.dtos.category.CategoryResponse;
 import com.arthuurdp.e_commerce.entities.dtos.product.*;
+import com.arthuurdp.e_commerce.entities.dtos.shipping.ShippingCarrierResponse;
 import com.arthuurdp.e_commerce.entities.dtos.shipping.ShippingResponse;
 import com.arthuurdp.e_commerce.entities.dtos.user.UserResponse;
 import org.springframework.stereotype.Component;
@@ -151,15 +152,8 @@ public class EntityMapperService {
                 address.getNumber(),
                 address.getComplement(),
                 address.getNeighborhood(),
-                new CityResponse(
-                        address.getCity().getId(),
-                        address.getCity().getName()
-                ),
-                new StateResponse(
-                        address.getCity().getState().getId(),
-                        address.getCity().getState().getName(),
-                        address.getCity().getState().getUf()
-                )
+                toCityResponse(address.getCity()),
+                toStateResponse(address.getCity().getState())
         );
     }
 
@@ -193,12 +187,23 @@ public class EntityMapperService {
         );
     }
 
+    public ShippingCarrierResponse toShippingCarrierResponse(ShippingCarrier shippingCarrier) {
+        return new ShippingCarrierResponse(
+                shippingCarrier.getId(),
+                shippingCarrier.getShipping().getId(),
+                toCarrierResponse(shippingCarrier.getCarrier()),
+                toStateResponse(shippingCarrier.getState()),
+                shippingCarrier.getLegOrder(),
+                shippingCarrier.getStatus()
+        );
+    }
+
     public ShippingResponse toShippingResponse(Shipping shipping) {
         return new ShippingResponse(
                 shipping.getId(),
                 shipping.getOrder().getId(),
                 shipping.getStatus(),
-                shipping.getCarrier(),
+                shipping.getCarriers().stream().map(this::toShippingCarrierResponse).toList(),
                 shipping.getTrackingCode(),
                 shipping.getShippedAt(),
                 shipping.getDeliveredAt(),
@@ -211,11 +216,7 @@ public class EntityMapperService {
                 carrier.getId(),
                 carrier.getName(),
                 carrier.getStatus(),
-                new StateResponse(
-                        carrier.getState().getId(),
-                        carrier.getState().getName(),
-                        carrier.getState().getUf()
-                )
+                toStateResponse(carrier.getState())
         );
     }
 }

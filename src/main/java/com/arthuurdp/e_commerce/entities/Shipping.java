@@ -23,9 +23,8 @@ public class Shipping {
     @Column(name = "status", nullable = false)
     private ShippingStatus status;
 
-    @ManyToMany
-    @JoinTable(name = "shipping_carriers", joinColumns = @JoinColumn(name = "shipping_id"), inverseJoinColumns = @JoinColumn(name = "carrier_id"))
-    private List<Carrier> carriers = new ArrayList<>();
+    @OneToMany(mappedBy = "shipping", cascade = CascadeType.ALL)
+    private List<ShippingCarrier> carriers = new ArrayList<>();
 
     @Column(name = "tracking_code")
     private String trackingCode;
@@ -61,9 +60,9 @@ public class Shipping {
 
     public void setStatus(ShippingStatus status) { this.status = status; }
 
-    public String getCarrier() { return carriers; }
-
-    public void setCarrier(String carrier) { this.carriers = carrier; }
+    public List<ShippingCarrier> getCarriers() {
+        return carriers;
+    }
 
     public String getTrackingCode() { return trackingCode; }
 

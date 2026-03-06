@@ -1,6 +1,6 @@
 package com.arthuurdp.e_commerce.entities;
 
-import com.arthuurdp.e_commerce.entities.enums.ActiveCarrierStatus;
+import com.arthuurdp.e_commerce.entities.enums.CarrierStatus;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ public class Carrier {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private ActiveCarrierStatus status;
+    private CarrierStatus status;
 
     @ManyToMany(mappedBy = "carriers")
     List<Shipping> shippings = new ArrayList<>();
@@ -30,7 +30,7 @@ public class Carrier {
 
     @PrePersist
     void PrePersist() {
-        this.status = ActiveCarrierStatus.AVAILABLE;
+        this.status = CarrierStatus.AVAILABLE;
     }
 
     public Carrier() {}
@@ -60,11 +60,11 @@ public class Carrier {
         this.state = state;
     }
 
-    public ActiveCarrierStatus getStatus() {
+    public CarrierStatus getStatus() {
         return status;
     }
 
-    public void setStatus(ActiveCarrierStatus status) {
+    public void setStatus(CarrierStatus status) {
         this.status = status;
     }
 }

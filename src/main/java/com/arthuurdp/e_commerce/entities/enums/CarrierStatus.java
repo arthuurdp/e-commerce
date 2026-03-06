@@ -1,6 +1,6 @@
 package com.arthuurdp.e_commerce.entities.enums;
 
-public enum ActiveCarrierStatus {
+public enum CarrierStatus {
     AVAILABLE,
     ON_DELIVERY,
     INACTIVE

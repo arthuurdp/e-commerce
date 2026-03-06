@@ -5,6 +5,7 @@ import com.arthuurdp.e_commerce.entities.State;
 import com.arthuurdp.e_commerce.entities.dtos.carrier.CarrierResponse;
 import com.arthuurdp.e_commerce.entities.dtos.carrier.CreateCarrierRequest;
 import com.arthuurdp.e_commerce.entities.dtos.carrier.UpdateCarrierRequest;
+import com.arthuurdp.e_commerce.entities.enums.CarrierStatus;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.CarrierRepository;
 import com.arthuurdp.e_commerce.repositories.StateRepository;
@@ -30,15 +31,17 @@ public class CarrierService {
         return entityMapperService.toCarrierResponse(carrier);
     }
 
-    public Page<CarrierResponse> findAllByStateId(int page, int size, Long stateId) {
-        Pageable pageable = PageRequest.of(page, size);
-        State state = stateRepository.findById(stateId).orElseThrow(() -> new ResourceNotFoundException("State not found"));
-        return carrierRepository.findByStateId(pageable, state.getId()).map(entityMapperService::toCarrierResponse);
-    }
-
     public Page<CarrierResponse> findAll(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return carrierRepository.findAll(pageable).map(entityMapperService::toCarrierResponse);
+    }
+
+    public Page<CarrierResponse> findAllByStateIdAndStatus(int page, int size, Long stateId, CarrierStatus status) {
+        if (!stateRepository.existsById(stateId)) {
+            throw new ResourceNotFoundException("State not found");
+        }
+        Pageable pageable = PageRequest.of(page, size);
+        return carrierRepository.findByStateIdAndStatus(stateId, status, pageable).map(entityMapperService::toCarrierResponse);
     }
 
     public CarrierResponse create(CreateCarrierRequest req) {

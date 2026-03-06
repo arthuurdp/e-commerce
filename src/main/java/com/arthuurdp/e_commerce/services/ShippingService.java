@@ -33,11 +33,11 @@ public class ShippingService {
     }
 
     @Transactional
-    public Shipping create(CreateShippingRequest req) {
+    public ShippingResponse create(CreateShippingRequest req) {
         if (shippingRepository.existsByOrderId(req.orderId())) {
             throw new ConflictException("Shipping already exists");
         }
-        return shippingRepository.save(new Shipping(order));
+        return entityMapperService.toShippingResponse(shippingRepository.save(new Shipping(order)));
     }
 
     public ShippingResponse findByOrderId(Long orderId) {
@@ -54,7 +54,7 @@ public class ShippingService {
             throw new BadRequestException("Invalid status transition");
         }
         if (req.carrier() != null) {
-            shipping.setCarrier(req.carrier());
+            shipping.s(req.carrier());
         }
         if (req.trackingCode() != null) {
             shipping.setTrackingCode(req.trackingCode());
