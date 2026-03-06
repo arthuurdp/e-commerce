@@ -22,16 +22,10 @@ public class State {
     @OneToMany(mappedBy = "state", fetch = FetchType.LAZY)
     private Set<City> cities;
 
-    @ManyToMany(mappedBy = "states", fetch = FetchType.LAZY)
-    @JoinTable(name = "carrier_state", joinColumns = @JoinColumn(name = "state_id"), inverseJoinColumns = @JoinColumn(name = "carrier_id"))
+    @OneToMany(mappedBy = "state", fetch = FetchType.LAZY)
     private List<Carrier> carriers;
 
     public State() {}
-
-    public State(String name, String uf) {
-        this.name = name;
-        this.uf = uf;
-    }
 
     public Long getId() {
         return id;

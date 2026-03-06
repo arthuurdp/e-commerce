@@ -1,6 +1,6 @@
 package com.arthuurdp.e_commerce.services;
 
-import com.arthuurdp.e_commerce.entities.dtos.address.StateResponse;
+import com.arthuurdp.e_commerce.entities.dtos.places.StateResponse;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.StateRepository;
 import org.springframework.data.domain.Page;

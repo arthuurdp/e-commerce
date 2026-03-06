@@ -3,6 +3,7 @@ package com.arthuurdp.e_commerce.services;
 import com.arthuurdp.e_commerce.entities.Order;
 import com.arthuurdp.e_commerce.entities.Shipping;
 import com.arthuurdp.e_commerce.entities.User;
+import com.arthuurdp.e_commerce.entities.dtos.shipping.CreateShippingRequest;
 import com.arthuurdp.e_commerce.entities.dtos.shipping.ShippingResponse;
 import com.arthuurdp.e_commerce.entities.dtos.shipping.UpdateShippingRequest;
 import com.arthuurdp.e_commerce.entities.enums.OrderStatus;
@@ -32,8 +33,8 @@ public class ShippingService {
     }
 
     @Transactional
-    public Shipping createForOrder(Order order) {
-        if (shippingRepository.existsByOrderId(order.getId())) {
+    public Shipping create(CreateShippingRequest req) {
+        if (shippingRepository.existsByOrderId(req.orderId())) {
             throw new ConflictException("Shipping already exists");
         }
         return shippingRepository.save(new Shipping(order));

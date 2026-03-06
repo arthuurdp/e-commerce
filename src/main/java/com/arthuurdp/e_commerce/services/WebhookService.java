@@ -104,7 +104,7 @@ public class WebhookService {
             payment.setPaidAt(LocalDateTime.now());
             payment.setTransactionId(session.getPaymentIntent());
             order.setStatus(OrderStatus.PAID);
-            shippingService.createForOrder(order);
+            shippingService.create(order.getId());
             emailSenderService.sendOrderConfirmation(order.getUser().getEmail(), orderId);
             log.info("Order {} marked as PAID", orderId);
         } else {

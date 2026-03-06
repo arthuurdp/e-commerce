@@ -4,13 +4,15 @@ import com.arthuurdp.e_commerce.entities.enums.ShippingStatus;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "shippings")
 public class Shipping {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -21,8 +23,9 @@ public class Shipping {
     @Column(name = "status", nullable = false)
     private ShippingStatus status;
 
-    @Column(name = "carrier")
-    private String carrier;
+    @ManyToMany
+    @JoinTable(name = "shipping_carriers", joinColumns = @JoinColumn(name = "shipping_id"), inverseJoinColumns = @JoinColumn(name = "carrier_id"))
+    private List<Carrier> carriers = new ArrayList<>();
 
     @Column(name = "tracking_code")
     private String trackingCode;
@@ -39,9 +42,7 @@ public class Shipping {
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
-        if (this.status == null) {
-            this.status = ShippingStatus.PENDING;
-        }
+        this.status = ShippingStatus.PENDING;
     }
 
     public Shipping() {}
@@ -60,9 +61,9 @@ public class Shipping {
 
     public void setStatus(ShippingStatus status) { this.status = status; }
 
-    public String getCarrier() { return carrier; }
+    public String getCarrier() { return carriers; }
 
-    public void setCarrier(String carrier) { this.carrier = carrier; }
+    public void setCarrier(String carrier) { this.carriers = carrier; }
 
     public String getTrackingCode() { return trackingCode; }
 

@@ -6,8 +6,8 @@ import com.arthuurdp.e_commerce.entities.dtos.order.OrderResponse;
 import com.arthuurdp.e_commerce.entities.dtos.order_item.OrderItemResponse;
 import com.arthuurdp.e_commerce.entities.dtos.order.OrderDetailsResponse;
 import com.arthuurdp.e_commerce.entities.dtos.address.AddressResponse;
-import com.arthuurdp.e_commerce.entities.dtos.address.CityResponse;
-import com.arthuurdp.e_commerce.entities.dtos.address.StateResponse;
+import com.arthuurdp.e_commerce.entities.dtos.places.CityResponse;
+import com.arthuurdp.e_commerce.entities.dtos.places.StateResponse;
 import com.arthuurdp.e_commerce.entities.dtos.cart.CartItemResponse;
 import com.arthuurdp.e_commerce.entities.dtos.auth.RegisterResponse;
 import com.arthuurdp.e_commerce.entities.dtos.cart.CartResponse;
@@ -209,7 +209,13 @@ public class EntityMapperService {
     public CarrierResponse toCarrierResponse(Carrier carrier) {
         return new CarrierResponse(
                 carrier.getId(),
-                carrier.getName()
+                carrier.getName(),
+                carrier.getStatus(),
+                new StateResponse(
+                        carrier.getState().getId(),
+                        carrier.getState().getName(),
+                        carrier.getState().getUf()
+                )
         );
     }
 }

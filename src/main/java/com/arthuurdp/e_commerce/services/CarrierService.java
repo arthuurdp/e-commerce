@@ -1,9 +1,13 @@
 package com.arthuurdp.e_commerce.services;
 
 import com.arthuurdp.e_commerce.entities.Carrier;
+import com.arthuurdp.e_commerce.entities.State;
 import com.arthuurdp.e_commerce.entities.dtos.carrier.CarrierResponse;
+import com.arthuurdp.e_commerce.entities.dtos.carrier.CreateCarrierRequest;
+import com.arthuurdp.e_commerce.entities.dtos.carrier.UpdateCarrierRequest;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.CarrierRepository;
+import com.arthuurdp.e_commerce.repositories.StateRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -12,10 +16,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class CarrierService {
     private final CarrierRepository carrierRepository;
+    private final StateRepository stateRepository;
     private final EntityMapperService entityMapperService;
 
-    public CarrierService(CarrierRepository carrierRepository, EntityMapperService entityMapperService) {
+    public CarrierService(CarrierRepository carrierRepository, StateRepository stateRepository, EntityMapperService entityMapperService) {
         this.carrierRepository = carrierRepository;
+        this.stateRepository = stateRepository;
         this.entityMapperService = entityMapperService;
     }
 
@@ -24,8 +30,10 @@ public class CarrierService {
         return entityMapperService.toCarrierResponse(carrier);
     }
 
-    public Carrier findByShippingId(Long shippingId) {
-        return carrierRepository.findByShippingId(shippingId).orElseThrow(() -> new ResourceNotFoundException("Carrier not found"));
+    public Page<CarrierResponse> findAllByStateId(int page, int size, Long stateId) {
+        Pageable pageable = PageRequest.of(page, size);
+        State state = stateRepository.findById(stateId).orElseThrow(() -> new ResourceNotFoundException("State not found"));
+        return carrierRepository.findByStateId(pageable, state.getId()).map(entityMapperService::toCarrierResponse);
     }
 
     public Page<CarrierResponse> findAll(int page, int size) {
@@ -33,17 +41,22 @@ public class CarrierService {
         return carrierRepository.findAll(pageable).map(entityMapperService::toCarrierResponse);
     }
 
-    public Carrier create(Carrier carrier) {
-        return carrierRepository.save(carrier);
+    public CarrierResponse create(CreateCarrierRequest req) {
+        State state = stateRepository.findById(req.stateId()).orElseThrow(() -> new ResourceNotFoundException("State not found"));
+        Carrier carrier = new Carrier(req.name(), state);
+        return entityMapperService.toCarrierResponse(carrierRepository.save(carrier));
     }
 
-    public Carrier update(Long id, Carrier carrier) {
+    public CarrierResponse update(Long id, UpdateCarrierRequest req) {
         Carrier existingCarrier = carrierRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Carrier not found"));
-        existingCarrier.setName(carrier.getName());
-        return carrierRepository.save(existingCarrier);
+        existingCarrier.setName(req.name());
+        return entityMapperService.toCarrierResponse(carrierRepository.save(existingCarrier));
     }
 
     public void delete(Long id) {
-        carrierRepository.deleteById(id);
+        Carrier carrier = carrierRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Carrier not found"));
+        carrierRepository.deleteById(carrier.getId());
     }
+
+
 }
