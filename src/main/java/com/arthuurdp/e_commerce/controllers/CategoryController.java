@@ -1,7 +1,7 @@
 package com.arthuurdp.e_commerce.controllers;
 
-import com.arthuurdp.e_commerce.entities.dtos.category.CategoryRequest;
-import com.arthuurdp.e_commerce.entities.dtos.category.CategoryResponse;
+import com.arthuurdp.e_commerce.domain.dtos.category.CategoryRequest;
+import com.arthuurdp.e_commerce.domain.dtos.category.CategoryResponse;
 import com.arthuurdp.e_commerce.services.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;

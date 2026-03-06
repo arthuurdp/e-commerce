@@ -1,9 +1,9 @@
 package com.arthuurdp.e_commerce.controllers;
 
-import com.arthuurdp.e_commerce.entities.dtos.carrier.CarrierResponse;
-import com.arthuurdp.e_commerce.entities.dtos.carrier.CreateCarrierRequest;
-import com.arthuurdp.e_commerce.entities.dtos.carrier.UpdateCarrierRequest;
-import com.arthuurdp.e_commerce.entities.enums.CarrierStatus;
+import com.arthuurdp.e_commerce.domain.dtos.carrier.CarrierResponse;
+import com.arthuurdp.e_commerce.domain.dtos.carrier.CreateCarrierRequest;
+import com.arthuurdp.e_commerce.domain.dtos.carrier.UpdateCarrierRequest;
+import com.arthuurdp.e_commerce.domain.enums.CarrierStatus;
 import com.arthuurdp.e_commerce.services.CarrierService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;

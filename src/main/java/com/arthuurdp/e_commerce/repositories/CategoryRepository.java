@@ -1,6 +1,6 @@
 package com.arthuurdp.e_commerce.repositories;
 
-import com.arthuurdp.e_commerce.entities.Category;
+import com.arthuurdp.e_commerce.domain.entities.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

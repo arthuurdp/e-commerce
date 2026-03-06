@@ -1,13 +1,11 @@
 package com.arthuurdp.e_commerce.controllers;
 
-import com.arthuurdp.e_commerce.entities.dtos.order.OrderDetailsResponse;
-import com.arthuurdp.e_commerce.entities.dtos.order.OrderResponse;
+import com.arthuurdp.e_commerce.domain.dtos.order.OrderDetailsResponse;
+import com.arthuurdp.e_commerce.domain.dtos.order.OrderResponse;
 import com.arthuurdp.e_commerce.services.OrderService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/orders")

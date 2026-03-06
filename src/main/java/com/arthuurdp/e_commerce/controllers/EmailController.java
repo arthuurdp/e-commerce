@@ -1,8 +1,8 @@
 package com.arthuurdp.e_commerce.controllers;
 
-import com.arthuurdp.e_commerce.entities.dtos.email.ChangeEmailRequest;
-import com.arthuurdp.e_commerce.entities.dtos.email.ChangePasswordRequest;
-import com.arthuurdp.e_commerce.entities.dtos.email.VerifyCodeRequest;
+import com.arthuurdp.e_commerce.domain.dtos.email.ChangeEmailRequest;
+import com.arthuurdp.e_commerce.domain.dtos.email.ChangePasswordRequest;
+import com.arthuurdp.e_commerce.domain.dtos.email.VerifyCodeRequest;
 import com.arthuurdp.e_commerce.services.EmailService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

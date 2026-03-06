@@ -1,7 +1,7 @@
 package com.arthuurdp.e_commerce.controllers;
 
-import com.arthuurdp.e_commerce.entities.dtos.checkout.CheckoutRequest;
-import com.arthuurdp.e_commerce.entities.dtos.checkout.CheckoutResponse;
+import com.arthuurdp.e_commerce.domain.dtos.checkout.CheckoutRequest;
+import com.arthuurdp.e_commerce.domain.dtos.checkout.CheckoutResponse;
 import com.arthuurdp.e_commerce.services.CheckoutService;
 import com.stripe.exception.StripeException;
 import jakarta.validation.Valid;

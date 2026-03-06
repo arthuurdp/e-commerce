@@ -1,7 +1,7 @@
 package com.arthuurdp.e_commerce.controllers;
 
-import com.arthuurdp.e_commerce.entities.dtos.shipping.ShippingResponse;
-import com.arthuurdp.e_commerce.entities.dtos.shipping.UpdateShippingRequest;
+import com.arthuurdp.e_commerce.domain.dtos.shipping.ShippingResponse;
+import com.arthuurdp.e_commerce.domain.dtos.shipping.UpdateShippingRequest;
 import com.arthuurdp.e_commerce.services.ShippingService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

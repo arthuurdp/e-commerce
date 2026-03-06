@@ -1,16 +1,14 @@
 package com.arthuurdp.e_commerce.controllers;
 
-import com.arthuurdp.e_commerce.entities.User;
-import com.arthuurdp.e_commerce.entities.dtos.address.AddressResponse;
-import com.arthuurdp.e_commerce.entities.dtos.address.CreateAddressRequest;
-import com.arthuurdp.e_commerce.entities.dtos.address.UpdateAddressRequest;
-import com.arthuurdp.e_commerce.infrastructure.security.CustomUserDetailsService;
+import com.arthuurdp.e_commerce.domain.entities.User;
+import com.arthuurdp.e_commerce.domain.dtos.address.AddressResponse;
+import com.arthuurdp.e_commerce.domain.dtos.address.CreateAddressRequest;
+import com.arthuurdp.e_commerce.domain.dtos.address.UpdateAddressRequest;
 import com.arthuurdp.e_commerce.services.AddressService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 

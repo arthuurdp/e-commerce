@@ -1,11 +1,11 @@
 package com.arthuurdp.e_commerce.services;
 
-import com.arthuurdp.e_commerce.entities.Carrier;
-import com.arthuurdp.e_commerce.entities.State;
-import com.arthuurdp.e_commerce.entities.dtos.carrier.CarrierResponse;
-import com.arthuurdp.e_commerce.entities.dtos.carrier.CreateCarrierRequest;
-import com.arthuurdp.e_commerce.entities.dtos.carrier.UpdateCarrierRequest;
-import com.arthuurdp.e_commerce.entities.enums.CarrierStatus;
+import com.arthuurdp.e_commerce.domain.entities.Carrier;
+import com.arthuurdp.e_commerce.domain.entities.State;
+import com.arthuurdp.e_commerce.domain.dtos.carrier.CarrierResponse;
+import com.arthuurdp.e_commerce.domain.dtos.carrier.CreateCarrierRequest;
+import com.arthuurdp.e_commerce.domain.dtos.carrier.UpdateCarrierRequest;
+import com.arthuurdp.e_commerce.domain.enums.CarrierStatus;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.CarrierRepository;
 import com.arthuurdp.e_commerce.repositories.StateRepository;

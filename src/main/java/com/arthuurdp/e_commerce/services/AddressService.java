@@ -1,11 +1,11 @@
 package com.arthuurdp.e_commerce.services;
 
-import com.arthuurdp.e_commerce.entities.Address;
-import com.arthuurdp.e_commerce.entities.City;
-import com.arthuurdp.e_commerce.entities.User;
-import com.arthuurdp.e_commerce.entities.dtos.address.AddressResponse;
-import com.arthuurdp.e_commerce.entities.dtos.address.CreateAddressRequest;
-import com.arthuurdp.e_commerce.entities.dtos.address.UpdateAddressRequest;
+import com.arthuurdp.e_commerce.domain.entities.Address;
+import com.arthuurdp.e_commerce.domain.entities.City;
+import com.arthuurdp.e_commerce.domain.entities.User;
+import com.arthuurdp.e_commerce.domain.dtos.address.AddressResponse;
+import com.arthuurdp.e_commerce.domain.dtos.address.CreateAddressRequest;
+import com.arthuurdp.e_commerce.domain.dtos.address.UpdateAddressRequest;
 import com.arthuurdp.e_commerce.exceptions.BadRequestException;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.AddressRepository;

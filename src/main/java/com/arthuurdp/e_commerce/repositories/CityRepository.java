@@ -1,6 +1,6 @@
 package com.arthuurdp.e_commerce.repositories;
 
-import com.arthuurdp.e_commerce.entities.City;
+import com.arthuurdp.e_commerce.domain.entities.City;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

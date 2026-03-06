@@ -1,8 +1,8 @@
 package com.arthuurdp.e_commerce.services;
 
-import com.arthuurdp.e_commerce.entities.Category;
-import com.arthuurdp.e_commerce.entities.dtos.category.CategoryRequest;
-import com.arthuurdp.e_commerce.entities.dtos.category.CategoryResponse;
+import com.arthuurdp.e_commerce.domain.entities.Category;
+import com.arthuurdp.e_commerce.domain.dtos.category.CategoryRequest;
+import com.arthuurdp.e_commerce.domain.dtos.category.CategoryResponse;
 import com.arthuurdp.e_commerce.exceptions.BadRequestException;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.CategoryRepository;

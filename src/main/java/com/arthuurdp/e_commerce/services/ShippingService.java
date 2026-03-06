@@ -1,13 +1,13 @@
 package com.arthuurdp.e_commerce.services;
 
-import com.arthuurdp.e_commerce.entities.Order;
-import com.arthuurdp.e_commerce.entities.Shipping;
-import com.arthuurdp.e_commerce.entities.User;
-import com.arthuurdp.e_commerce.entities.dtos.shipping.CreateShippingRequest;
-import com.arthuurdp.e_commerce.entities.dtos.shipping.ShippingResponse;
-import com.arthuurdp.e_commerce.entities.dtos.shipping.UpdateShippingRequest;
-import com.arthuurdp.e_commerce.entities.enums.OrderStatus;
-import com.arthuurdp.e_commerce.entities.enums.ShippingStatus;
+import com.arthuurdp.e_commerce.domain.entities.Order;
+import com.arthuurdp.e_commerce.domain.entities.Shipping;
+import com.arthuurdp.e_commerce.domain.entities.User;
+import com.arthuurdp.e_commerce.domain.dtos.shipping.CreateShippingRequest;
+import com.arthuurdp.e_commerce.domain.dtos.shipping.ShippingResponse;
+import com.arthuurdp.e_commerce.domain.dtos.shipping.UpdateShippingRequest;
+import com.arthuurdp.e_commerce.domain.enums.OrderStatus;
+import com.arthuurdp.e_commerce.domain.enums.ShippingStatus;
 import com.arthuurdp.e_commerce.exceptions.BadRequestException;
 import com.arthuurdp.e_commerce.exceptions.ConflictException;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;

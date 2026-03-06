@@ -1,8 +1,8 @@
 package com.arthuurdp.e_commerce.services;
 
-import com.arthuurdp.e_commerce.entities.EmailVerificationToken;
-import com.arthuurdp.e_commerce.entities.PasswordVerificationToken;
-import com.arthuurdp.e_commerce.entities.User;
+import com.arthuurdp.e_commerce.domain.entities.EmailVerificationToken;
+import com.arthuurdp.e_commerce.domain.entities.PasswordVerificationToken;
+import com.arthuurdp.e_commerce.domain.entities.User;
 import com.arthuurdp.e_commerce.exceptions.AccessDeniedException;
 import com.arthuurdp.e_commerce.exceptions.BadRequestException;
 import com.arthuurdp.e_commerce.exceptions.ConflictException;

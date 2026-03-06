@@ -1,11 +1,11 @@
 package com.arthuurdp.e_commerce.services;
 
-import com.arthuurdp.e_commerce.entities.Cart;
-import com.arthuurdp.e_commerce.entities.Order;
-import com.arthuurdp.e_commerce.entities.Payment;
-import com.arthuurdp.e_commerce.entities.User;
-import com.arthuurdp.e_commerce.entities.enums.PaymentMethod;
-import com.arthuurdp.e_commerce.entities.enums.PaymentStatus;
+import com.arthuurdp.e_commerce.domain.entities.Cart;
+import com.arthuurdp.e_commerce.domain.entities.Order;
+import com.arthuurdp.e_commerce.domain.entities.Payment;
+import com.arthuurdp.e_commerce.domain.entities.User;
+import com.arthuurdp.e_commerce.domain.enums.PaymentMethod;
+import com.arthuurdp.e_commerce.domain.enums.PaymentStatus;
 import com.arthuurdp.e_commerce.repositories.PaymentRepository;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;

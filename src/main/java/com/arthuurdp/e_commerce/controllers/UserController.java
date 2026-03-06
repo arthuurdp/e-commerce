@@ -1,7 +1,7 @@
 package com.arthuurdp.e_commerce.controllers;
 
-import com.arthuurdp.e_commerce.entities.dtos.user.UpdateUserRequest;
-import com.arthuurdp.e_commerce.entities.dtos.user.UserResponse;
+import com.arthuurdp.e_commerce.domain.dtos.user.UpdateUserRequest;
+import com.arthuurdp.e_commerce.domain.dtos.user.UserResponse;
 import com.arthuurdp.e_commerce.infrastructure.security.annotations.AdminOrSelf;
 import com.arthuurdp.e_commerce.services.UserService;
 import jakarta.validation.Valid;

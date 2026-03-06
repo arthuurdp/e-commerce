@@ -1,9 +1,9 @@
 package com.arthuurdp.e_commerce.controllers;
 
-import com.arthuurdp.e_commerce.entities.dtos.auth.LoginRequest;
-import com.arthuurdp.e_commerce.entities.dtos.auth.LoginResponse;
-import com.arthuurdp.e_commerce.entities.dtos.auth.RegisterRequest;
-import com.arthuurdp.e_commerce.entities.dtos.auth.RegisterResponse;
+import com.arthuurdp.e_commerce.domain.dtos.auth.LoginRequest;
+import com.arthuurdp.e_commerce.domain.dtos.auth.LoginResponse;
+import com.arthuurdp.e_commerce.domain.dtos.auth.RegisterRequest;
+import com.arthuurdp.e_commerce.domain.dtos.auth.RegisterResponse;
 import com.arthuurdp.e_commerce.services.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

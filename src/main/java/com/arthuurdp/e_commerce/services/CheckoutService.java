@@ -1,8 +1,8 @@
 package com.arthuurdp.e_commerce.services;
 
-import com.arthuurdp.e_commerce.entities.*;
-import com.arthuurdp.e_commerce.entities.dtos.checkout.CheckoutRequest;
-import com.arthuurdp.e_commerce.entities.dtos.checkout.CheckoutResponse;
+import com.arthuurdp.e_commerce.domain.entities.*;
+import com.arthuurdp.e_commerce.domain.dtos.checkout.CheckoutRequest;
+import com.arthuurdp.e_commerce.domain.dtos.checkout.CheckoutResponse;
 import com.arthuurdp.e_commerce.exceptions.BadRequestException;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.*;

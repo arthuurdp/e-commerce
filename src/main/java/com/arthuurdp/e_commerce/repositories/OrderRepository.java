@@ -1,12 +1,11 @@
 package com.arthuurdp.e_commerce.repositories;
 
-import com.arthuurdp.e_commerce.entities.Order;
+import com.arthuurdp.e_commerce.domain.entities.Order;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository

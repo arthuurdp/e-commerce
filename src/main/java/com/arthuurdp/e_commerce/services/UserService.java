@@ -1,8 +1,8 @@
 package com.arthuurdp.e_commerce.services;
 
-import com.arthuurdp.e_commerce.entities.User;
-import com.arthuurdp.e_commerce.entities.dtos.user.UpdateUserRequest;
-import com.arthuurdp.e_commerce.entities.dtos.user.UserResponse;
+import com.arthuurdp.e_commerce.domain.entities.User;
+import com.arthuurdp.e_commerce.domain.dtos.user.UpdateUserRequest;
+import com.arthuurdp.e_commerce.domain.dtos.user.UserResponse;
 import com.arthuurdp.e_commerce.exceptions.BadRequestException;
 import com.arthuurdp.e_commerce.exceptions.ConflictException;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;

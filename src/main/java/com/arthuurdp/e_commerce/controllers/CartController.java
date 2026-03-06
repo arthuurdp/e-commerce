@@ -1,7 +1,7 @@
 package com.arthuurdp.e_commerce.controllers;
 
-import com.arthuurdp.e_commerce.entities.dtos.cart.CartItemResponse;
-import com.arthuurdp.e_commerce.entities.dtos.cart.CartResponse;
+import com.arthuurdp.e_commerce.domain.dtos.cart.CartItemResponse;
+import com.arthuurdp.e_commerce.domain.dtos.cart.CartResponse;
 import com.arthuurdp.e_commerce.services.CartService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

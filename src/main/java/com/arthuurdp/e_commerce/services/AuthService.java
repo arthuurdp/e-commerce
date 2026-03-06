@@ -1,8 +1,11 @@
 package com.arthuurdp.e_commerce.services;
 
-import com.arthuurdp.e_commerce.entities.User;
-import com.arthuurdp.e_commerce.entities.dtos.auth.*;
-import com.arthuurdp.e_commerce.entities.enums.Role;
+import com.arthuurdp.e_commerce.domain.entities.User;
+import com.arthuurdp.e_commerce.domain.dtos.auth.LoginRequest;
+import com.arthuurdp.e_commerce.domain.dtos.auth.LoginResponse;
+import com.arthuurdp.e_commerce.domain.dtos.auth.RegisterRequest;
+import com.arthuurdp.e_commerce.domain.dtos.auth.RegisterResponse;
+import com.arthuurdp.e_commerce.domain.enums.Role;
 import com.arthuurdp.e_commerce.exceptions.ConflictException;
 import com.arthuurdp.e_commerce.infrastructure.security.TokenService;
 import com.arthuurdp.e_commerce.repositories.UserRepository;

@@ -1,9 +1,9 @@
 package com.arthuurdp.e_commerce.services;
 
-import com.arthuurdp.e_commerce.entities.Order;
-import com.arthuurdp.e_commerce.entities.Payment;
-import com.arthuurdp.e_commerce.entities.enums.OrderStatus;
-import com.arthuurdp.e_commerce.entities.enums.PaymentStatus;
+import com.arthuurdp.e_commerce.domain.entities.Order;
+import com.arthuurdp.e_commerce.domain.entities.Payment;
+import com.arthuurdp.e_commerce.domain.enums.OrderStatus;
+import com.arthuurdp.e_commerce.domain.enums.PaymentStatus;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.OrderRepository;
 import com.arthuurdp.e_commerce.repositories.PaymentRepository;

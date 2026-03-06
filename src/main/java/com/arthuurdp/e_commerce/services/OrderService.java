@@ -1,9 +1,9 @@
 package com.arthuurdp.e_commerce.services;
 
-import com.arthuurdp.e_commerce.entities.*;
-import com.arthuurdp.e_commerce.entities.dtos.order.OrderDetailsResponse;
-import com.arthuurdp.e_commerce.entities.dtos.order.OrderResponse;
-import com.arthuurdp.e_commerce.entities.enums.OrderStatus;
+import com.arthuurdp.e_commerce.domain.entities.*;
+import com.arthuurdp.e_commerce.domain.dtos.order.OrderDetailsResponse;
+import com.arthuurdp.e_commerce.domain.dtos.order.OrderResponse;
+import com.arthuurdp.e_commerce.domain.enums.OrderStatus;
 import com.arthuurdp.e_commerce.exceptions.AccessDeniedException;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.*;
@@ -14,7 +14,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Service
 public class OrderService {

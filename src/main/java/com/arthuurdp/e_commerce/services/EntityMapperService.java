@@ -1,21 +1,21 @@
 package com.arthuurdp.e_commerce.services;
 
-import com.arthuurdp.e_commerce.entities.*;
-import com.arthuurdp.e_commerce.entities.dtos.carrier.CarrierResponse;
-import com.arthuurdp.e_commerce.entities.dtos.order.OrderResponse;
-import com.arthuurdp.e_commerce.entities.dtos.order_item.OrderItemResponse;
-import com.arthuurdp.e_commerce.entities.dtos.order.OrderDetailsResponse;
-import com.arthuurdp.e_commerce.entities.dtos.address.AddressResponse;
-import com.arthuurdp.e_commerce.entities.dtos.places.CityResponse;
-import com.arthuurdp.e_commerce.entities.dtos.places.StateResponse;
-import com.arthuurdp.e_commerce.entities.dtos.cart.CartItemResponse;
-import com.arthuurdp.e_commerce.entities.dtos.auth.RegisterResponse;
-import com.arthuurdp.e_commerce.entities.dtos.cart.CartResponse;
-import com.arthuurdp.e_commerce.entities.dtos.category.CategoryResponse;
-import com.arthuurdp.e_commerce.entities.dtos.product.*;
-import com.arthuurdp.e_commerce.entities.dtos.shipping.ShippingCarrierResponse;
-import com.arthuurdp.e_commerce.entities.dtos.shipping.ShippingResponse;
-import com.arthuurdp.e_commerce.entities.dtos.user.UserResponse;
+import com.arthuurdp.e_commerce.domain.dtos.product.*;
+import com.arthuurdp.e_commerce.domain.entities.*;
+import com.arthuurdp.e_commerce.domain.dtos.carrier.CarrierResponse;
+import com.arthuurdp.e_commerce.domain.dtos.order.OrderResponse;
+import com.arthuurdp.e_commerce.domain.dtos.order.OrderItemResponse;
+import com.arthuurdp.e_commerce.domain.dtos.order.OrderDetailsResponse;
+import com.arthuurdp.e_commerce.domain.dtos.address.AddressResponse;
+import com.arthuurdp.e_commerce.domain.dtos.places.CityResponse;
+import com.arthuurdp.e_commerce.domain.dtos.places.StateResponse;
+import com.arthuurdp.e_commerce.domain.dtos.cart.CartItemResponse;
+import com.arthuurdp.e_commerce.domain.dtos.auth.RegisterResponse;
+import com.arthuurdp.e_commerce.domain.dtos.cart.CartResponse;
+import com.arthuurdp.e_commerce.domain.dtos.category.CategoryResponse;
+import com.arthuurdp.e_commerce.domain.dtos.shipping.ShippingCarrierResponse;
+import com.arthuurdp.e_commerce.domain.dtos.shipping.ShippingResponse;
+import com.arthuurdp.e_commerce.domain.dtos.user.UserResponse;
 import org.springframework.stereotype.Component;
 
 @Component

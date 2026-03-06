@@ -1,8 +1,8 @@
 package com.arthuurdp.e_commerce.services;
 
-import com.arthuurdp.e_commerce.entities.Product;
-import com.arthuurdp.e_commerce.entities.ProductImage;
-import com.arthuurdp.e_commerce.entities.dtos.product.*;
+import com.arthuurdp.e_commerce.domain.dtos.product.*;
+import com.arthuurdp.e_commerce.domain.entities.Product;
+import com.arthuurdp.e_commerce.domain.entities.ProductImage;
 import com.arthuurdp.e_commerce.exceptions.BadRequestException;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.ProductRepository;

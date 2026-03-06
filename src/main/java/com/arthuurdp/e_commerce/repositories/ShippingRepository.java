@@ -1,6 +1,6 @@
 package com.arthuurdp.e_commerce.repositories;
 
-import com.arthuurdp.e_commerce.entities.Shipping;
+import com.arthuurdp.e_commerce.domain.entities.Shipping;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

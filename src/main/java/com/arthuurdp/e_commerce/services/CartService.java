@@ -1,11 +1,11 @@
 package com.arthuurdp.e_commerce.services;
 
-import com.arthuurdp.e_commerce.entities.CartItem;
-import com.arthuurdp.e_commerce.entities.Product;
-import com.arthuurdp.e_commerce.entities.Cart;
-import com.arthuurdp.e_commerce.entities.User;
-import com.arthuurdp.e_commerce.entities.dtos.cart.CartItemResponse;
-import com.arthuurdp.e_commerce.entities.dtos.cart.CartResponse;
+import com.arthuurdp.e_commerce.domain.entities.CartItem;
+import com.arthuurdp.e_commerce.domain.entities.Product;
+import com.arthuurdp.e_commerce.domain.entities.Cart;
+import com.arthuurdp.e_commerce.domain.entities.User;
+import com.arthuurdp.e_commerce.domain.dtos.cart.CartItemResponse;
+import com.arthuurdp.e_commerce.domain.dtos.cart.CartResponse;
 import com.arthuurdp.e_commerce.exceptions.AuthenticationException;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.CartItemRepository;

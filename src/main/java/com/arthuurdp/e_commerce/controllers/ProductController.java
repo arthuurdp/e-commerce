@@ -1,6 +1,6 @@
 package com.arthuurdp.e_commerce.controllers;
 
-import com.arthuurdp.e_commerce.entities.dtos.product.*;
+import com.arthuurdp.e_commerce.domain.dtos.product.*;
 import com.arthuurdp.e_commerce.services.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
