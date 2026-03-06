@@ -31,11 +31,13 @@ public class WebhookService {
 
     private final OrderRepository orderRepository;
     private final PaymentRepository paymentRepository;
+    private final EmailSenderService emailSenderService;
 
-    public WebhookService(OrderRepository orderRepository, PaymentRepository paymentRepository, ShippingService shippingService) {
+    public WebhookService(OrderRepository orderRepository, PaymentRepository paymentRepository, ShippingService shippingService, EmailSenderService emailSenderService) {
         this.orderRepository = orderRepository;
         this.paymentRepository = paymentRepository;
         this.shippingService = shippingService;
+        this.emailSenderService = emailSenderService;
     }
 
     @Transactional
@@ -103,6 +105,7 @@ public class WebhookService {
             payment.setTransactionId(session.getPaymentIntent());
             order.setStatus(OrderStatus.PAID);
             shippingService.createForOrder(order);
+            emailSenderService.sendOrderConfirmation(order.getUser().getEmail(), orderId);
             log.info("Order {} marked as PAID", orderId);
         } else {
             payment.setStatus(PaymentStatus.PENDING);

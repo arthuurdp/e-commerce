@@ -50,4 +50,12 @@ public class EmailSenderService {
         message.setText("Your password has been changed successfully.");
         sender.send(message);
     }
+
+    public void sendOrderConfirmation(String to, String orderId) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject("Order confirmation");
+        message.setText("Your order has been placed successfully!");
+        sender.send(message);
+    }
 }
