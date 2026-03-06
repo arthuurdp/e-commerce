@@ -1,6 +1,7 @@
 package com.arthuurdp.e_commerce.services;
 
 import com.arthuurdp.e_commerce.entities.*;
+import com.arthuurdp.e_commerce.entities.dtos.carrier.CarrierResponse;
 import com.arthuurdp.e_commerce.entities.dtos.order.OrderResponse;
 import com.arthuurdp.e_commerce.entities.dtos.order_item.OrderItemResponse;
 import com.arthuurdp.e_commerce.entities.dtos.order.OrderDetailsResponse;
@@ -202,6 +203,13 @@ public class EntityMapperService {
                 shipping.getShippedAt(),
                 shipping.getDeliveredAt(),
                 shipping.getCreatedAt()
+        );
+    }
+
+    public CarrierResponse toCarrierResponse(Carrier carrier) {
+        return new CarrierResponse(
+                carrier.getId(),
+                carrier.getName()
         );
     }
 }
