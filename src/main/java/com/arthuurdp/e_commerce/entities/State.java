@@ -2,6 +2,7 @@ package com.arthuurdp.e_commerce.entities;
 
 import jakarta.persistence.*;
 
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -20,6 +21,10 @@ public class State {
 
     @OneToMany(mappedBy = "state", fetch = FetchType.LAZY)
     private Set<City> cities;
+
+    @ManyToMany(mappedBy = "states", fetch = FetchType.LAZY)
+    @JoinTable(name = "carrier_state", joinColumns = @JoinColumn(name = "state_id"), inverseJoinColumns = @JoinColumn(name = "carrier_id"))
+    private List<Carrier> carriers;
 
     public State() {}
 
@@ -54,5 +59,9 @@ public class State {
 
     public Set<City> getCities() {
         return cities;
+    }
+
+    public List<Carrier> getCarriers() {
+        return carriers;
     }
 }
