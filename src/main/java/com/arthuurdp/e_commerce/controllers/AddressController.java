@@ -5,6 +5,7 @@ import com.arthuurdp.e_commerce.domain.dtos.address.AddressResponse;
 import com.arthuurdp.e_commerce.domain.dtos.address.CreateAddressRequest;
 import com.arthuurdp.e_commerce.domain.dtos.address.UpdateAddressRequest;
 import com.arthuurdp.e_commerce.services.AddressService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,7 +16,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 
 @RestController
-@PreAuthorize("hasRole('USER')")
 @RequestMapping("/addresses")
 public class AddressController {
     private final AddressService service;
@@ -24,7 +24,9 @@ public class AddressController {
         this.service = service;
     }
 
+
     @GetMapping
+    @PreAuthorize("hasRole('USER')")
     public Page<AddressResponse> findAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -34,6 +36,7 @@ public class AddressController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<AddressResponse> findById(
             @PathVariable Long id,
             @AuthenticationPrincipal User user
@@ -42,8 +45,9 @@ public class AddressController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<AddressResponse> create(
-            @RequestBody CreateAddressRequest req,
+            @RequestBody @Valid CreateAddressRequest req,
             @AuthenticationPrincipal User user
     ) {
         AddressResponse response = service.create(req, user);
@@ -57,13 +61,22 @@ public class AddressController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<AddressResponse> update(@PathVariable Long id, @RequestBody UpdateAddressRequest req) {
-        return ResponseEntity.ok().body(service.update(id, req));
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<AddressResponse> update(
+            @PathVariable Long id,
+            @RequestBody @Valid UpdateAddressRequest req,
+            @AuthenticationPrincipal User user
+    ) {
+        return ResponseEntity.ok().body(service.update(id, req, user));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        service.delete(id);
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Void> delete(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User user
+    ) {
+        service.delete(id, user);
         return ResponseEntity.noContent().build();
     }
 }

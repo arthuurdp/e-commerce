@@ -6,7 +6,6 @@ import com.arthuurdp.e_commerce.domain.entities.User;
 import com.arthuurdp.e_commerce.domain.dtos.address.AddressResponse;
 import com.arthuurdp.e_commerce.domain.dtos.address.CreateAddressRequest;
 import com.arthuurdp.e_commerce.domain.dtos.address.UpdateAddressRequest;
-import com.arthuurdp.e_commerce.exceptions.BadRequestException;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.AddressRepository;
 import com.arthuurdp.e_commerce.repositories.CityRepository;
@@ -21,13 +20,11 @@ public class AddressService {
     private final AddressRepository addressRepository;
     private final CityRepository cityRepository;
     private final EntityMapperService entityMapperService;
-    private final AuthService authService;
 
-    public AddressService(AddressRepository addressRepository, CityRepository cityRepository, EntityMapperService entityMapperService, AuthService authService) {
+    public AddressService(AddressRepository addressRepository, CityRepository cityRepository, EntityMapperService entityMapperService) {
         this.addressRepository = addressRepository;
         this.cityRepository = cityRepository;
         this.entityMapperService = entityMapperService;
-        this.authService = authService;
     }
 
     public AddressResponse findById(Long id, Long userId) {
@@ -43,12 +40,14 @@ public class AddressService {
     public AddressResponse create(CreateAddressRequest req, User user) {
         City city = cityRepository.findById(req.cityId()).orElseThrow(() -> new ResourceNotFoundException("City not found"));
 
-        Address address = new Address();
-        address.setName((req.name() != null) ? req.name() : "Default");
-        address.setStreet(req.street());
-        address.setNumber(req.number());
-        address.setComplement(req.complement());
-        address.setNeighborhood(req.neighborhood());
+        Address address = new Address(
+                req.name(),
+                req.street(),
+                req.number(),
+                req.complement(),
+                req.neighborhood()
+        );
+
         address.setCity(city);
         address.setUser(user);
 
@@ -56,40 +55,20 @@ public class AddressService {
     }
 
     @Transactional
-    public AddressResponse update(Long id, UpdateAddressRequest req) {
-        User user = authService.getCurrentUser();
+    public AddressResponse update(Long id, UpdateAddressRequest req, User user) {
         Address address = addressRepository.findByIdAndUserId(id, user.getId()).orElseThrow(() -> new ResourceNotFoundException("Address not found"));
-        boolean updated = false;
 
-        if (req.name() != null) {
-            address.setName(req.name());
-            updated = true;
-        }
-        if (req.street() != null) {
-            address.setStreet(req.street());
-            updated = true;
-        }
-        if (req.number() != null) {
-            address.setNumber(req.number());
-            updated = true;
-        }
-        if (req.complement() != null) {
-            address.setComplement(req.complement());
-            updated = true;
-        }
-        if (req.neighborhood() != null) {
-            address.setNeighborhood(req.neighborhood());
-            updated = true;
-        }
-        if (!updated) {
-            throw new BadRequestException("No valid fields provided");
-        }
+        address.setName(req.name());
+        address.setStreet(req.street());
+        address.setNumber(req.number());
+        address.setComplement(req.complement());
+        address.setNeighborhood(req.neighborhood());
+
         return entityMapperService.toAddressResponse(addressRepository.save(address));
     }
 
     @Transactional
-    public void delete(Long id) {
-        User user = authService.getCurrentUser();
+    public void delete(Long id, User user) {
         Address address = addressRepository.findByIdAndUserId(id, user.getId()).orElseThrow(() -> new ResourceNotFoundException("Address not found"));
         addressRepository.delete(address);
     }
