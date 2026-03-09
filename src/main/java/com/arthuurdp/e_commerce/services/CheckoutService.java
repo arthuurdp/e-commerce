@@ -34,8 +34,7 @@ public class CheckoutService {
     }
 
     @Transactional
-    public CheckoutResponse checkout(CheckoutRequest req) throws StripeException {
-        User user = authService.getCurrentUser();
+    public CheckoutResponse checkout(CheckoutRequest req, User user) throws StripeException {
         Cart cart = cartRepository.findById(user.getCart().getId()).orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
 
         if (cart.isEmpty()) {

@@ -114,8 +114,7 @@ public class EmailService {
     }
 
     @Transactional
-    public void requestPasswordChange(String newPassword) {
-        User user = authService.getCurrentUser();
+    public void requestPasswordChange(String newPassword, User user) {
 
         if (!user.isEmailVerified()) {
             throw new AccessDeniedException("Email not verified");

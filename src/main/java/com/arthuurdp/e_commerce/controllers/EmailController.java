@@ -3,9 +3,11 @@ package com.arthuurdp.e_commerce.controllers;
 import com.arthuurdp.e_commerce.domain.dtos.email.ChangeEmailRequest;
 import com.arthuurdp.e_commerce.domain.dtos.email.ChangePasswordRequest;
 import com.arthuurdp.e_commerce.domain.dtos.email.VerifyCodeRequest;
+import com.arthuurdp.e_commerce.domain.entities.User;
 import com.arthuurdp.e_commerce.services.EmailService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -42,8 +44,11 @@ public class EmailController {
     }
 
     @PostMapping("/password/change")
-    public ResponseEntity<Void> requestPasswordChange(@RequestBody @Valid ChangePasswordRequest req) {
-        emailService.requestPasswordChange(req.newPassword());
+    public ResponseEntity<Void> requestPasswordChange(
+            @RequestBody @Valid ChangePasswordRequest req,
+            @AuthenticationPrincipal User user
+            ) {
+        emailService.requestPasswordChange(req.newPassword(), user);
         return ResponseEntity.noContent().build();
     }
 

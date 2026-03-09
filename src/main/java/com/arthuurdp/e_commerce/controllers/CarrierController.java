@@ -51,7 +51,7 @@ public class CarrierController {
     public ResponseEntity<CarrierResponse> create(@RequestBody @Valid CreateCarrierRequest req) {
         CarrierResponse response = carrierService.create(req);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(response.id()).toUri();
-        return ResponseEntity.created(uri).build();
+        return ResponseEntity.created(uri).body(response);
     }
 
     @PatchMapping("/{id}")

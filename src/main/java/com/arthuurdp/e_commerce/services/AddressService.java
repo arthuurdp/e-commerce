@@ -58,11 +58,26 @@ public class AddressService {
     public AddressResponse update(Long id, UpdateAddressRequest req, User user) {
         Address address = addressRepository.findByIdAndUserId(id, user.getId()).orElseThrow(() -> new ResourceNotFoundException("Address not found"));
 
-        address.setName(req.name());
-        address.setStreet(req.street());
-        address.setNumber(req.number());
-        address.setComplement(req.complement());
-        address.setNeighborhood(req.neighborhood());
+        if (req.name() != null) {
+            address.setName(req.name());
+        }
+        if (req.street() != null) {
+            address.setStreet(req.street());
+        }
+        if (req.number() != null) {
+            address.setNumber(req.number());
+        }
+        if (req.complement() != null) {
+            address.setComplement(req.complement());
+        }
+        if (req.neighborhood() != null) {
+            address.setNeighborhood(req.neighborhood());
+        }
+        if (req.cityId() != null) {
+            if (cityRepository.existsById(req.cityId())) {
+                address.setCity(cityRepository.findById(req.cityId()).orElseThrow());
+            }
+        }
 
         return entityMapperService.toAddressResponse(addressRepository.save(address));
     }

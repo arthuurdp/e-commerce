@@ -2,11 +2,13 @@ package com.arthuurdp.e_commerce.controllers;
 
 import com.arthuurdp.e_commerce.domain.dtos.checkout.CheckoutRequest;
 import com.arthuurdp.e_commerce.domain.dtos.checkout.CheckoutResponse;
+import com.arthuurdp.e_commerce.domain.entities.User;
 import com.arthuurdp.e_commerce.services.CheckoutService;
 import com.stripe.exception.StripeException;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,9 +21,12 @@ public class CheckoutController {
 
     @PostMapping("/orders/checkout")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<CheckoutResponse> checkout(@RequestBody @Valid CheckoutRequest req)
+    public ResponseEntity<CheckoutResponse> checkout(
+            @RequestBody @Valid CheckoutRequest req,
+            @AuthenticationPrincipal User user
+    )
             throws StripeException {
-        return ResponseEntity.ok(checkoutService.checkout(req));
+        return ResponseEntity.ok(checkoutService.checkout(req, user));
     }
 
     @GetMapping("/checkout/success")

@@ -19,19 +19,16 @@ import java.math.BigDecimal;
 public class OrderService {
     private final OrderRepository orderRepository;
     private final EntityMapperService entityMapperService;
-    private final AuthService authService;
     private final ProductService productService;
 
-    public OrderService(OrderRepository orderRepository, EntityMapperService entityMapperService, AuthService authService, ProductService productService) {
+    public OrderService(OrderRepository orderRepository, EntityMapperService entityMapperService, ProductService productService) {
         this.orderRepository = orderRepository;
         this.entityMapperService = entityMapperService;
-        this.authService = authService;
         this.productService = productService;
     }
 
     @Transactional
-    public OrderDetailsResponse findById(Long id) {
-        User user = authService.getCurrentUser();
+    public OrderDetailsResponse findById(Long id, User user) {
         Order order = orderRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
         if (!order.getUser().getEmail().equals(user.getEmail())) {
@@ -42,9 +39,8 @@ public class OrderService {
     }
 
     @Transactional
-    public Page<OrderResponse> findByUser(int page, int size) {
+    public Page<OrderResponse> findByUser(int page, int size, User user) {
         Pageable pageable = PageRequest.of(page, size);
-        User user = authService.getCurrentUser();
         return orderRepository.findByUserId(pageable, user.getId()).map(entityMapperService::toOrderResponse);
     }
 

@@ -2,9 +2,11 @@ package com.arthuurdp.e_commerce.controllers;
 
 import com.arthuurdp.e_commerce.domain.dtos.order.OrderDetailsResponse;
 import com.arthuurdp.e_commerce.domain.dtos.order.OrderResponse;
+import com.arthuurdp.e_commerce.domain.entities.User;
 import com.arthuurdp.e_commerce.services.OrderService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,13 +21,17 @@ public class OrderController {
     @GetMapping
     public ResponseEntity<Page<OrderResponse>> findByUser(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "10") int size,
+            @AuthenticationPrincipal User user
     ) {
-        return ResponseEntity.ok(orderService.findByUser(page, size));
+        return ResponseEntity.ok(orderService.findByUser(page, size, user));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrderDetailsResponse> findById(@PathVariable Long id) {
-        return ResponseEntity.ok(orderService.findById(id));
+    public ResponseEntity<OrderDetailsResponse> findById(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User user
+    ) {
+        return ResponseEntity.ok(orderService.findById(id, user));
     }
 }

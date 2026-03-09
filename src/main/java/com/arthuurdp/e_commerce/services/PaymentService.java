@@ -33,11 +33,11 @@ public class PaymentService {
 
     @Transactional
     public Payment createPayment(Order order, PaymentMethod method) {
-        Payment payment = new Payment();
-        payment.setOrder(order);
-        payment.setMethod(method);
-        payment.setAmount(order.getTotal());
-        payment.setStatus(PaymentStatus.PENDING);
+        Payment payment = new Payment(
+                order,
+                method,
+                order.getTotal()
+      );
         return paymentRepository.save(payment);
     }
 

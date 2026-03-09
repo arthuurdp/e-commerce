@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CityService {
-    private CityRepository cityRepository;
-    private EntityMapperService entityMapperService;
+    private final CityRepository cityRepository;
+    private final EntityMapperService entityMapperService;
 
     public CityService(CityRepository cityRepository, EntityMapperService entityMapperService) {
         this.cityRepository = cityRepository;

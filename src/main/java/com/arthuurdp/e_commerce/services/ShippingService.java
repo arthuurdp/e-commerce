@@ -21,13 +21,11 @@ import java.time.LocalDateTime;
 public class ShippingService {
     private final ShippingRepository shippingRepository;
     private final OrderRepository orderRepository;
-    private final AuthService authService;
     private final EntityMapperService entityMapperService;
 
-    public ShippingService(ShippingRepository shippingRepository, OrderRepository orderRepository, AuthService authService, EntityMapperService entityMapperService) {
+    public ShippingService(ShippingRepository shippingRepository, OrderRepository orderRepository, EntityMapperService entityMapperService) {
         this.shippingRepository = shippingRepository;
         this.orderRepository = orderRepository;
-        this.authService = authService;
         this.entityMapperService = entityMapperService;
     }
 
@@ -42,8 +40,8 @@ public class ShippingService {
         return entityMapperService.toShippingResponse(shippingRepository.save(new Shipping(order)));
     }
 
-    public ShippingResponse findByOrderId(Long orderId) {
-        User user = authService.getCurrentUser();
+    @Transactional
+    public ShippingResponse findByOrderId(Long orderId, User user) {
         Shipping shipping = shippingRepository.findByOrderIdAndOrderUserId(orderId, user.getId()).orElseThrow(() -> new ResourceNotFoundException("Shipping not found"));
         return entityMapperService.toShippingResponse(shipping);
     }
