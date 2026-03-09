@@ -3,7 +3,6 @@ package com.arthuurdp.e_commerce.services;
 import com.arthuurdp.e_commerce.domain.entities.Order;
 import com.arthuurdp.e_commerce.domain.entities.Shipping;
 import com.arthuurdp.e_commerce.domain.entities.User;
-import com.arthuurdp.e_commerce.domain.dtos.shipping.CreateShippingRequest;
 import com.arthuurdp.e_commerce.domain.dtos.shipping.ShippingResponse;
 import com.arthuurdp.e_commerce.domain.dtos.shipping.UpdateShippingRequest;
 import com.arthuurdp.e_commerce.domain.enums.OrderStatus;
@@ -33,10 +32,13 @@ public class ShippingService {
     }
 
     @Transactional
-    public ShippingResponse create(CreateShippingRequest req) {
-        if (shippingRepository.existsByOrderId(req.orderId())) {
+    public ShippingResponse create(Long orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+
+        if (shippingRepository.existsByOrderId(orderId)) {
             throw new ConflictException("Shipping already exists");
         }
+
         return entityMapperService.toShippingResponse(shippingRepository.save(new Shipping(order)));
     }
 
@@ -52,12 +54,6 @@ public class ShippingService {
 
         if (req.status().ordinal() < shipping.getStatus().ordinal()) {
             throw new BadRequestException("Invalid status transition");
-        }
-        if (req.carrier() != null) {
-            shipping.s(req.carrier());
-        }
-        if (req.trackingCode() != null) {
-            shipping.setTrackingCode(req.trackingCode());
         }
 
         shipping.setStatus(req.status());

@@ -3,7 +3,8 @@ package com.arthuurdp.e_commerce.domain.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "category")
@@ -18,7 +19,7 @@ public class Category {
 
     @JsonIgnore
     @ManyToMany(mappedBy = "categories", fetch = FetchType.LAZY)
-    private List<Product> products;
+    private Set<Product> products = new HashSet<>();
 
     public Category() {
     }
@@ -43,7 +44,7 @@ public class Category {
         this.name = name;
     }
 
-    public List<Product> getProducts() {
+    public java.util.Set<Product> getProducts() {
         return products;
     }
 

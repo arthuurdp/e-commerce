@@ -24,7 +24,6 @@ public class AddressController {
         this.service = service;
     }
 
-
     @GetMapping
     @PreAuthorize("hasRole('USER')")
     public Page<AddressResponse> findAll(

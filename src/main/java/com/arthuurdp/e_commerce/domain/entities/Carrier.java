@@ -21,8 +21,8 @@ public class Carrier {
     @Column(name = "status", nullable = false)
     private CarrierStatus status;
 
-    @ManyToMany(mappedBy = "carriers")
-    List<Shipping> shippings = new ArrayList<>();
+    @OneToMany(mappedBy = "carrier")
+    List<ShippingCarrier> shippingCarriers = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "state_id")
