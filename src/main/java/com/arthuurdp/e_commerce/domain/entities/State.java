@@ -1,7 +1,9 @@
 package com.arthuurdp.e_commerce.domain.entities;
 
+import com.arthuurdp.e_commerce.domain.enums.Region;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -19,11 +21,20 @@ public class State {
     @Column(name = "uf", nullable = false, length = 2)
     private String uf;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "region", nullable = false)
+    private Region region;
+
     @OneToMany(mappedBy = "state", fetch = FetchType.LAZY)
     private Set<City> cities;
 
-    @OneToMany(mappedBy = "state", fetch = FetchType.LAZY)
-    private List<Carrier> carriers;
+    @ManyToMany
+    @JoinTable(
+            name = "state_neighbors",
+            joinColumns = @JoinColumn(name = "state_id"),
+            inverseJoinColumns = @JoinColumn(name = "neighbor_id")
+    )
+    private List<State> neighbors = new ArrayList<>();
 
     public State() {}
 
@@ -51,11 +62,19 @@ public class State {
         this.uf = uf;
     }
 
+    public Region getRegion() {
+        return region;
+    }
+
+    public void setRegion(Region region) {
+        this.region = region;
+    }
+
     public Set<City> getCities() {
         return cities;
     }
 
-    public List<Carrier> getCarriers() {
-        return carriers;
+    public List<State> getNeighbors() {
+        return neighbors;
     }
 }

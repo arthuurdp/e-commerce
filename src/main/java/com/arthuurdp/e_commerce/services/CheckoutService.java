@@ -13,20 +13,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CheckoutService {
-    private final AuthService authService;
     private final CartRepository cartRepository;
     private final AddressRepository addressRepository;
     private final OrderService orderService;
     private final PaymentService paymentService;
 
-    public CheckoutService(
-            AuthService authService,
-            CartRepository cartRepository,
-            AddressRepository addressRepository,
-            OrderService orderService,
-            PaymentService paymentService
-    ) {
-        this.authService = authService;
+    public CheckoutService(CartRepository cartRepository, AddressRepository addressRepository, OrderService orderService, PaymentService paymentService) {
         this.cartRepository = cartRepository;
         this.addressRepository = addressRepository;
         this.orderService = orderService;

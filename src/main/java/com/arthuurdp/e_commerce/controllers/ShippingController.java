@@ -1,17 +1,15 @@
 package com.arthuurdp.e_commerce.controllers;
 
 import com.arthuurdp.e_commerce.domain.dtos.shipping.ShippingResponse;
-import com.arthuurdp.e_commerce.domain.dtos.shipping.UpdateShippingRequest;
 import com.arthuurdp.e_commerce.domain.entities.User;
 import com.arthuurdp.e_commerce.services.ShippingService;
-import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("orders/{orderId}/shipping")
+@RequestMapping("/shippings")
 public class ShippingController {
     private final ShippingService shippingService;
 
@@ -20,19 +18,23 @@ public class ShippingController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ShippingResponse> findByOrderId(
-            @PathVariable Long orderId,
-            @AuthenticationPrincipal User user
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Page<ShippingResponse>> findAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
     ) {
-        return ResponseEntity.ok().body(shippingService.findByOrderId(orderId, user));
+        return ResponseEntity.ok(shippingService.findAll(page, size));
     }
 
-    @PatchMapping("/{shippingId}")
+    @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ShippingResponse> update(
-            @PathVariable Long shippingId,
-            @RequestBody @Valid UpdateShippingRequest req) {
-        return ResponseEntity.ok(shippingService.update(shippingId, req));
+    public ResponseEntity<ShippingResponse> findById(@PathVariable Long id) {
+        return ResponseEntity.ok().body(shippingService.findById(id));
+    }
+
+    @PatchMapping("/carriers/{id}/handoff")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ShippingResponse> handOff(@PathVariable Long id) {
+        return ResponseEntity.ok().body(shippingService.handOff(id));
     }
 }

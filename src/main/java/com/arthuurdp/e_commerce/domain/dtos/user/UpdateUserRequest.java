@@ -1,9 +1,8 @@
 package com.arthuurdp.e_commerce.domain.dtos.user;
 
 import com.arthuurdp.e_commerce.domain.enums.Gender;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import com.arthuurdp.e_commerce.infrastructure.security.annotations.ValidPhone;
+import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 
@@ -14,16 +13,10 @@ public record UpdateUserRequest(
         @Size(max = 50, message = "Last name must have at most 50 chars")
         String lastName,
 
-        @Email(message = "Please enter a valid e-mail")
-        @Size(max = 100, message = "Email must have at most 100 chars")
-        String email,
-
-        @Pattern(regexp = "\\d{11}", message = "Please enter a valid cpf")
-        String cpf,
-
-        @Pattern(regexp = "\\d{10,11}", message = "Please enter a valid phone number")
+        @ValidPhone(message = "Please enter a valid phone")
         String phone,
 
+        @Past(message = "Please insert a valid date")
         LocalDate birthDate,
 
         Gender gender) {

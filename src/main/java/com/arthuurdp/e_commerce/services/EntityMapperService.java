@@ -192,7 +192,7 @@ public class EntityMapperService {
                 shippingCarrier.getId(),
                 shippingCarrier.getShipping().getId(),
                 toCarrierResponse(shippingCarrier.getCarrier()),
-                toStateResponse(shippingCarrier.getState()),
+                shippingCarrier.getRegion(),
                 shippingCarrier.getLegOrder(),
                 shippingCarrier.getStatus()
         );
@@ -216,7 +216,7 @@ public class EntityMapperService {
                 carrier.getId(),
                 carrier.getName(),
                 carrier.getStatus(),
-                toStateResponse(carrier.getState())
+                carrier.getRegion()
         );
     }
 }

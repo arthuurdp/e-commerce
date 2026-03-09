@@ -51,6 +51,7 @@ public class OrderService {
         order.setAddress(address);
         order.setStatus(OrderStatus.PENDING);
         order.setTotal(cart.total());
+        order.setOriginState(address.getCity().getState());
 
         for (CartItem cartItem : cart.getItems()) {
             Product product = cartItem.getProduct();

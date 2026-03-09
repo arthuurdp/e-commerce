@@ -42,6 +42,10 @@ public class Order {
     @OneToMany(mappedBy = "order", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<OrderItem> items = new HashSet<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "origin_state_id", nullable = false)
+    private State originState;
+
     private LocalDateTime createdAt;
 
     @PrePersist
@@ -126,6 +130,12 @@ public class Order {
             value += oi.getQuantity();
         }
         return value;
+    }
+
+    public State getOriginState() { return originState; }
+
+    public void setOriginState(State state) {
+        this.originState = state;
     }
 
     @Override

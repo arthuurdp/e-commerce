@@ -1,7 +1,10 @@
 package com.arthuurdp.e_commerce.domain.entities;
 
+import com.arthuurdp.e_commerce.domain.enums.Region;
 import com.arthuurdp.e_commerce.domain.enums.ShippingCarrierStatus;
 import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "shipping_carriers")
@@ -19,9 +22,9 @@ public class ShippingCarrier {
     @JoinColumn(name = "carrier_id")
     private Carrier carrier;
 
-    @ManyToOne
-    @JoinColumn(name = "state_id")
-    private State state;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "region")
+    private Region region;
 
     @Column(name = "leg_order", nullable = false)
     private Integer legOrder;
@@ -29,6 +32,9 @@ public class ShippingCarrier {
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private ShippingCarrierStatus status;
+
+    @Column(name = "handed_off_at")
+    private LocalDateTime handedOffAt;
 
     @PrePersist
     public void PrePersist() {
@@ -62,12 +68,12 @@ public class ShippingCarrier {
         this.carrier = carrier;
     }
 
-    public State getState() {
-        return state;
+    public Region getRegion() {
+        return region;
     }
 
-    public void setState(State state) {
-        this.state = state;
+    public void setRegion(Region region) {
+        this.region = region;
     }
 
     public Integer getLegOrder() {
@@ -84,5 +90,13 @@ public class ShippingCarrier {
 
     public void setStatus(ShippingCarrierStatus status) {
         this.status = status;
+    }
+
+    public LocalDateTime getHandedOffAt() {
+        return handedOffAt;
+    }
+
+    public void setHandedOffAt(LocalDateTime handedOffAt) {
+        this.handedOffAt = handedOffAt;
     }
 }

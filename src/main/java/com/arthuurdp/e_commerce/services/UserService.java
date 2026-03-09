@@ -43,35 +43,13 @@ public class UserService {
         if (req.lastName() != null) {
             user.setLastName(req.lastName());
         }
-
-        if (req.email() != null) {
-            if (req.email().isBlank()) {
-                throw new BadRequestException("Email cannot be blank");
-            }
-            if (!req.email().equals(user.getEmail())) {
-                if (userRepository.existsByEmail(req.email())) {
-                    throw new ConflictException("Email already in use");
-                }
-                user.setEmail(req.email());
-            }
-        }
-
-        if (req.cpf() != null) {
-            if (!req.cpf().equals(user.getCpf()) && userRepository.existsByCpf(req.cpf())) {
-                throw new ConflictException("CPF already in use");
-            }
-            user.setCpf(req.cpf());
-        }
-
         if (req.phone() != null) {
             user.setPhone(req.phone());
-        }
-        if (req.birthDate() != null) {
-            user.setBirthDate(req.birthDate());
         }
         if (req.gender() != null) {
             user.setGender(req.gender());
         }
+
         return entityMapperService.toUserResponse(userRepository.save(user));
     }
 

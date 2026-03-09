@@ -4,6 +4,7 @@ import com.arthuurdp.e_commerce.domain.dtos.carrier.CarrierResponse;
 import com.arthuurdp.e_commerce.domain.dtos.carrier.CreateCarrierRequest;
 import com.arthuurdp.e_commerce.domain.dtos.carrier.UpdateCarrierRequest;
 import com.arthuurdp.e_commerce.domain.enums.CarrierStatus;
+import com.arthuurdp.e_commerce.domain.enums.Region;
 import com.arthuurdp.e_commerce.services.CarrierService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -32,14 +33,14 @@ public class CarrierController {
         return ResponseEntity.ok().body(carrierService.findAll(page, size));
     }
 
-    @GetMapping("/states/{stateId}")
-    public ResponseEntity<Page<CarrierResponse>> findAllByStateIdAndStatus(
+    @GetMapping("/region/{region}")
+    public ResponseEntity<Page<CarrierResponse>> findAllByRegion(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @PathVariable Long stateId,
-            @RequestBody CarrierStatus status
-            ) {
-        return ResponseEntity.ok().body(carrierService.findAllByStateIdAndStatus(page, size, stateId, status));
+            @PathVariable Region region,
+            @RequestParam(required = false) CarrierStatus status
+    ) {
+        return ResponseEntity.ok().body(carrierService.findAllByRegion(page, size, region, status));
     }
 
     @GetMapping("/{id}")

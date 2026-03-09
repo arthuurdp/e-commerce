@@ -5,7 +5,6 @@ import com.arthuurdp.e_commerce.domain.entities.Order;
 import com.arthuurdp.e_commerce.domain.entities.Payment;
 import com.arthuurdp.e_commerce.domain.entities.User;
 import com.arthuurdp.e_commerce.domain.enums.PaymentMethod;
-import com.arthuurdp.e_commerce.domain.enums.PaymentStatus;
 import com.arthuurdp.e_commerce.repositories.PaymentRepository;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
