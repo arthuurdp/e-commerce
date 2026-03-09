@@ -41,7 +41,7 @@ public class Shipping {
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
-        this.status = ShippingStatus.PENDING;
+        this.status = ShippingStatus.SHIPPED;
     }
 
     public Shipping() {}

@@ -42,8 +42,7 @@ public class ShippingService {
 
     @Transactional
     public ShippingResponse create(Long orderId) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
         if (order.getShipping() != null) {
             throw new ConflictException("Order already has a shipping");
@@ -55,16 +54,13 @@ public class ShippingService {
         List<Region> route = routeService.findRoute(originRegion, destinationRegion);
 
         Shipping shipping = new Shipping(order);
+        order.setShipping(shipping);
         shippingRepository.save(shipping);
 
         for (int i = 0; i < route.size(); i++) {
             Region region = route.get(i);
 
-            Carrier carrier = carrierRepository
-                    .findFirstByRegionAndStatus(region, CarrierStatus.AVAILABLE)
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "No available carrier for region: " + region
-                    ));
+            Carrier carrier = carrierRepository.findFirstByRegionAndStatus(region, CarrierStatus.AVAILABLE).orElseThrow(() -> new ResourceNotFoundException("No available carrier for region: " + region));
 
             ShippingCarrier leg = new ShippingCarrier();
             leg.setShipping(shipping);
@@ -72,24 +68,22 @@ public class ShippingService {
             leg.setRegion(region);
             leg.setLegOrder(i + 1);
 
+            carrier.setStatus(CarrierStatus.ON_DELIVERY);
+            carrierRepository.save(carrier);
+
             if (i == 0) {
                 leg.setStatus(ShippingCarrierStatus.IN_PROGRESS);
-                carrier.setStatus(CarrierStatus.ON_DELIVERY);
-                carrierRepository.save(carrier);
             } else {
                 leg.setStatus(ShippingCarrierStatus.PENDING);
             }
-
             shippingCarrierRepository.save(leg);
         }
-
         return entityMapperService.toShippingResponse(shipping);
     }
 
     @Transactional
     public ShippingResponse handOff(Long shippingCarrierId) {
-        ShippingCarrier leg = shippingCarrierRepository.findById(shippingCarrierId)
-                .orElseThrow(() -> new ResourceNotFoundException("Leg not found"));
+        ShippingCarrier leg = shippingCarrierRepository.findById(shippingCarrierId).orElseThrow(() -> new ResourceNotFoundException("Leg not found"));
 
         if (leg.getStatus() != ShippingCarrierStatus.IN_PROGRESS) {
             throw new BadRequestException("This leg is not in progress");
@@ -101,11 +95,7 @@ public class ShippingService {
         carrierRepository.save(leg.getCarrier());
         shippingCarrierRepository.save(leg);
 
-        Optional<ShippingCarrier> nextLeg = shippingCarrierRepository
-                .findByShippingIdAndLegOrder(
-                        leg.getShipping().getId(),
-                        leg.getLegOrder() + 1
-                );
+        Optional<ShippingCarrier> nextLeg = shippingCarrierRepository.findByShippingIdAndLegOrder(leg.getShipping().getId(), leg.getLegOrder() + 1);
 
         if (nextLeg.isPresent()) {
             nextLeg.get().setStatus(ShippingCarrierStatus.IN_PROGRESS);
@@ -113,12 +103,13 @@ public class ShippingService {
             carrierRepository.save(nextLeg.get().getCarrier());
             shippingCarrierRepository.save(nextLeg.get());
         } else {
+            leg.setStatus(ShippingCarrierStatus.DELIVERED);
+            shippingCarrierRepository.save(leg);
             Shipping shipping = leg.getShipping();
             shipping.setStatus(ShippingStatus.DELIVERED);
             shipping.setDeliveredAt(LocalDateTime.now());
             shippingRepository.save(shipping);
         }
-
         return entityMapperService.toShippingResponse(leg.getShipping());
     }
 
@@ -128,7 +119,9 @@ public class ShippingService {
         return shippingRepository.findAll(pageable).map(entityMapperService::toShippingResponse);
     }
 
+    @Transactional
     public ShippingResponse findById(Long id) {
-        return entityMapperService.toShippingResponse(shippingRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Shipping not found")));
+        Shipping shipping = shippingRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Shipping not found"));
+        return entityMapperService.toShippingResponse(shipping);
     }
 }

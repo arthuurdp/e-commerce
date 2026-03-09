@@ -36,11 +36,6 @@ public class ShippingCarrier {
     @Column(name = "handed_off_at")
     private LocalDateTime handedOffAt;
 
-    @PrePersist
-    public void PrePersist() {
-        this.status = ShippingCarrierStatus.PENDING;
-    }
-
     public ShippingCarrier() {
     }
 
