@@ -2,16 +2,18 @@ package com.arthuurdp.e_commerce.domain.dtos.shipping;
 
 import com.arthuurdp.e_commerce.domain.enums.ShippingStatus;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 public record ShippingResponse(
         Long id,
         Long orderId,
         ShippingStatus status,
-        List<ShippingCarrierResponse> carriers,
+        String carrier,
         String trackingCode,
-        LocalDateTime shippedAt,
+        String trackingUrl,
+        BigDecimal shippingCost,
+        LocalDateTime postedAt,
         LocalDateTime deliveredAt,
         LocalDateTime createdAt
 ) {}

@@ -1,6 +1,7 @@
 package com.arthuurdp.e_commerce.services;
 
 import com.arthuurdp.e_commerce.domain.dtos.product.*;
+import com.arthuurdp.e_commerce.domain.dtos.shipping.ShippingResponse;
 import com.arthuurdp.e_commerce.domain.entities.*;
 import com.arthuurdp.e_commerce.domain.dtos.carrier.CarrierResponse;
 import com.arthuurdp.e_commerce.domain.dtos.order.OrderResponse;
@@ -13,8 +14,6 @@ import com.arthuurdp.e_commerce.domain.dtos.cart.CartItemResponse;
 import com.arthuurdp.e_commerce.domain.dtos.auth.RegisterResponse;
 import com.arthuurdp.e_commerce.domain.dtos.cart.CartResponse;
 import com.arthuurdp.e_commerce.domain.dtos.category.CategoryResponse;
-import com.arthuurdp.e_commerce.domain.dtos.shipping.ShippingCarrierResponse;
-import com.arthuurdp.e_commerce.domain.dtos.shipping.ShippingResponse;
 import com.arthuurdp.e_commerce.domain.dtos.user.UserResponse;
 import org.springframework.stereotype.Component;
 
@@ -187,14 +186,12 @@ public class EntityMapperService {
         );
     }
 
-    public ShippingCarrierResponse toShippingCarrierResponse(ShippingCarrier shippingCarrier) {
-        return new ShippingCarrierResponse(
-                shippingCarrier.getId(),
-                shippingCarrier.getShipping().getId(),
-                toCarrierResponse(shippingCarrier.getCarrier()),
-                shippingCarrier.getRegion(),
-                shippingCarrier.getLegOrder(),
-                shippingCarrier.getStatus()
+    public CarrierResponse toCarrierResponse(Carrier carrier) {
+        return new CarrierResponse(
+                carrier.getId(),
+                carrier.getName(),
+                carrier.getStatus(),
+                carrier.getRegion()
         );
     }
 
@@ -203,20 +200,13 @@ public class EntityMapperService {
                 shipping.getId(),
                 shipping.getOrder().getId(),
                 shipping.getStatus(),
-                shipping.getCarriers().stream().map(this::toShippingCarrierResponse).toList(),
+                shipping.getCarrier(),
                 shipping.getTrackingCode(),
-                shipping.getShippedAt(),
+                shipping.getTrackingUrl(),
+                shipping.getShippingCost(),
+                shipping.getPostedAt(),
                 shipping.getDeliveredAt(),
                 shipping.getCreatedAt()
-        );
-    }
-
-    public CarrierResponse toCarrierResponse(Carrier carrier) {
-        return new CarrierResponse(
-                carrier.getId(),
-                carrier.getName(),
-                carrier.getStatus(),
-                carrier.getRegion()
         );
     }
 }

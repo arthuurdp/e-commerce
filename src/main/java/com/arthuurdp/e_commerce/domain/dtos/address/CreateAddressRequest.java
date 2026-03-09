@@ -3,6 +3,7 @@ package com.arthuurdp.e_commerce.domain.dtos.address;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 
 public record CreateAddressRequest(
         @NotBlank(message = "Name is required")
@@ -23,6 +24,10 @@ public record CreateAddressRequest(
 
         @NotNull(message = "State is required")
         Long stateId,
+
+        @NotNull(message = "Postal code is required")
+        @Size(max = 9, message = "Postal code must have at most 9 chars")
+        String postalCode,
 
         @NotNull(message = "City is required")
         Long cityId

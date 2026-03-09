@@ -2,6 +2,10 @@ package com.arthuurdp.e_commerce.domain.enums;
 
 public enum ShippingStatus {
     PENDING,
-    SHIPPED,
-    DELIVERED
+    LABEL_PURCHASED,
+    POSTED,
+    IN_TRANSIT,
+    DELIVERED,
+    CANCELLED,
+    FAILED
 }

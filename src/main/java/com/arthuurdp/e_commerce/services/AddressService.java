@@ -45,7 +45,8 @@ public class AddressService {
                 req.street(),
                 req.number(),
                 req.complement(),
-                req.neighborhood()
+                req.neighborhood(),
+                req.postalCode()
         );
 
         address.setCity(city);

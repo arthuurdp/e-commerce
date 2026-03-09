@@ -3,16 +3,15 @@ package com.arthuurdp.e_commerce.domain.entities;
 import com.arthuurdp.e_commerce.domain.enums.ShippingStatus;
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "shippings")
 public class Shipping {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -23,14 +22,32 @@ public class Shipping {
     @Column(name = "status", nullable = false)
     private ShippingStatus status;
 
-    @OneToMany(mappedBy = "shipping", cascade = CascadeType.ALL)
-    private List<ShippingCarrier> carriers = new ArrayList<>();
+    // Melhor Envio order ID (returned when label is added to cart and purchased)
+    @Column(name = "me_order_id")
+    private String meOrderId;
 
+    // Carrier name chosen (e.g. "Correios - PAC", "Correios - SEDEX")
+    @Column(name = "carrier")
+    private String carrier;
+
+    // Tracking code returned after label generation
     @Column(name = "tracking_code")
     private String trackingCode;
 
-    @Column(name = "shipped_at")
-    private LocalDateTime shippedAt;
+    // Link to ME tracking page
+    @Column(name = "tracking_url")
+    private String trackingUrl;
+
+    // URL of the printable label PDF
+    @Column(name = "label_url")
+    private String labelUrl;
+
+    // Shipping cost charged (from ME calculate response)
+    @Column(name = "shipping_cost", precision = 10, scale = 2)
+    private BigDecimal shippingCost;
+
+    @Column(name = "posted_at")
+    private LocalDateTime postedAt;
 
     @Column(name = "delivered_at")
     private LocalDateTime deliveredAt;
@@ -41,7 +58,9 @@ public class Shipping {
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
-        this.status = ShippingStatus.SHIPPED;
+        if (this.status == null) {
+            this.status = ShippingStatus.PENDING;
+        }
     }
 
     public Shipping() {}
@@ -60,17 +79,33 @@ public class Shipping {
 
     public void setStatus(ShippingStatus status) { this.status = status; }
 
-    public List<ShippingCarrier> getCarriers() {
-        return carriers;
-    }
+    public String getMeOrderId() { return meOrderId; }
+
+    public void setMeOrderId(String meOrderId) { this.meOrderId = meOrderId; }
+
+    public String getCarrier() { return carrier; }
+
+    public void setCarrier(String carrier) { this.carrier = carrier; }
 
     public String getTrackingCode() { return trackingCode; }
 
     public void setTrackingCode(String trackingCode) { this.trackingCode = trackingCode; }
 
-    public LocalDateTime getShippedAt() { return shippedAt; }
+    public String getTrackingUrl() { return trackingUrl; }
 
-    public void setShippedAt(LocalDateTime shippedAt) { this.shippedAt = shippedAt; }
+    public void setTrackingUrl(String trackingUrl) { this.trackingUrl = trackingUrl; }
+
+    public String getLabelUrl() { return labelUrl; }
+
+    public void setLabelUrl(String labelUrl) { this.labelUrl = labelUrl; }
+
+    public BigDecimal getShippingCost() { return shippingCost; }
+
+    public void setShippingCost(BigDecimal shippingCost) { this.shippingCost = shippingCost; }
+
+    public LocalDateTime getPostedAt() { return postedAt; }
+
+    public void setPostedAt(LocalDateTime postedAt) { this.postedAt = postedAt; }
 
     public LocalDateTime getDeliveredAt() { return deliveredAt; }
 

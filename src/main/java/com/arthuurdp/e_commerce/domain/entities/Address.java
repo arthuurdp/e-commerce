@@ -25,6 +25,9 @@ public class Address {
     @Column(name = "neighborhood", nullable = false)
     private String neighborhood;
 
+    @Column(name = "postal_code", nullable = false, length = 8)
+    private String postalCode;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "city_id", nullable = false)
     private City city;
@@ -36,12 +39,13 @@ public class Address {
     public Address() {
     }
 
-    public Address(String name, String street, Integer number, String complement, String neighborhood) {
+    public Address(String name, String street, Integer number, String complement, String neighborhood, String postalCode) {
         this.name = name;
         this.street = street;
         this.number = number;
         this.complement = complement;
         this.neighborhood = neighborhood;
+        this.postalCode = postalCode;
     }
 
     public Long getId() {
@@ -90,6 +94,14 @@ public class Address {
 
     public void setNeighborhood(String neighborhood) {
         this.neighborhood = neighborhood;
+    }
+
+    public String getPostalCode() {
+        return postalCode;
+    }
+
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
     }
 
     public City getCity() {
