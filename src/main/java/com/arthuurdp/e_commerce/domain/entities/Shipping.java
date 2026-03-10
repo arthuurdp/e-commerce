@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "shippings")
 public class Shipping {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -19,30 +18,24 @@ public class Shipping {
     private Order order;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
+    @Column(name = "status", nullable = false, columnDefinition = "VARCHAR(20)")
     private ShippingStatus status;
 
-    // Melhor Envio order ID (returned when label is added to cart and purchased)
     @Column(name = "me_order_id")
     private String meOrderId;
 
-    // Carrier name chosen (e.g. "Correios - PAC", "Correios - SEDEX")
     @Column(name = "carrier")
     private String carrier;
 
-    // Tracking code returned after label generation
     @Column(name = "tracking_code")
     private String trackingCode;
 
-    // Link to ME tracking page
     @Column(name = "tracking_url")
     private String trackingUrl;
 
-    // URL of the printable label PDF
     @Column(name = "label_url")
     private String labelUrl;
 
-    // Shipping cost charged (from ME calculate response)
     @Column(name = "shipping_cost", precision = 10, scale = 2)
     private BigDecimal shippingCost;
 

@@ -12,6 +12,10 @@ public record CreateProductResponse(
         String description,
         BigDecimal price,
         Integer stock,
+        Double weight,
+        Integer width,
+        Integer height,
+        Integer length,
         List<ProductImageResponse> imgs,
         List<CategoryResponse> categories,
         Instant createdAt

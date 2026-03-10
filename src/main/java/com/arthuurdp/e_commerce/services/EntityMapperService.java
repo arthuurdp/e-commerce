@@ -26,6 +26,10 @@ public class EntityMapperService {
                 product.getDescription(),
                 product.getPrice(),
                 product.getStock(),
+                product.getWeight(),
+                product.getWidth(),
+                product.getHeight(),
+                product.getLength(),
                 product.getImages().stream().map(this::toProductImageResponse).toList(),
                 product.getCategories().stream().map(this::toCategoryResponse).toList(),
                 product.getCreatedAt()
@@ -39,6 +43,10 @@ public class EntityMapperService {
                 product.getDescription(),
                 product.getPrice(),
                 product.getStock(),
+                product.getWeight(),
+                product.getWidth(),
+                product.getHeight(),
+                product.getLength(),
                 product.getImages().stream().map(this::toProductImageResponse).toList(),
                 product.getCategories().stream().map(this::toCategoryResponse).toList(),
                 product.getLastUpdatedAt()
@@ -51,8 +59,12 @@ public class EntityMapperService {
                 product.getName(),
                 product.getDescription(),
                 product.getPrice(),
-                product.getMainImageUrl()
-                );
+                product.getMainImageUrl(),
+                product.getWeight(),
+                product.getWidth(),
+                product.getHeight(),
+                product.getLength()
+        );
     }
 
     public ProductDetailsResponse toProductDetails(Product product) {
@@ -61,7 +73,11 @@ public class EntityMapperService {
                 product.getName(),
                 product.getDescription(),
                 product.getPrice(),
-                product.getImages().stream().map(this::toProductImageResponse).toList()
+                product.getImages().stream().map(this::toProductImageResponse).toList(),
+                product.getWeight(),
+                product.getWidth(),
+                product.getHeight(),
+                product.getLength()
         );
     }
 

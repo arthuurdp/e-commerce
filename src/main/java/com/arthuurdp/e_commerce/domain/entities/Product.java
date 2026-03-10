@@ -33,6 +33,18 @@ public class Product {
     @Column(name = "last_updated_at")
     private Instant lastUpdatedAt;
 
+    @Column(name = "weight", nullable = false)
+    private Double weight;
+
+    @Column(name = "width", nullable = false)
+    private Integer width;
+    
+    @Column(name = "height", nullable = false)
+    private Integer height;
+    
+    @Column(name = "length", nullable = false)
+    private Integer length;
+
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImage> images = new ArrayList<>();
 
@@ -56,11 +68,15 @@ public class Product {
 
     public Product() {}
 
-    public Product(String name, String description, BigDecimal price, Integer stock) {
+    public Product(String name, String description, BigDecimal price, Integer stock, Double weight, Integer width, Integer height, Integer length) {
         this.name = name;
         this.description = description;
         this.price = price;
         this.stock = stock;
+        this.weight = weight != null ? weight : 0.5;
+        this.width = width != null ? width : 15;
+        this.height = height != null ? height : 10;
+        this.length = length != null ? length : 20;
     }
 
     public Long getId() {
@@ -106,6 +122,18 @@ public class Product {
     public Instant getLastUpdatedAt() {
         return lastUpdatedAt;
     }
+
+    public Double getWeight() { return weight != null ? weight : 0.5; }
+    public void setWeight(Double weight) { this.weight = weight; }
+
+    public Integer getWidth() { return width != null ? width : 15; }
+    public void setWidth(Integer width) { this.width = width; }
+
+    public Integer getHeight() { return height != null ? height : 10; }
+    public void setHeight(Integer height) { this.height = height; }
+
+    public Integer getLength() { return length != null ? length : 20; }
+    public void setLength(Integer length) { this.length = length; }
 
     public List<ProductImage> getImages() {
         return images;

@@ -22,6 +22,22 @@ public record CreateProductRequest(
         @Min(value = 1, message = "Stock must be 1 or greater")
         Integer stock,
 
+        @NotNull(message = "Weight is required")
+        @Positive(message = "Weight must be positive")
+        Double weight,
+
+        @NotNull(message = "Width is required")
+        @Positive(message = "Width must be positive")
+        Integer width,
+
+        @NotNull(message = "Height is required")
+        @Positive(message = "Height must be positive")
+        Integer height,
+
+        @NotNull(message = "Length is required")
+        @Positive(message = "Length must be positive")
+        Integer length,
+
         @NotEmpty(message = "Images are required")
         List<@NotBlank(message = "Image URL cannot be blank") String> images,
 

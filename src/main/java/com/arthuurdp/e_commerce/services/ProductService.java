@@ -40,7 +40,11 @@ public class ProductService {
                 product.name(),
                 product.description(),
                 product.price(),
-                product.stock()
+                product.stock(),
+                product.weight(),
+                product.width(),
+                product.height(),
+                product.length()
         );
         p.addCategories(product.categoryIds().stream().map(categoryService::findById).toList());
         p.addImages(product.images().stream().map(entityMapperService::toProductImage).toList());
@@ -76,6 +80,22 @@ public class ProductService {
 
         if (product.stock() != null) {
             p.setStock(product.stock());
+        }
+        
+        if (product.weight() != null) {
+            p.setWeight(product.weight());
+        }
+
+        if (product.width() != null) {
+            p.setWidth(product.width());
+        }
+
+        if (product.height() != null) {
+            p.setHeight(product.height());
+        }
+
+        if (product.length() != null) {
+            p.setLength(product.length());
         }
 
         if (product.imageUrls() != null) {

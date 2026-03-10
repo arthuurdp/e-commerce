@@ -11,17 +11,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/orders/{orderId}/shipping")
 public class ShippingController {
-
     private final ShippingService shippingService;
 
     public ShippingController(ShippingService shippingService) {
         this.shippingService = shippingService;
     }
 
-    /**
-     * GET /orders/{orderId}/shipping
-     * Returns the shipping details for the authenticated user's order.
-     */
     @GetMapping
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ShippingResponse> getShipping(

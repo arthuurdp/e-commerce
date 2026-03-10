@@ -16,34 +16,14 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Thin wrapper around the Melhor Envio REST API v2.
- *
- * Sandbox base URL:   https://sandbox.melhorenvio.com.br/api/v2
- * Production base URL: https://melhorenvio.com.br/api/v2
- *
- * Required application.yml properties:
- *   melhorenvio.base-url=https://sandbox.melhorenvio.com.br/api/v2
- *   melhorenvio.token=<your bearer token>
- *   melhorenvio.app-email=<your app contact email>   (required by ME in User-Agent)
- *
- * Full label flow:
- *   1. calculate()     → pick cheapest / preferred option
- *   2. addToCart()     → returns meOrderId
- *   3. purchase()      → charges ME wallet
- *   4. generateLabel() → returns label PDF URL + tracking code
- */
 @Component
 public class MelhorEnvioClient {
-
     private static final Logger log = LoggerFactory.getLogger(MelhorEnvioClient.class);
 
-    // Placeholder dimensions used until Product entity has real fields.
-    // Unit: cm / kg
     private static final double DEFAULT_WEIGHT = 0.5;
-    private static final int    DEFAULT_WIDTH   = 15;
-    private static final int    DEFAULT_HEIGHT  = 10;
-    private static final int    DEFAULT_LENGTH  = 20;
+    private static final int DEFAULT_WIDTH = 15;
+    private static final int DEFAULT_HEIGHT = 10;
+    private static final int DEFAULT_LENGTH = 20;
 
     private final WebClient webClient;
 
@@ -60,14 +40,9 @@ public class MelhorEnvioClient {
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                // ME requires a User-Agent identifying your app
                 .defaultHeader("User-Agent", "ecommerce-app (" + appEmail + ")")
                 .build();
     }
-
-    // ─────────────────────────────────────────────────────────────
-    // 1. Calculate freight — returns list of available services
-    // ─────────────────────────────────────────────────────────────
 
     public List<FreightOption> calculate(String toPostalCode, int itemCount) {
         var body = Map.of(
@@ -80,7 +55,7 @@ public class MelhorEnvioClient {
                         "length", DEFAULT_LENGTH
                 ),
                 "options",  Map.of("receipt", false, "own_hand", false),
-                "services", "1,2"   // 1 = PAC, 2 = SEDEX (Correios via ME)
+                "services", "1,2"
         );
 
         try {
@@ -96,10 +71,6 @@ public class MelhorEnvioClient {
             throw new MelhorEnvioApiException("Freight calculation failed", e);
         }
     }
-
-    // ─────────────────────────────────────────────────────────────
-    // 2. Add label to cart — returns ME order ID
-    // ─────────────────────────────────────────────────────────────
 
     public String addToCart(AddToCartRequest request) {
         try {
@@ -120,10 +91,6 @@ public class MelhorEnvioClient {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // 3. Purchase labels (checkout) — charges ME wallet
-    // ─────────────────────────────────────────────────────────────
-
     public void purchase(List<String> meOrderIds) {
         var body = Map.of("orders", meOrderIds);
         try {
@@ -139,33 +106,32 @@ public class MelhorEnvioClient {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // 4. Generate label — returns tracking code + label URL
-    // ─────────────────────────────────────────────────────────────
-
     public LabelInfo generateLabel(String meOrderId) {
         var body = Map.of("orders", List.of(meOrderId));
         try {
-            var response = webClient.post()
+            var results = webClient.post()
                     .uri("/me/shipment/generate")
                     .bodyValue(body)
                     .retrieve()
-                    .bodyToMono(GenerateLabelResponse.class)
+                    .bodyToFlux(GenerateLabelResponse.class)
+                    .collectList()
                     .block();
 
-            if (response == null) {
+            if (results == null || results.isEmpty()) {
                 throw new MelhorEnvioApiException("Empty response from ME generate endpoint");
             }
-            return response.toLabelInfo(meOrderId);
+
+            var result = results.stream()
+                    .filter(r -> meOrderId.equals(r.id()))
+                    .findFirst()
+                    .orElse(results.get(0));
+
+            return new LabelInfo(result.trackingCode(), result.labelUrl());
         } catch (WebClientResponseException e) {
             log.error("ME generateLabel failed: {} {}", e.getStatusCode(), e.getResponseBodyAsString());
             throw new MelhorEnvioApiException("Failed to generate ME label", e);
         }
     }
-
-    // ─────────────────────────────────────────────────────────────
-    // Internal response models
-    // ─────────────────────────────────────────────────────────────
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record FreightOption(
@@ -182,33 +148,20 @@ public class MelhorEnvioClient {
     public record CartResponse(String id) {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record GenerateLabelResponse(Map<String, OrderLabelData> orders) {
-        public LabelInfo toLabelInfo(String meOrderId) {
-            if (orders == null || !orders.containsKey(meOrderId)) {
-                throw new MelhorEnvioApiException("ME order not found in generate response: " + meOrderId);
-            }
-            var data = orders.get(meOrderId);
-            return new LabelInfo(data.trackingCode(), data.labelUrl());
-        }
-    }
-
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public record OrderLabelData(
+    public record GenerateLabelResponse(
+            @JsonProperty("id") String id,
             @JsonProperty("tracking_code") String trackingCode,
-            @JsonProperty("label_url")     String labelUrl
+            @JsonProperty("label_url") String labelUrl
     ) {}
 
     public record LabelInfo(String trackingCode, String labelUrl) {}
 
-    // ─────────────────────────────────────────────────────────────
-    // Cart request model (used by ShippingService)
-    // ─────────────────────────────────────────────────────────────
-
     public record AddToCartRequest(
             @JsonProperty("service") Integer serviceId,
-            @JsonProperty("from")    FromAddress from,
-            @JsonProperty("to")      ToAddress to,
-            @JsonProperty("products") java.util.List<Product> products,
+            @JsonProperty("from") FromAddress from,
+            @JsonProperty("to") ToAddress to,
+            @JsonProperty("products") List<Product> products,
+            @JsonProperty("volumes") List<Volume> volumes,
             @JsonProperty("options") Options options
     ) {
         public record FromAddress(
@@ -226,9 +179,19 @@ public class MelhorEnvioClient {
         ) {}
 
         public record Product(
-                String name, String quantity, int units,
-                double weight, int width, int height, int length,
+                String name,
+                String sku,
+                @JsonProperty("quantity") int quantity,
+                double weight,
+                int width, int height, int length,
                 @JsonProperty("unitary_value") double unitaryValue
+        ) {}
+
+        public record Volume(
+                double weight,
+                int width,
+                int height,
+                int length
         ) {}
 
         public record Options(boolean receipt, @JsonProperty("own_hand") boolean ownHand,

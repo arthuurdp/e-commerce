@@ -11,6 +11,10 @@ public record UpdateProductResponse(
         String description,
         java.math.BigDecimal price,
         Integer stock,
+        Double weight,
+        Integer width,
+        Integer height,
+        Integer length,
         List<ProductImageResponse> imgs,
         List<CategoryResponse> category,
         Instant updatedAt

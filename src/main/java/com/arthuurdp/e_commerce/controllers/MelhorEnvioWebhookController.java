@@ -14,16 +14,6 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.HexFormat;
 
-/**
- * Receives tracking event webhooks from Melhor Envio.
- *
- * ME sends a POST request to this endpoint whenever a shipment status changes.
- * The request includes an HMAC-SHA256 signature in the X-Melhor-Envio-Signature
- * header that we verify to ensure the payload is legitimate.
- *
- * Required application.yml property:
- *   melhorenvio.webhook-secret=<your webhook secret from ME dashboard>
- */
 @RestController
 @RequestMapping("/webhooks/melhor-envio")
 public class MelhorEnvioWebhookController {
@@ -44,14 +34,19 @@ public class MelhorEnvioWebhookController {
     @PostMapping
     public ResponseEntity<Void> handleEvent(
             @RequestHeader(value = "X-Melhor-Envio-Signature", required = false) String signature,
-            @RequestBody String rawPayload,
-            @org.springframework.web.bind.annotation.RequestBody(required = false)
-            MelhorEnvioWebhookEvent event) {
+            @RequestBody String rawPayload) {
 
-        // Verify signature before processing
         if (!isValidSignature(rawPayload, signature)) {
             log.warn("ME webhook received with invalid signature — rejecting");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        MelhorEnvioWebhookEvent event;
+        try {
+            event = new com.fasterxml.jackson.databind.ObjectMapper().readValue(rawPayload, MelhorEnvioWebhookEvent.class);
+        } catch (Exception e) {
+            log.warn("ME webhook received with invalid payload — ignoring");
+            return ResponseEntity.ok().build();
         }
 
         if (event == null || event.orderId() == null) {
@@ -64,7 +59,6 @@ public class MelhorEnvioWebhookController {
         try {
             shippingService.handleWebhookEvent(event);
         } catch (Exception e) {
-            // Log but return 200 to prevent ME from retrying indefinitely
             log.error("Error processing ME webhook for order {}: {}", event.orderId(), e.getMessage(), e);
         }
 

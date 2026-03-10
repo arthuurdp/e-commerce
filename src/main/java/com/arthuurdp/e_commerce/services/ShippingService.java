@@ -10,6 +10,7 @@ import com.arthuurdp.e_commerce.domain.entities.Address;
 import com.arthuurdp.e_commerce.domain.entities.Order;
 import com.arthuurdp.e_commerce.domain.entities.Shipping;
 import com.arthuurdp.e_commerce.domain.enums.ShippingStatus;
+import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.ShippingRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
@@ -24,96 +25,107 @@ import java.util.List;
 
 @Service
 public class ShippingService {
-
     private static final Logger log = LoggerFactory.getLogger(ShippingService.class);
 
-    // ME tracking URL pattern
     private static final String TRACKING_URL = "https://melhorrastreio.com.br/rastreio/";
 
-    private final ShippingRepository  shippingRepository;
-    private final MelhorEnvioClient   melhorEnvioClient;
+    private final ShippingRepository shippingRepository;
+    private final MelhorEnvioClient melhorEnvioClient;
     private final EntityMapperService mapper;
 
     @Value("${melhorenvio.from-postal-code}")
     private String fromPostalCode;
 
-    public ShippingService(ShippingRepository shippingRepository,
-                           MelhorEnvioClient melhorEnvioClient,
-                           EntityMapperService mapper) {
+    @Value("${melhorenvio.store-name}")
+    private String storeName;
+
+    @Value("${melhorenvio.store-document}")
+    private String storeDocument;
+
+    @Value("${melhorenvio.store-email}")
+    private String storeEmail;
+
+    @Value("${melhorenvio.store-phone}")
+    private String storePhone;
+
+    @Value("${melhorenvio.store-address}")
+    private String storeAddress;
+
+    @Value("${melhorenvio.store-number}")
+    private String storeNumber;
+
+    @Value("${melhorenvio.store-district}")
+    private String storeDistrict;
+
+    @Value("${melhorenvio.store-city}")
+    private String storeCity;
+
+    @Value("${melhorenvio.store-state}")
+    private String storeState;
+
+    public ShippingService(ShippingRepository shippingRepository, MelhorEnvioClient melhorEnvioClient, EntityMapperService mapper) {
         this.shippingRepository = shippingRepository;
         this.melhorEnvioClient  = melhorEnvioClient;
-        this.mapper             = mapper;
+        this.mapper = mapper;
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Called by WebhookService after Stripe confirms payment
-    // ─────────────────────────────────────────────────────────────────────────
 
     @Transactional
     public void createForOrder(Order order) {
-        if (shippingRepository.existsByOrderId(order.getId())) {
-            log.warn("Shipping already exists for order {}, skipping", order.getId());
+        Shipping shipping = shippingRepository.findByOrderId(order.getId()).orElseGet(() -> shippingRepository.save(new Shipping(order)));
+
+        if (shipping.getStatus() == ShippingStatus.LABEL_GENERATED) {
+            log.info("Order {}: shipping label already generated — skipping", order.getId());
             return;
         }
 
-        // Persist a PENDING record immediately so the order has a shipping entry
-        // even if the ME API calls below fail
-        Shipping shipping = shippingRepository.save(new Shipping(order));
-
         try {
-            // Destination postal code comes from the order's shipping address
             String toPostalCode = order.getAddress().getPostalCode().replaceAll("\\D", "");
-            int    itemCount    = order.getItems().size();
 
-            // 1. Calculate freight options and pick the cheapest available one
-            List<FreightOption> options = melhorEnvioClient.calculate(toPostalCode, itemCount);
-            FreightOption chosen = options.stream()
-                    .filter(FreightOption::isAvailable)
-                    .min(Comparator.comparing(FreightOption::price))
-                    .orElseThrow(() -> new MelhorEnvioApiException("No freight options available for CEP " + toPostalCode));
+            if (shipping.getMeOrderId() == null) {
+                int itemCount = order.getItems().size();
+                List<FreightOption> options = melhorEnvioClient.calculate(toPostalCode, itemCount);
+                FreightOption chosen = options.stream()
+                        .filter(FreightOption::isAvailable)
+                        .min(Comparator.comparing(FreightOption::price))
+                        .orElseThrow(() -> new MelhorEnvioApiException("No freight options available for CEP " + toPostalCode));
 
-            log.info("Order {}: chose freight '{}' at R$ {} ({} days)",
-                    order.getId(), chosen.name(), chosen.price(), chosen.deliveryDays());
+                log.info("Order {}: chose freight '{}' at R$ {} ({} days)",
+                        order.getId(), chosen.name(), chosen.price(), chosen.deliveryDays());
 
-            // 2. Add to ME cart
-            var cartRequest = buildCartRequest(order, chosen, toPostalCode);
-            String meOrderId = melhorEnvioClient.addToCart(cartRequest);
+                var cartRequest = buildCartRequest(order, chosen, toPostalCode);
+                String meOrderId = melhorEnvioClient.addToCart(cartRequest);
+                shipping.setMeOrderId(meOrderId);
+                shipping.setCarrier(chosen.name());
+                shipping.setShippingCost(chosen.price());
+                shippingRepository.save(shipping);
+            }
 
-            // 3. Purchase (deduct from ME wallet)
-            melhorEnvioClient.purchase(List.of(meOrderId));
+            if (shipping.getStatus() == ShippingStatus.PENDING || shipping.getStatus() == ShippingStatus.FAILED) {
+                melhorEnvioClient.purchase(List.of(shipping.getMeOrderId()));
+                shipping.setStatus(ShippingStatus.PURCHASED);
+                shippingRepository.save(shipping);
+            }
 
-            // 4. Generate label → get tracking code + label URL
-            var labelInfo = melhorEnvioClient.generateLabel(meOrderId);
-
-            // Persist all ME data
-            shipping.setMeOrderId(meOrderId);
-            shipping.setCarrier(chosen.name());
-            shipping.setShippingCost(chosen.price());
-            shipping.setTrackingCode(labelInfo.trackingCode());
-            shipping.setTrackingUrl(TRACKING_URL + labelInfo.trackingCode());
-            shipping.setLabelUrl(labelInfo.labelUrl());
-            shipping.setStatus(ShippingStatus.LABEL_PURCHASED);
-
-            shippingRepository.save(shipping);
-            log.info("Order {}: label purchased — tracking {}", order.getId(), labelInfo.trackingCode());
+            if (shipping.getStatus() == ShippingStatus.PURCHASED) {
+                var labelInfo = melhorEnvioClient.generateLabel(shipping.getMeOrderId());
+                shipping.setTrackingCode(labelInfo.trackingCode());
+                shipping.setTrackingUrl(TRACKING_URL + labelInfo.trackingCode());
+                shipping.setLabelUrl(labelInfo.labelUrl());
+                shipping.setStatus(ShippingStatus.LABEL_GENERATED);
+                shippingRepository.save(shipping);
+                log.info("Order {}: label generated — tracking {}", order.getId(), labelInfo.trackingCode());
+            }
 
         } catch (Exception e) {
-            // Don't lose the shipping row — mark as FAILED so admins can retry
             shipping.setStatus(ShippingStatus.FAILED);
             shippingRepository.save(shipping);
             log.error("Order {}: ME label creation failed — {}", order.getId(), e.getMessage(), e);
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Called by MelhorEnvioWebhookController when ME sends a tracking event
-    // ─────────────────────────────────────────────────────────────────────────
-
     @Transactional
     public void handleWebhookEvent(MelhorEnvioWebhookEvent event) {
-        Shipping shipping = shippingRepository.findByMeOrderId(event.orderId())
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "No shipping found for ME order: " + event.orderId()));
+        Shipping shipping = shippingRepository.findByMeOrderId(event.orderId()).orElseThrow(() -> new ResourceNotFoundException("No shipping found for ME order: " + event.orderId()));
 
         ShippingStatus newStatus = mapMeStatus(event.status());
         if (newStatus == null) {
@@ -133,10 +145,6 @@ public class ShippingService {
         log.info("Shipping for ME order {} updated to {}", event.orderId(), newStatus);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // GET for users
-    // ─────────────────────────────────────────────────────────────────────────
-
     public ShippingResponse getShippingForUser(Long orderId, Long userId) {
         Shipping shipping = shippingRepository.findByOrderIdAndOrderUserId(orderId, userId)
                 .orElseThrow(() -> new EntityNotFoundException(
@@ -144,28 +152,21 @@ public class ShippingService {
         return mapper.toShippingResponse(shipping);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Helpers
-    // ─────────────────────────────────────────────────────────────────────────
-
     private AddToCartRequest buildCartRequest(Order order, FreightOption option, String toPostalCode) {
-        Address addr     = order.getAddress();
-        String  cityName = addr.getCity().getName();
-        String  stateUf  = addr.getCity().getState().getUf();
-        String  numStr   = String.valueOf(addr.getNumber());
-        String  name     = order.getUser().getFirstName() + " " + order.getUser().getLastName();
-        String  email    = order.getUser().getEmail();
-        String  doc      = order.getUser().getCpf();
-        String  phone    = order.getUser().getPhone();
+        Address addr = order.getAddress();
+        String cityName = addr.getCity().getName();
+        String stateUf = addr.getCity().getState().getUf();
+        String numStr = String.valueOf(addr.getNumber());
+        String name = order.getUser().getFirstName() + " " + order.getUser().getLastName();
+        String email = order.getUser().getEmail();
+        String doc = order.getUser().getCpf();
+        String phone = order.getUser().getPhone();
 
-        // "From" is your store — using the same address as placeholder until you
-        // add a dedicated store-address config. Replace fromPostalCode field is already
-        // injected in MelhorEnvioClient; here we reuse toPostalCode as a safe fallback.
         var from = new AddToCartRequest.FromAddress(
-                name, email, doc, phone,
+                storeName, storeEmail, storeDocument, storePhone,
                 fromPostalCode,
-                addr.getStreet(), numStr,
-                addr.getNeighborhood(), cityName, stateUf
+                storeAddress, storeNumber,
+                storeDistrict, storeCity, storeState
         );
 
         var to = new AddToCartRequest.ToAddress(
@@ -175,34 +176,40 @@ public class ShippingService {
                 addr.getNeighborhood(), cityName, stateUf
         );
 
-        var products = List.of(new AddToCartRequest.Product(
-                "Pedido #" + order.getId(),
-                "SKU-" + order.getId(),
-                order.getItems().size(),
-                0.5 * order.getItems().size(),  // placeholder weight
-                15, 10, 20,                     // placeholder dimensions
-                order.getTotal().doubleValue()
-        ));
+        var products = order.getItems().stream()
+                .map(item -> new AddToCartRequest.Product(
+                        item.getProduct().getName(),
+                        "SKU-" + item.getProduct().getId(),
+                        item.getQuantity(),
+                        item.getProduct().getWeight() * item.getQuantity(),
+                        item.getProduct().getWidth(),
+                        item.getProduct().getHeight(),
+                        item.getProduct().getLength(),
+                        item.getSubtotal().doubleValue()
+                )).toList();
+
+        var volumes = order.getItems().stream()
+                .map(item -> new AddToCartRequest.Volume(
+                        item.getProduct().getWeight() * item.getQuantity(),
+                        item.getProduct().getHeight(),
+                        item.getProduct().getWidth(),
+                        item.getProduct().getLength()
+                )).toList();
 
         return new AddToCartRequest(
-                option.id(), from, to, products,
+                option.id(), from, to, products, volumes,
                 new AddToCartRequest.Options(false, false, String.valueOf(order.getId()))
         );
     }
 
-    /**
-     * Maps Melhor Envio webhook status strings to our internal ShippingStatus.
-     * ME sends statuses like "posted", "delivered", "canceled", etc.
-     * Returns null for statuses we intentionally ignore.
-     */
     private ShippingStatus mapMeStatus(String meStatus) {
         if (meStatus == null) return null;
         return switch (meStatus.toLowerCase()) {
-            case "posted"                       -> ShippingStatus.POSTED;
-            case "in_transit", "with_carrier"   -> ShippingStatus.IN_TRANSIT;
-            case "delivered"                    -> ShippingStatus.DELIVERED;
-            case "canceled", "cancelled"        -> ShippingStatus.CANCELLED;
-            default                             -> null;
+            case "released", "posted" -> ShippingStatus.POSTED;
+            case "in_transit", "with_carrier" -> ShippingStatus.IN_TRANSIT;
+            case "delivered" -> ShippingStatus.DELIVERED;
+            case "canceled", "cancelled" -> ShippingStatus.CANCELLED;
+            default -> null;
         };
     }
 }

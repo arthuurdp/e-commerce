@@ -34,7 +34,6 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         return httpSecurity
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -47,30 +46,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/webhook/stripe").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/webhooks/melhor-envio").permitAll()
                         .requestMatchers(HttpMethod.GET, "/checkout/success").permitAll()
                         .requestMatchers(HttpMethod.GET, "/checkout/failure").permitAll()
 
                         .anyRequest().authenticated()
-                )
-                .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            response.setStatus(401);
-                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                            mapper.writeValue(response.getWriter(), Map.of(
-                                    "status", 401,
-                                    "error", "Unauthorized",
-                                    "message", "Authentication required. Please provide a valid token."
-                            ));
-                        })
-                        .accessDeniedHandler((request, response, accessDeniedException) -> {
-                            response.setStatus(403);
-                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                            mapper.writeValue(response.getWriter(), Map.of(
-                                    "status", 403,
-                                    "error", "Forbidden",
-                                    "message", "You don't have permission to access this resource."
-                            ));
-                        })
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
