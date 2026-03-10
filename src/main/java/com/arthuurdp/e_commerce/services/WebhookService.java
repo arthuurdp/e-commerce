@@ -5,6 +5,7 @@ import com.arthuurdp.e_commerce.domain.entities.Payment;
 import com.arthuurdp.e_commerce.domain.enums.OrderStatus;
 import com.arthuurdp.e_commerce.domain.enums.PaymentStatus;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
+import com.arthuurdp.e_commerce.exceptions.WebhookException;
 import com.arthuurdp.e_commerce.repositories.OrderRepository;
 import com.arthuurdp.e_commerce.repositories.PaymentRepository;
 import com.stripe.exception.SignatureVerificationException;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 public class WebhookService {
@@ -47,7 +49,7 @@ public class WebhookService {
             event = Webhook.constructEvent(payload, sigHeader, webhookSecret);
         } catch (SignatureVerificationException e) {
             log.warn("Invalid Stripe webhook signature: {}", e.getMessage());
-            throw new RuntimeException("Invalid webhook signature");
+            throw new WebhookException("Invalid webhook signature");
         }
 
         log.info("Stripe event received: {}", event.getType());
@@ -62,16 +64,14 @@ public class WebhookService {
     private Session deserializeSession(Event event) {
         EventDataObjectDeserializer deserializer = event.getDataObjectDeserializer();
 
-        if (deserializer.getObject().isPresent()) {
-            StripeObject stripeObject = deserializer.getObject().get();
-            if (stripeObject instanceof Session session) {
-                return session;
-            }
+        Optional<StripeObject> stripeObject = deserializer.getObject();
+        if (stripeObject.isPresent() && stripeObject.get() instanceof Session session) {
+            return session;
         }
 
         try {
-            StripeObject stripeObject = deserializer.deserializeUnsafe();
-            if (stripeObject instanceof Session session) {
+            StripeObject unsafeObject = deserializer.deserializeUnsafe();
+            if (unsafeObject instanceof Session session) {
                 return session;
             }
         } catch (Exception e) {
@@ -105,7 +105,7 @@ public class WebhookService {
             payment.setTransactionId(session.getPaymentIntent());
             order.setStatus(OrderStatus.PAID);
             shippingService.createForOrder(order);
-            emailSenderService.sendOrderConfirmation(order.getUser().getEmail(), orderId);
+            emailSenderService.sendOrderConfirmation(order.getUser().getEmail());
             log.info("Order {} marked as PAID", orderId);
         } else {
             payment.setStatus(PaymentStatus.PENDING);

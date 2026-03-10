@@ -4,52 +4,45 @@ import com.arthuurdp.e_commerce.domain.entities.Carrier;
 import com.arthuurdp.e_commerce.domain.dtos.carrier.CarrierResponse;
 import com.arthuurdp.e_commerce.domain.dtos.carrier.CreateCarrierRequest;
 import com.arthuurdp.e_commerce.domain.dtos.carrier.UpdateCarrierRequest;
-import com.arthuurdp.e_commerce.domain.entities.User;
 import com.arthuurdp.e_commerce.domain.enums.CarrierStatus;
 import com.arthuurdp.e_commerce.domain.enums.Region;
-import com.arthuurdp.e_commerce.domain.enums.Role;
 import com.arthuurdp.e_commerce.exceptions.ConflictException;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.CarrierRepository;
-import com.arthuurdp.e_commerce.repositories.UserRepository;
+import com.arthuurdp.e_commerce.services.mappers.CarrierMapper;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CarrierService {
-    private final CarrierRepository carrierRepository;
-    private final EntityMapperService entityMapperService;
+    private final CarrierRepository repo;
+    private final CarrierMapper mapper;
 
-    public CarrierService(CarrierRepository carrierRepository, EntityMapperService entityMapperService) {
-        this.carrierRepository = carrierRepository;
-        this.entityMapperService = entityMapperService;
+    public CarrierService(CarrierRepository repo, CarrierMapper mapper) {
+        this.repo = repo;
+        this.mapper = mapper;
     }
 
     public CarrierResponse findById(Long id) {
-        Carrier carrier = carrierRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Carrier not found"));
-        return entityMapperService.toCarrierResponse(carrier);
+        return mapper.toCarrierResponse(repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Carrier not found")));
     }
 
     public Page<CarrierResponse> findAll(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return carrierRepository.findAll(pageable).map(entityMapperService::toCarrierResponse);
+        return repo.findAll(PageRequest.of(page, size)).map(mapper::toCarrierResponse);
     }
 
     public Page<CarrierResponse> findAllByRegion(int page, int size, Region region, CarrierStatus status) {
-        Pageable pageable = PageRequest.of(page, size);
         if (status != null) {
-            return carrierRepository.findByRegionAndStatus(region, status, pageable).map(entityMapperService::toCarrierResponse);
+            return repo.findByRegionAndStatus(region, status, PageRequest.of(page, size)).map(mapper::toCarrierResponse);
         }
-        return carrierRepository.findByRegion(region, pageable).map(entityMapperService::toCarrierResponse);
+        return repo.findByRegion(region, PageRequest.of(page, size)).map(mapper::toCarrierResponse);
     }
 
     @Transactional
     public CarrierResponse create(CreateCarrierRequest req) {
-        if (carrierRepository.existsByEmail(req.email())) {
+        if (repo.existsByEmail(req.email())) {
             throw new ConflictException("Carrier already exists");
         }
 
@@ -61,22 +54,40 @@ public class CarrierService {
                 req.region()
         );
 
-        return entityMapperService.toCarrierResponse(carrierRepository.save(carrier));
+        return mapper.toCarrierResponse(repo.save(carrier));
     }
 
     @Transactional
     public CarrierResponse update(Long id, UpdateCarrierRequest req) {
-        Carrier carrier = carrierRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Carrier not found"));
+        Carrier carrier = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Carrier not found"));
 
         if (req.name() != null) {
             carrier.setName(req.name());
         }
 
-        return entityMapperService.toCarrierResponse(carrierRepository.save(carrier));
+        if (req.email() != null) {
+            if (repo.existsByEmail(req.email()) && !carrier.getEmail().equals(req.email())) {
+                throw new ConflictException("Email already in use by another carrier");
+            }
+            carrier.setEmail(req.email());
+        }
+
+        if (req.phone() != null) {
+            carrier.setPhone(req.phone());
+        }
+
+        if (req.region() != null) {
+            carrier.setRegion(req.region());
+        }
+
+        if (req.status() != null) {
+            carrier.setStatus(req.status());
+        }
+
+        return mapper.toCarrierResponse(repo.save(carrier));
     }
 
     public void delete(Long id) {
-        Carrier carrier = carrierRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Carrier not found"));
-        carrierRepository.deleteById(carrier.getId());
+        repo.delete(repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Carrier not found")));
     }
 }

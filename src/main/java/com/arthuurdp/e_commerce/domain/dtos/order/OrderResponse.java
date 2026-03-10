@@ -11,5 +11,4 @@ public record OrderResponse(
         BigDecimal total,
         Integer totalItems,
         LocalDateTime createdAt
-) {
-}
+) {}

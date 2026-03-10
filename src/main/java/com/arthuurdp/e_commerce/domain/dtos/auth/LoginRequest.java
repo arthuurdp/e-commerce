@@ -8,5 +8,4 @@ public record LoginRequest(
 
         @NotBlank(message = "Password is required")
         String password
-) {
-}
+) {}

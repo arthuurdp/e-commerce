@@ -27,22 +27,29 @@ public class UserController {
     ) {
         return ResponseEntity.ok().body(service.findAll(page, size));
     }
-
+    
     @GetMapping("/{id}")
     @AdminOrSelf
-    public ResponseEntity<UserResponse> findById(@PathVariable Long id) {
+    public ResponseEntity<UserResponse> findById(
+            @PathVariable Long id
+    ) {
         return ResponseEntity.ok().body(service.findById(id));
     }
 
     @PatchMapping("/{id}")
     @AdminOrSelf
-    public ResponseEntity<UserResponse> update(@PathVariable Long id, @RequestBody @Valid UpdateUserRequest req) {
+    public ResponseEntity<UserResponse> update(
+            @PathVariable Long id,
+            @RequestBody @Valid UpdateUserRequest req
+    ) {
         return ResponseEntity.ok().body(service.update(id, req));
     }
 
     @DeleteMapping("/{id}")
     @AdminOrSelf
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(
+            @PathVariable Long id
+    ) {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }

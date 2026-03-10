@@ -4,6 +4,9 @@ import com.arthuurdp.e_commerce.exceptions.ProductOutOfStockException;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -12,6 +15,9 @@ import java.util.Optional;
 
 @Entity
 @Table(name = "cart")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,31 +32,9 @@ public class Cart {
             mappedBy = "cart",
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL,
-            orphanRemoval = true)
+            orphanRemoval = true
+    )
     private List<CartItem> items = new ArrayList<>();
-
-    public Cart() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public List<CartItem> getItems() {
-        return items;
-    }
 
     public CartItem addProduct(Product product) {
         Optional<CartItem> existingItem = items.stream()

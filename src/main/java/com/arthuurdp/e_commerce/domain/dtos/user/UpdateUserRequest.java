@@ -19,5 +19,5 @@ public record UpdateUserRequest(
         @Past(message = "Please insert a valid date")
         LocalDate birthDate,
 
-        Gender gender) {
-}
+        Gender gender
+) {}

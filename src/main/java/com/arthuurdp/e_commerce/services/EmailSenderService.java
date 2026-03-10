@@ -51,7 +51,7 @@ public class EmailSenderService {
         sender.send(message);
     }
 
-    public void sendOrderConfirmation(String to, String orderId) {
+    public void sendOrderConfirmation(String to) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
         message.setSubject("Order confirmation");

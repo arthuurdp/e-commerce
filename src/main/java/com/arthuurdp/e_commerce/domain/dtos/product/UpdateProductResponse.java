@@ -18,5 +18,4 @@ public record UpdateProductResponse(
         List<ProductImageResponse> imgs,
         List<CategoryResponse> category,
         Instant updatedAt
-) {
-}
+) {}

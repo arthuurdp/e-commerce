@@ -12,7 +12,7 @@ import com.arthuurdp.e_commerce.domain.entities.Shipping;
 import com.arthuurdp.e_commerce.domain.enums.ShippingStatus;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.ShippingRepository;
-import jakarta.persistence.EntityNotFoundException;
+import com.arthuurdp.e_commerce.services.mappers.ShippingMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,9 +29,9 @@ public class ShippingService {
 
     private static final String TRACKING_URL = "https://melhorrastreio.com.br/rastreio/";
 
-    private final ShippingRepository shippingRepository;
-    private final MelhorEnvioClient melhorEnvioClient;
-    private final EntityMapperService mapper;
+    private final ShippingRepository repo;
+    private final MelhorEnvioClient client;
+    private final ShippingMapper mapper;
 
     @Value("${melhorenvio.from-postal-code}")
     private String fromPostalCode;
@@ -63,15 +63,15 @@ public class ShippingService {
     @Value("${melhorenvio.store-state}")
     private String storeState;
 
-    public ShippingService(ShippingRepository shippingRepository, MelhorEnvioClient melhorEnvioClient, EntityMapperService mapper) {
-        this.shippingRepository = shippingRepository;
-        this.melhorEnvioClient  = melhorEnvioClient;
+    public ShippingService(ShippingRepository repo, MelhorEnvioClient client, ShippingMapper mapper) {
+        this.repo = repo;
+        this.client  = client;
         this.mapper = mapper;
     }
 
     @Transactional
     public void createForOrder(Order order) {
-        Shipping shipping = shippingRepository.findByOrderId(order.getId()).orElseGet(() -> shippingRepository.save(new Shipping(order)));
+        Shipping shipping = repo.findByOrderId(order.getId()).orElseGet(() -> repo.save(new Shipping(order)));
 
         if (shipping.getStatus() == ShippingStatus.LABEL_GENERATED) {
             log.info("Order {}: shipping label already generated — skipping", order.getId());
@@ -83,7 +83,7 @@ public class ShippingService {
 
             if (shipping.getMeOrderId() == null) {
                 int itemCount = order.getItems().size();
-                List<FreightOption> options = melhorEnvioClient.calculate(toPostalCode, itemCount);
+                List<FreightOption> options = client.calculate(toPostalCode, itemCount);
                 FreightOption chosen = options.stream()
                         .filter(FreightOption::isAvailable)
                         .min(Comparator.comparing(FreightOption::price))
@@ -93,39 +93,39 @@ public class ShippingService {
                         order.getId(), chosen.name(), chosen.price(), chosen.deliveryDays());
 
                 var cartRequest = buildCartRequest(order, chosen, toPostalCode);
-                String meOrderId = melhorEnvioClient.addToCart(cartRequest);
+                String meOrderId = client.addToCart(cartRequest);
                 shipping.setMeOrderId(meOrderId);
                 shipping.setCarrier(chosen.name());
                 shipping.setShippingCost(chosen.price());
-                shippingRepository.save(shipping);
+                repo.save(shipping);
             }
 
             if (shipping.getStatus() == ShippingStatus.PENDING || shipping.getStatus() == ShippingStatus.FAILED) {
-                melhorEnvioClient.purchase(List.of(shipping.getMeOrderId()));
+                client.purchase(List.of(shipping.getMeOrderId()));
                 shipping.setStatus(ShippingStatus.PURCHASED);
-                shippingRepository.save(shipping);
+                repo.save(shipping);
             }
 
             if (shipping.getStatus() == ShippingStatus.PURCHASED) {
-                var labelInfo = melhorEnvioClient.generateLabel(shipping.getMeOrderId());
+                var labelInfo = client.generateLabel(shipping.getMeOrderId());
                 shipping.setTrackingCode(labelInfo.trackingCode());
                 shipping.setTrackingUrl(TRACKING_URL + labelInfo.trackingCode());
                 shipping.setLabelUrl(labelInfo.labelUrl());
                 shipping.setStatus(ShippingStatus.LABEL_GENERATED);
-                shippingRepository.save(shipping);
+                repo.save(shipping);
                 log.info("Order {}: label generated — tracking {}", order.getId(), labelInfo.trackingCode());
             }
 
         } catch (Exception e) {
             shipping.setStatus(ShippingStatus.FAILED);
-            shippingRepository.save(shipping);
+            repo.save(shipping);
             log.error("Order {}: ME label creation failed — {}", order.getId(), e.getMessage(), e);
         }
     }
 
     @Transactional
     public void handleWebhookEvent(MelhorEnvioWebhookEvent event) {
-        Shipping shipping = shippingRepository.findByMeOrderId(event.orderId()).orElseThrow(() -> new ResourceNotFoundException("No shipping found for ME order: " + event.orderId()));
+        Shipping shipping = repo.findByMeOrderId(event.orderId()).orElseThrow(() -> new ResourceNotFoundException("No shipping found for ME order"));
 
         ShippingStatus newStatus = mapMeStatus(event.status());
         if (newStatus == null) {
@@ -141,14 +141,12 @@ public class ShippingService {
             shipping.setDeliveredAt(LocalDateTime.now());
         }
 
-        shippingRepository.save(shipping);
+        repo.save(shipping);
         log.info("Shipping for ME order {} updated to {}", event.orderId(), newStatus);
     }
 
     public ShippingResponse getShippingForUser(Long orderId, Long userId) {
-        Shipping shipping = shippingRepository.findByOrderIdAndOrderUserId(orderId, userId)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Shipping not found for order " + orderId));
+        Shipping shipping = repo.findByOrderIdAndOrderUserId(orderId, userId).orElseThrow(() -> new ResourceNotFoundException("Shipping not found for this order"));
         return mapper.toShippingResponse(shipping);
     }
 

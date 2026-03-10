@@ -19,10 +19,10 @@ import java.net.URI;
 @RequestMapping("/carriers")
 @PreAuthorize("hasRole('ADMIN')")
 public class CarrierController {
-    private final CarrierService carrierService;
+    private final CarrierService service;
 
-    public CarrierController(CarrierService carrierService) {
-        this.carrierService = carrierService;
+    public CarrierController(CarrierService service) {
+        this.service = service;
     }
 
     @GetMapping
@@ -30,7 +30,7 @@ public class CarrierController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return ResponseEntity.ok().body(carrierService.findAll(page, size));
+        return ResponseEntity.ok().body(service.findAll(page, size));
     }
 
     @GetMapping("/region/{region}")
@@ -40,29 +40,38 @@ public class CarrierController {
             @PathVariable Region region,
             @RequestParam(required = false) CarrierStatus status
     ) {
-        return ResponseEntity.ok().body(carrierService.findAllByRegion(page, size, region, status));
+        return ResponseEntity.ok().body(service.findAllByRegion(page, size, region, status));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CarrierResponse> findById(@PathVariable Long id) {
-        return ResponseEntity.ok().body(carrierService.findById(id));
+    public ResponseEntity<CarrierResponse> findById(
+            @PathVariable Long id
+    ) {
+        return ResponseEntity.ok().body(service.findById(id));
     }
 
     @PostMapping
-    public ResponseEntity<CarrierResponse> create(@RequestBody @Valid CreateCarrierRequest req) {
-        CarrierResponse response = carrierService.create(req);
+    public ResponseEntity<CarrierResponse> create(
+            @RequestBody @Valid CreateCarrierRequest req
+    ) {
+        CarrierResponse response = service.create(req);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(response.id()).toUri();
         return ResponseEntity.created(uri).body(response);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<CarrierResponse> update(@PathVariable Long id, @RequestBody @Valid UpdateCarrierRequest req) {
-        return ResponseEntity.ok().body(carrierService.update(id, req));
+    public ResponseEntity<CarrierResponse> update(
+            @PathVariable Long id,
+            @RequestBody @Valid UpdateCarrierRequest req
+    ) {
+        return ResponseEntity.ok().body(service.update(id, req));
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        carrierService.delete(id);
+    public ResponseEntity<Void> delete(
+            @PathVariable Long id
+    ) {
+        service.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

@@ -20,18 +20,24 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest req) {
+    public ResponseEntity<LoginResponse> login(
+            @RequestBody @Valid LoginRequest req
+    ) {
         return ResponseEntity.ok().body(service.login(req));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponse> registerUser(@RequestBody @Valid RegisterRequest req) {
+    public ResponseEntity<RegisterResponse> registerUser(
+            @RequestBody @Valid RegisterRequest req
+    ) {
         return ResponseEntity.status(201).body(service.registerUser(req));
     }
 
     @PostMapping("/register/admin")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<RegisterResponse> registerAdmin(@RequestBody @Valid RegisterRequest req) {
+    public ResponseEntity<RegisterResponse> registerAdmin(
+            @RequestBody @Valid RegisterRequest req
+    ) {
         return ResponseEntity.status(201).body(service.registerAdmin(req));
     }
 }

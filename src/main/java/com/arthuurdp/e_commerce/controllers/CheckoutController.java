@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class CheckoutController {
-    private final CheckoutService checkoutService;
+    private final CheckoutService service;
 
-    public CheckoutController(CheckoutService checkoutService) {
-        this.checkoutService = checkoutService;
+    public CheckoutController(CheckoutService service) {
+        this.service = service;
     }
 
     @PostMapping("/orders/checkout")
@@ -24,13 +24,14 @@ public class CheckoutController {
     public ResponseEntity<CheckoutResponse> checkout(
             @RequestBody @Valid CheckoutRequest req,
             @AuthenticationPrincipal User user
-    )
-            throws StripeException {
-        return ResponseEntity.ok(checkoutService.checkout(req, user));
+    ) throws StripeException {
+        return ResponseEntity.ok(service.checkout(req, user));
     }
 
     @GetMapping("/checkout/success")
-    public ResponseEntity<String> success(@RequestParam String session_id) {
+    public ResponseEntity<String> success(
+            @RequestParam String session_id
+    ) {
         return ResponseEntity.ok("Pagamento realizado com sucesso! Session: " + session_id);
     }
 

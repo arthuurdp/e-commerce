@@ -2,6 +2,10 @@ package com.arthuurdp.e_commerce.domain.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -9,10 +13,15 @@ import java.util.*;
 
 @Entity
 @Table(name = "products")
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "name", nullable = false)
@@ -66,8 +75,6 @@ public class Product {
         this.lastUpdatedAt = Instant.now();
     }
 
-    public Product() {}
-
     public Product(String name, String description, BigDecimal price, Integer stock, Double weight, Integer width, Integer height, Integer length) {
         this.name = name;
         this.description = description;
@@ -79,73 +86,10 @@ public class Product {
         this.length = length != null ? length : 20;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public Integer getStock() {
-        return stock;
-    }
-
-    public void setStock(Integer stock) {
-        this.stock = stock;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public Instant getLastUpdatedAt() {
-        return lastUpdatedAt;
-    }
-
     public Double getWeight() { return weight != null ? weight : 0.5; }
-    public void setWeight(Double weight) { this.weight = weight; }
-
     public Integer getWidth() { return width != null ? width : 15; }
-    public void setWidth(Integer width) { this.width = width; }
-
     public Integer getHeight() { return height != null ? height : 10; }
-    public void setHeight(Integer height) { this.height = height; }
-
     public Integer getLength() { return length != null ? length : 20; }
-    public void setLength(Integer length) { this.length = length; }
-
-    public List<ProductImage> getImages() {
-        return images;
-    }
-
-    public Set<Category> getCategories() {
-        return categories;
-    }
-
-    public Set<OrderItem> getOrderItems() {
-        return orderItems;
-    }
 
     public String getMainImageUrl() {
         return images.stream().filter(ProductImage::isMainImage).map(ProductImage::getUrl).findFirst().orElse(null);
@@ -176,7 +120,7 @@ public class Product {
 
     public void addCategory(Category category) {
         if (categories.add(category)) {
-            category.addProduct(this);
+            category.getProducts().add(this);
         }
     }
 
@@ -187,17 +131,5 @@ public class Product {
     public void removeAllCategories() {
         categories.forEach(c -> c.getProducts().remove(this));
         categories.clear();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Product product = (Product) o;
-        return Objects.equals(id, product.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
     }
 }

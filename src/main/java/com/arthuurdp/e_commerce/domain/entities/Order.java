@@ -2,19 +2,27 @@ package com.arthuurdp.e_commerce.domain.entities;
 
 import com.arthuurdp.e_commerce.domain.enums.OrderStatus;
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @Table(name = "orders")
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
+    @EqualsAndHashCode.Include
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -53,100 +61,15 @@ public class Order {
         this.createdAt = LocalDateTime.now();
     }
 
-    public Order() {
-    }
-
-    public Order(BigDecimal total) {
-        this.total = total;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
+    public Order(User user, Address address, OrderStatus status, BigDecimal total, State originState) {
         this.user = user;
-    }
-
-    public Address getAddress() {
-        return address;
-    }
-
-    public void setAddress(Address address) {
         this.address = address;
-    }
-
-    public OrderStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(OrderStatus status) {
         this.status = status;
-    }
-
-    public BigDecimal getTotal() {
-        return total;
-    }
-
-    public void setTotal(BigDecimal total) {
         this.total = total;
-    }
-
-    public Payment getPayment() {
-        return payment;
-    }
-
-    public void setPayment(Payment payment) {
-        this.payment = payment;
-    }
-
-    public Shipping getShipping() {
-        return shipping;
-    }
-
-    public void setShipping(Shipping shipping) {
-        this.shipping = shipping;
-    }
-
-    public Set<OrderItem> getItems() {
-        return items;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+        this.originState = originState;
     }
 
     public Integer getTotalItems() {
-        Integer value = 0;
-        for (OrderItem oi : items) {
-            value += oi.getQuantity();
-        }
-        return value;
-    }
-
-    public State getOriginState() { return originState; }
-
-    public void setOriginState(State state) {
-        this.originState = state;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Order order = (Order) o;
-        return Objects.equals(id, order.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
+        return items.stream().mapToInt(OrderItem::getQuantity).sum();
     }
 }

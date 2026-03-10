@@ -3,9 +3,15 @@ package com.arthuurdp.e_commerce.domain.entities;
 import com.arthuurdp.e_commerce.domain.enums.CarrierStatus;
 import com.arthuurdp.e_commerce.domain.enums.Region;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "carriers")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Carrier {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,66 +42,11 @@ public class Carrier {
         this.status = CarrierStatus.AVAILABLE;
     }
 
-    public Carrier() {
-    }
-
     public Carrier(String name, String cnpj, String email, String phone, Region region) {
         this.name = name;
         this.cnpj = cnpj;
         this.email = email;
         this.phone = phone;
         this.region = region;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getCnpj() {
-        return cnpj;
-    }
-
-    public void setCnpj(String cnpj) {
-        this.cnpj = cnpj;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public Region getRegion() {
-        return region;
-    }
-
-    public void setRegion(Region region) {
-        this.region = region;
-    }
-
-    public CarrierStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(CarrierStatus status) {
-        this.status = status;
     }
 }

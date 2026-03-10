@@ -2,6 +2,7 @@ package com.arthuurdp.e_commerce.controllers;
 
 import com.arthuurdp.e_commerce.domain.dtos.shipping.MelhorEnvioWebhookEvent;
 import com.arthuurdp.e_commerce.services.ShippingService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,7 +44,7 @@ public class MelhorEnvioWebhookController {
 
         MelhorEnvioWebhookEvent event;
         try {
-            event = new com.fasterxml.jackson.databind.ObjectMapper().readValue(rawPayload, MelhorEnvioWebhookEvent.class);
+            event = new ObjectMapper().readValue(rawPayload, MelhorEnvioWebhookEvent.class);
         } catch (Exception e) {
             log.warn("ME webhook received with invalid payload — ignoring");
             return ResponseEntity.ok().build();

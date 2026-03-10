@@ -9,10 +9,9 @@ import com.arthuurdp.e_commerce.domain.enums.Role;
 import com.arthuurdp.e_commerce.exceptions.ConflictException;
 import com.arthuurdp.e_commerce.infrastructure.security.TokenService;
 import com.arthuurdp.e_commerce.repositories.UserRepository;
+import com.arthuurdp.e_commerce.services.mappers.AuthMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,20 +20,14 @@ public class AuthService {
     private final AuthenticationManager authManager;
     private final TokenService tokenService;
     private final UserRepository userRepository;
-    private final EntityMapperService entityMapperService;
+    private final AuthMapper mapper;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthService(
-            AuthenticationManager authManager,
-            TokenService tokenService,
-            UserRepository userRepository,
-            EntityMapperService entityMapperService,
-            PasswordEncoder passwordEncoder
-    ) {
+    public AuthService(AuthenticationManager authManager, TokenService tokenService, UserRepository userRepository, AuthMapper mapper, PasswordEncoder passwordEncoder) {
         this.authManager = authManager;
         this.tokenService = tokenService;
         this.userRepository = userRepository;
-        this.entityMapperService = entityMapperService;
+        this.mapper = mapper;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -71,14 +64,6 @@ public class AuthService {
         );
 
         userRepository.save(user);
-        return entityMapperService.toRegisterResponse(user);
-    }
-
-    public User getCurrentUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated()) {
-            return null;
-        }
-        return (User) auth.getPrincipal();
+        return mapper.toRegisterResponse(user);
     }
 }

@@ -1,11 +1,17 @@
 package com.arthuurdp.e_commerce.domain.entities;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "password_verification_tokens")
+@Getter
+@Setter
+@NoArgsConstructor
 public class PasswordVerificationToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,9 +38,6 @@ public class PasswordVerificationToken {
         this.expiresAt = LocalDateTime.now().plusMinutes(15);
     }
 
-    public PasswordVerificationToken() {
-    }
-
     public PasswordVerificationToken(String code, User user, String pendingPassword) {
         this.code = code;
         this.user = user;
@@ -43,53 +46,5 @@ public class PasswordVerificationToken {
 
     public boolean isExpired() {
         return LocalDateTime.now().isAfter(expiresAt);
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public String getPendingPassword() {
-        return pendingPassword;
-    }
-
-    public void setPendingPassword(String pendingPassword) {
-        this.pendingPassword = pendingPassword;
-    }
-
-    public LocalDateTime getExpiresAt() {
-        return expiresAt;
-    }
-
-    public void setExpiresAt(LocalDateTime expiresAt) {
-        this.expiresAt = expiresAt;
-    }
-
-    public boolean isUsed() {
-        return used;
-    }
-
-    public void setUsed(boolean used) {
-        this.used = used;
     }
 }

@@ -19,5 +19,4 @@ public record CreateProductResponse(
         List<ProductImageResponse> imgs,
         List<CategoryResponse> categories,
         Instant createdAt
-) {
-}
+) {}

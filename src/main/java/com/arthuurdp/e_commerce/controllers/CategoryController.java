@@ -1,7 +1,8 @@
 package com.arthuurdp.e_commerce.controllers;
 
-import com.arthuurdp.e_commerce.domain.dtos.category.CategoryRequest;
+import com.arthuurdp.e_commerce.domain.dtos.category.CreateCategoryRequest;
 import com.arthuurdp.e_commerce.domain.dtos.category.CategoryResponse;
+import com.arthuurdp.e_commerce.domain.dtos.category.UpdateCategoryRequest;
 import com.arthuurdp.e_commerce.services.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -13,49 +14,54 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 
 @RestController
-@PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("/categories")
 public class CategoryController {
-    private final CategoryService categoryService;
+    private final CategoryService service;
 
-    public CategoryController(CategoryService categoryService) {
-        this.categoryService = categoryService;
-    }
-
-    @GetMapping
-    public ResponseEntity<Page<CategoryResponse>> findAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok().body(categoryService.findAllResponse(page, size));
+    public CategoryController(CategoryService service) {
+        this.service = service;
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CategoryResponse> findById(@PathVariable Long id) {
-        return ResponseEntity.ok().body(categoryService.findByIdResponse(id));
+    public ResponseEntity<CategoryResponse> findById(
+            @PathVariable Long id
+    ) {
+        return ResponseEntity.ok().body(service.findById(id));
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<CategoryResponse>> findAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok().body(service.findAll(page, size));
     }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CategoryResponse> create(@RequestBody @Valid CategoryRequest req) {
-        CategoryResponse response = categoryService.create(req);
-
-        URI uri = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(response.id())
-                .toUri();
-
+    public ResponseEntity<CategoryResponse> create(
+            @RequestBody @Valid CreateCategoryRequest req
+    ) {
+        CategoryResponse response = service.create(req);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(response.id()).toUri();
         return ResponseEntity.created(uri).body(response);
     }
 
     @PatchMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CategoryResponse> update(@PathVariable Long id, @RequestBody @Valid CategoryRequest req) {
-        return ResponseEntity.ok().body(categoryService.update(id, req));
+    public ResponseEntity<CategoryResponse> update(
+            @PathVariable Long id,
+            @RequestBody @Valid UpdateCategoryRequest req
+    ) {
+        return ResponseEntity.ok().body(service.update(id, req));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        categoryService.delete(id);
+    public ResponseEntity<Void> delete(
+            @PathVariable Long id
+    ) {
+        service.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

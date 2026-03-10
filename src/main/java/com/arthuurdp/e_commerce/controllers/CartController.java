@@ -2,13 +2,14 @@ package com.arthuurdp.e_commerce.controllers;
 
 import com.arthuurdp.e_commerce.domain.dtos.cart.CartItemResponse;
 import com.arthuurdp.e_commerce.domain.dtos.cart.CartResponse;
+import com.arthuurdp.e_commerce.domain.entities.User;
 import com.arthuurdp.e_commerce.services.CartService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@PreAuthorize("hasRole('USER')")
 @RequestMapping("/cart")
 public class CartController {
     private final CartService service;
@@ -18,26 +19,35 @@ public class CartController {
     }
 
     @GetMapping
-    public ResponseEntity<CartResponse> display() {
-        return ResponseEntity.ok().body(service.display());
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<CartResponse> display(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok().body(service.display(user));
     }
 
     @PatchMapping("/{productId}/increment")
-    public ResponseEntity<CartItemResponse> addProduct(@PathVariable Long productId) {
-        return ResponseEntity.ok().body(service.addProduct(productId));
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<CartItemResponse> addProduct(
+            @PathVariable Long productId,
+            @AuthenticationPrincipal User user
+    ) {
+        return ResponseEntity.ok().body(service.addProduct(productId, user));
     }
 
-    @PreAuthorize("principal.emailVerified")
     @PatchMapping("/{productId}/decrement")
-    public ResponseEntity<CartItemResponse> removeProduct(@PathVariable Long productId) {
-        return service.removeProduct(productId)
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<CartItemResponse> removeProduct(
+            @PathVariable Long productId,
+            @AuthenticationPrincipal User user
+    ) {
+        return service.removeProduct(productId, user)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.noContent().build());
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> clear() {
-        service.clear();
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Void> clear(User user) {
+        service.clear(user);
         return ResponseEntity.noContent().build();
     }
 }

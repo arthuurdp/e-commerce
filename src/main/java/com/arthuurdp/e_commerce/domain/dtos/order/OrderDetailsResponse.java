@@ -12,5 +12,4 @@ public record OrderDetailsResponse(
         BigDecimal total,
         LocalDateTime createdAt,
         List<OrderItemResponse> items
-) {
-}
+) {}

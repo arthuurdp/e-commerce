@@ -11,18 +11,18 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/orders/{orderId}/shipping")
 public class ShippingController {
-    private final ShippingService shippingService;
+    private final ShippingService service;
 
-    public ShippingController(ShippingService shippingService) {
-        this.shippingService = shippingService;
+    public ShippingController(ShippingService service) {
+        this.service = service;
     }
 
     @GetMapping
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ShippingResponse> getShipping(
             @PathVariable Long orderId,
-            @AuthenticationPrincipal User user) {
-
-        return ResponseEntity.ok(shippingService.getShippingForUser(orderId, user.getId()));
+            @AuthenticationPrincipal User user
+    ) {
+        return ResponseEntity.ok(service.getShippingForUser(orderId, user.getId()));
     }
 }

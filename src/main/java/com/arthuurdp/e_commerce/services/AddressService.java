@@ -9,31 +9,30 @@ import com.arthuurdp.e_commerce.domain.dtos.address.UpdateAddressRequest;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.AddressRepository;
 import com.arthuurdp.e_commerce.repositories.CityRepository;
+import com.arthuurdp.e_commerce.services.mappers.AddressMapper;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AddressService {
     private final AddressRepository addressRepository;
     private final CityRepository cityRepository;
-    private final EntityMapperService entityMapperService;
+    private final AddressMapper mapper;
 
-    public AddressService(AddressRepository addressRepository, CityRepository cityRepository, EntityMapperService entityMapperService) {
+    public AddressService(AddressRepository addressRepository, CityRepository cityRepository, AddressMapper mapper) {
         this.addressRepository = addressRepository;
         this.cityRepository = cityRepository;
-        this.entityMapperService = entityMapperService;
+        this.mapper = mapper;
     }
 
     public AddressResponse findById(Long id, Long userId) {
-        return addressRepository.findByIdAndUserId(id, userId).map(entityMapperService::toAddressResponse).orElseThrow(() -> new ResourceNotFoundException("Address not found"));
+        return addressRepository.findByIdAndUserId(id, userId).map(mapper::toAddressResponse).orElseThrow(() -> new ResourceNotFoundException("Address not found"));
     }
 
     public Page<AddressResponse> findAll(int page, int size, Long userId) {
-        Pageable pageable = PageRequest.of(page, size);
-        return addressRepository.findByUserId(pageable, userId).map(entityMapperService::toAddressResponse);
+        return addressRepository.findByUserId(PageRequest.of(page, size), userId).map(mapper::toAddressResponse);
     }
 
     @Transactional
@@ -52,7 +51,7 @@ public class AddressService {
         address.setCity(city);
         address.setUser(user);
 
-        return entityMapperService.toAddressResponse(addressRepository.save(address));
+        return mapper.toAddressResponse(addressRepository.save(address));
     }
 
     @Transactional
@@ -74,18 +73,15 @@ public class AddressService {
         if (req.neighborhood() != null) {
             address.setNeighborhood(req.neighborhood());
         }
-        if (req.cityId() != null) {
-            if (cityRepository.existsById(req.cityId())) {
-                address.setCity(cityRepository.findById(req.cityId()).orElseThrow());
-            }
+        if (req.cityId() != null && cityRepository.existsById(req.cityId())) {
+            address.setCity(cityRepository.findById(req.cityId()).orElseThrow(() -> new ResourceNotFoundException("City not found")));
         }
 
-        return entityMapperService.toAddressResponse(addressRepository.save(address));
+        return mapper.toAddressResponse(addressRepository.save(address));
     }
 
     @Transactional
     public void delete(Long id, User user) {
-        Address address = addressRepository.findByIdAndUserId(id, user.getId()).orElseThrow(() -> new ResourceNotFoundException("Address not found"));
-        addressRepository.delete(address);
+        addressRepository.delete(addressRepository.findByIdAndUserId(id, user.getId()).orElseThrow(() -> new ResourceNotFoundException("Address not found")));
     }
 }

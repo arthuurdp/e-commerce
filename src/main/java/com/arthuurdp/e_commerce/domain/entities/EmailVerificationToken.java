@@ -1,11 +1,17 @@
 package com.arthuurdp.e_commerce.domain.entities;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "email_verification_tokens")
+@Getter
+@Setter
+@NoArgsConstructor
 public class EmailVerificationToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,8 +39,6 @@ public class EmailVerificationToken {
         this.expiresAt = LocalDateTime.now().plusMinutes(15);
     }
 
-    public EmailVerificationToken() {}
-
     public EmailVerificationToken(String code, User user, String pendingEmail) {
         this.code = code;
         this.user = user;
@@ -43,53 +47,5 @@ public class EmailVerificationToken {
 
     public boolean isExpired() {
         return LocalDateTime.now().isAfter(expiresAt);
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public String getPendingEmail() {
-        return pendingEmail;
-    }
-
-    public void setPendingEmail(String pendingEmail) {
-        this.pendingEmail = pendingEmail;
-    }
-
-    public LocalDateTime getExpiresAt() {
-        return expiresAt;
-    }
-
-    public void setExpiresAt(LocalDateTime expiresAt) {
-        this.expiresAt = expiresAt;
-    }
-
-    public boolean isUsed() {
-        return used;
-    }
-
-    public void setUsed(boolean used) {
-        this.used = used;
     }
 }

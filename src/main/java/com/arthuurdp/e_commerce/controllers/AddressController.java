@@ -30,7 +30,7 @@ public class AddressController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @AuthenticationPrincipal User user
-            ) {
+    ) {
         return service.findAll(page, size, user.getId());
     }
 
@@ -39,7 +39,7 @@ public class AddressController {
     public ResponseEntity<AddressResponse> findById(
             @PathVariable Long id,
             @AuthenticationPrincipal User user
-            ) {
+    ) {
         return ResponseEntity.ok().body(service.findById(id, user.getId()));
     }
 
@@ -50,12 +50,7 @@ public class AddressController {
             @AuthenticationPrincipal User user
     ) {
         AddressResponse response = service.create(req, user);
-
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(response.id())
-                .toUri();
-
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(response.id()).toUri();
         return ResponseEntity.created(uri).body(response);
     }
 

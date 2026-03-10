@@ -6,9 +6,19 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record CreateCarrierRequest(
-        @NotBlank String name,
-        @NotBlank String cnpj,
-        @NotBlank @Email String email,
-        @NotBlank String phone,
-        @NotNull Region region
+        @NotBlank(message = "Name is required")
+        String name,
+
+        @NotBlank(message = "CNPJ is required")
+        String cnpj,
+
+        @NotBlank(message = "E-mail is required")
+        @Email(message = "Please enter a valid e-mail")
+        String email,
+
+        @NotBlank(message = "Phone is required")
+        String phone,
+
+        @NotNull(message = "Region is required")
+        Region region
 ) {}

@@ -20,12 +20,14 @@ public class CityController {
             @RequestParam String query,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
-            ){
+    ){
         return service.searchCities(stateId, query, page, size);
     }
 
     @GetMapping("/{id}")
-    public CityResponse findById(@PathVariable Long id) {
+    public CityResponse findById(
+            @PathVariable Long id
+    ) {
         return service.findById(id);
     }
 }

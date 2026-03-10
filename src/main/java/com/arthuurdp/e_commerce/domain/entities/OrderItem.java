@@ -1,11 +1,17 @@
 package com.arthuurdp.e_commerce.domain.entities;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "order_items")
+@Getter
+@Setter
+@NoArgsConstructor
 public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,60 +40,11 @@ public class OrderItem {
         this.subtotal = unitPrice.multiply(BigDecimal.valueOf(quantity));
     }
 
-    public OrderItem() {
-    }
-
-    public OrderItem(Integer quantity, BigDecimal unitPrice, BigDecimal subtotal) {
-        this.quantity = quantity;
-        this.unitPrice = unitPrice;
-        this.subtotal = subtotal;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Order getOrder() {
-        return order;
-    }
-
-    public void setOrder(Order order) {
+    public OrderItem(Order order, Product product, Integer quantity, BigDecimal unitPrice) {
         this.order = order;
-    }
-
-    public Product getProduct() {
-        return product;
-    }
-
-    public void setProduct(Product product) {
         this.product = product;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
         this.quantity = quantity;
-    }
-
-    public BigDecimal getUnitPrice() {
-        return unitPrice;
-    }
-
-    public void setUnitPrice(BigDecimal unitPrice) {
         this.unitPrice = unitPrice;
-    }
-
-    public BigDecimal getSubtotal() {
-        return subtotal;
-    }
-
-    public void setSubtotal(BigDecimal subtotal) {
-        this.subtotal = subtotal;
+        this.subtotal = unitPrice.multiply(BigDecimal.valueOf(quantity));
     }
 }

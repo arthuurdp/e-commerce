@@ -13,5 +13,4 @@ public record UserResponse(
         String phone,
         LocalDate birthDate,
         Gender gender
-) {
-}
+) {}

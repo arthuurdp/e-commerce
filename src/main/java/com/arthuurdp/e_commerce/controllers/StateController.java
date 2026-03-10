@@ -16,12 +16,17 @@ public class StateController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<StateResponse>> findAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<Page<StateResponse>> findAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
         return ResponseEntity.ok().body(service.findAll(page, size));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<StateResponse> findById(@PathVariable Long id) {
+    public ResponseEntity<StateResponse> findById(
+            @PathVariable Long id
+    ) {
         return ResponseEntity.ok().body(service.findById(id));
     }
 }

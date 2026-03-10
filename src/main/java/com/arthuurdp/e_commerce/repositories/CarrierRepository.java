@@ -8,13 +8,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
-
 @Repository
 public interface CarrierRepository extends JpaRepository<Carrier, Long> {
     Page<Carrier> findByRegionAndStatus(Region region, CarrierStatus status, Pageable pageable);
     Page<Carrier> findByRegion(Region region, Pageable pageable);
-    Optional<Carrier> findFirstByRegionAndStatus(Region region, CarrierStatus status);
     boolean existsByEmail(String email);
 
 }

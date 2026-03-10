@@ -14,22 +14,22 @@ import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Random;
+import java.security.SecureRandom;
 
 @Service
 public class EmailService {
     private final EmailVerificationTokenRepository emailVerificationTokenRepository;
     private final PasswordVerificationTokenRepository passwordVerificationTokenRepository;
     private final UserRepository userRepository;
-    private final AuthService authService;
     private final EmailSenderService emailSenderService;
     private final PasswordEncoder passwordEncoder;
 
-    public EmailService(EmailVerificationTokenRepository emailVerificationTokenRepository, PasswordVerificationTokenRepository passwordVerificationTokenRepository, UserRepository userRepository, AuthService authService, EmailSenderService emailSenderService, PasswordEncoder passwordEncoder) {
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+
+    public EmailService(EmailVerificationTokenRepository emailVerificationTokenRepository, PasswordVerificationTokenRepository passwordVerificationTokenRepository, UserRepository userRepository, EmailSenderService emailSenderService, PasswordEncoder passwordEncoder) {
         this.emailVerificationTokenRepository = emailVerificationTokenRepository;
         this.passwordVerificationTokenRepository = passwordVerificationTokenRepository;
         this.userRepository = userRepository;
-        this.authService = authService;
         this.emailSenderService = emailSenderService;
         this.passwordEncoder = passwordEncoder;
     }
@@ -53,16 +53,14 @@ public class EmailService {
     }
 
     @Transactional
-    public void sendEmailVerification() {
-        User user = authService.getCurrentUser();
-
+    public void sendEmailVerification(User user) {
         if (user.isEmailVerified()) {
             throw new BadRequestException("Email already verified");
         }
 
         emailVerificationTokenRepository.deleteByUserId(user.getId());
 
-        String code = String.format("%06d", new Random().nextInt(999999));
+        String code = String.format("%06d", SECURE_RANDOM.nextInt(999999));
         EmailVerificationToken token = new EmailVerificationToken(code, user, user.getEmail());
         emailVerificationTokenRepository.save(token);
 
@@ -70,9 +68,7 @@ public class EmailService {
     }
 
     @Transactional
-    public void requestEmailChange(String newEmail) {
-        User user = authService.getCurrentUser();
-
+    public void requestEmailChange(String newEmail, User user) {
         if (newEmail.equals(user.getEmail())) {
             throw new BadRequestException("New email is the same as current");
         }
@@ -82,7 +78,7 @@ public class EmailService {
 
         emailVerificationTokenRepository.deleteByUserId(user.getId());
 
-        String code = String.format("%06d", new Random().nextInt(999999));
+        String code = String.format("%06d", SECURE_RANDOM.nextInt(999999));
         EmailVerificationToken token = new EmailVerificationToken(code, user, newEmail);
         emailVerificationTokenRepository.save(token);
 
@@ -90,8 +86,7 @@ public class EmailService {
     }
 
     @Transactional
-    public void confirmEmailChange(String code) {
-        User user = authService.getCurrentUser();
+    public void confirmEmailChange(String code, User user) {
         EmailVerificationToken token = emailVerificationTokenRepository.findByCodeAndUsedFalse(code).orElseThrow(() -> new ResourceNotFoundException("Invalid or already used code"));
 
         if (!token.getUser().getId().equals(user.getId())) {
@@ -115,18 +110,17 @@ public class EmailService {
 
     @Transactional
     public void requestPasswordChange(String newPassword, User user) {
-
         if (!user.isEmailVerified()) {
-            throw new AccessDeniedException("Email not verified");
+            throw new AccessDeniedException("Please verify your email");
         }
 
         if (passwordEncoder.matches(newPassword, user.getPassword())) {
-            throw new BadRequestException("Password can't be the same as current");
+            throw new BadRequestException("Password has to be different than the others");
         }
 
         passwordVerificationTokenRepository.deleteByUserId(user.getId());
 
-        String code = String.format("%06d", new Random().nextInt(999999));
+        String code = String.format("%06d", SECURE_RANDOM.nextInt(999999));
         PasswordVerificationToken token = new PasswordVerificationToken(code, user, newPassword);
 
         passwordVerificationTokenRepository.save(token);
@@ -135,8 +129,7 @@ public class EmailService {
     }
 
     @Transactional
-    public void confirmPasswordChange(String code) {
-        User user = authService.getCurrentUser();
+    public void confirmPasswordChange(String code, User user) {
         PasswordVerificationToken token = passwordVerificationTokenRepository.findByCodeAndUsedFalse(code).orElseThrow(() -> new ResourceNotFoundException("Invalid or already used code"));
 
         if (!token.getUser().getId().equals(user.getId())) {

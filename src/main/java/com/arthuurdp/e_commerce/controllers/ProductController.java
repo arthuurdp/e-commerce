@@ -12,7 +12,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 
 @RestController
-@PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("/products")
 public class ProductController {
     private final ProductService service;
@@ -30,36 +29,46 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDetailsResponse> findById(@PathVariable Long id) {
+    public ResponseEntity<ProductDetailsResponse> findById(
+            @PathVariable Long id
+    ) {
         return ResponseEntity.ok().body(service.findById(id));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<CreateProductResponse> create(@RequestBody @Valid CreateProductRequest req) {
+    public ResponseEntity<CreateProductResponse> create(
+            @RequestBody @Valid CreateProductRequest req
+    ) {
         CreateProductResponse response = service.register(req);
-
-        URI uri = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(response.id())
-                .toUri();
-
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(response.id()).toUri();
         return ResponseEntity.created(uri).body(response);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{id}")
-    public ResponseEntity<UpdateProductResponse> update(@PathVariable Long id, @RequestBody @Valid UpdateProductRequest req) {
+    public ResponseEntity<UpdateProductResponse> update(
+            @PathVariable Long id,
+            @RequestBody @Valid UpdateProductRequest req
+    ) {
         return ResponseEntity.ok().body(service.update(id, req));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> delete(
+            @PathVariable Long id
+    ) {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{productId}/main-image")
-    public ResponseEntity<Void> setMainImage(@PathVariable Long productId, @RequestBody SetMainImageRequest req) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> setMainImage(
+            @PathVariable Long productId,
+            @RequestBody SetMainImageRequest req
+    ) {
         service.setMainImage(productId, req);
         return ResponseEntity.noContent().build();
     }

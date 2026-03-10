@@ -13,33 +13,43 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping
 public class EmailController {
-    private final EmailService emailService;
+    private final EmailService service;
 
-    public EmailController(EmailService emailService) {
-        this.emailService = emailService;
+    public EmailController(EmailService service) {
+        this.service = service;
     }
 
     @PostMapping("/verify-email/send")
-    public ResponseEntity<Void> sendVerification() {
-        emailService.sendEmailVerification();
+    public ResponseEntity<Void> sendVerification(
+            @AuthenticationPrincipal User user
+    ) {
+        service.sendEmailVerification(user);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/verify-email/confirm")
-    public ResponseEntity<Void> verifyEmail(@RequestBody @Valid VerifyCodeRequest req) {
-        emailService.verifyEmail(req.code());
+    public ResponseEntity<Void> verifyEmail(
+            @RequestBody @Valid VerifyCodeRequest req
+    ) {
+        service.verifyEmail(req.code());
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/email/change")
-    public ResponseEntity<Void> requestEmailChange(@RequestBody @Valid ChangeEmailRequest req) {
-        emailService.requestEmailChange(req.newEmail());
+    public ResponseEntity<Void> requestEmailChange(
+            @RequestBody @Valid ChangeEmailRequest req,
+            @AuthenticationPrincipal User user
+    ) {
+        service.requestEmailChange(req.email(), user);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/email/confirm")
-    public ResponseEntity<Void> confirmEmailChange(@RequestBody @Valid VerifyCodeRequest req) {
-        emailService.confirmEmailChange(req.code());
+    public ResponseEntity<Void> confirmEmailChange(
+            @RequestBody @Valid VerifyCodeRequest req,
+            @AuthenticationPrincipal User user
+    ) {
+        service.confirmEmailChange(req.code(), user);
         return ResponseEntity.noContent().build();
     }
 
@@ -48,13 +58,16 @@ public class EmailController {
             @RequestBody @Valid ChangePasswordRequest req,
             @AuthenticationPrincipal User user
             ) {
-        emailService.requestPasswordChange(req.newPassword(), user);
+        service.requestPasswordChange(req.password(), user);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/password/confirm")
-    public ResponseEntity<Void> confirmPasswordChange(@RequestBody @Valid VerifyCodeRequest req) {
-        emailService.confirmPasswordChange(req.code());
+    public ResponseEntity<Void> confirmPasswordChange(
+            @RequestBody @Valid VerifyCodeRequest req,
+            @AuthenticationPrincipal User user
+    ) {
+        service.confirmPasswordChange(req.code(), user);
         return ResponseEntity.noContent().build();
     }
 }
