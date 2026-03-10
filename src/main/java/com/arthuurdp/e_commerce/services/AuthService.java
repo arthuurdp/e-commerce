@@ -1,5 +1,6 @@
 package com.arthuurdp.e_commerce.services;
 
+import com.arthuurdp.e_commerce.domain.entities.Cart;
 import com.arthuurdp.e_commerce.domain.entities.User;
 import com.arthuurdp.e_commerce.domain.dtos.auth.LoginRequest;
 import com.arthuurdp.e_commerce.domain.dtos.auth.LoginResponse;
@@ -51,6 +52,7 @@ public class AuthService {
             throw new ConflictException("E-mail already in use");
         }
 
+        Cart cart = new Cart();
         User user = new User(
                 req.firstName(),
                 req.lastName(),
@@ -62,6 +64,7 @@ public class AuthService {
                 req.gender(),
                 role
         );
+        user.setCart(cart);
 
         userRepository.save(user);
         return mapper.toRegisterResponse(user);

@@ -78,10 +78,6 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PasswordVerificationToken> passwordTokens = new ArrayList<>();
 
-    @PrePersist void prePersist() {
-        this.cart = new Cart();
-    }
-
     public User(String firstName, String lastName, String email, String password, String cpf, String phone, LocalDate birthDate, Gender gender, Role role) {
         this.firstName = firstName;
         this.lastName = lastName;
