@@ -33,12 +33,4 @@ public class State {
 
     @OneToMany(mappedBy = "state", fetch = FetchType.LAZY)
     private Set<City> cities;
-
-    @ManyToMany
-    @JoinTable(
-            name = "state_neighbors",
-            joinColumns = @JoinColumn(name = "state_id"),
-            inverseJoinColumns = @JoinColumn(name = "neighbor_id")
-    )
-    private List<State> neighbors = new ArrayList<>();
 }

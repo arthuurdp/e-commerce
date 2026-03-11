@@ -48,10 +48,9 @@ public class AuthService {
     }
 
     private RegisterResponse createUser(RegisterRequest req, Role role) {
-        if (userRepository.existsByEmail(req.email())) {
-            throw new ConflictException("E-mail already in use");
+        if (userRepository.existsByEmail(req.email()) || userRepository.existsByCpf(req.cpf())) {
+            throw new ConflictException("Credentials already in use");
         }
-
         Cart cart = new Cart();
 
         User user = new User(

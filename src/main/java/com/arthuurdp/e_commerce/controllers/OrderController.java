@@ -7,6 +7,7 @@ import com.arthuurdp.e_commerce.infrastructure.security.annotations.AdminOrSelf;
 import com.arthuurdp.e_commerce.services.OrderService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +21,7 @@ public class OrderController {
     }
 
     @GetMapping
-    @AdminOrSelf
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Page<OrderResponse>> findByUser(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,

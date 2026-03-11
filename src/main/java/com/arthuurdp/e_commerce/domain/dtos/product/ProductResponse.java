@@ -7,9 +7,5 @@ public record ProductResponse(
         String name,
         String description,
         BigDecimal price,
-        String mainImage,
-        Double weight,
-        Integer width,
-        Integer height,
-        Integer length
+        String mainImage
 ) {}
