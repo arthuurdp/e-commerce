@@ -8,6 +8,7 @@ import com.arthuurdp.e_commerce.exceptions.BadRequestException;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.CartRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
@@ -22,6 +23,7 @@ public class FreightService {
         this.repo = repo;
     }
 
+    @Transactional
     public List<FreightResponse> calculate(String postalCode, User user) {
         Cart cart = repo.findById(user.getCart().getId()).orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
 
