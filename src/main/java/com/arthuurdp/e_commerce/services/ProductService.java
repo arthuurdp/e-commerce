@@ -7,7 +7,7 @@ import com.arthuurdp.e_commerce.exceptions.BadRequestException;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.ProductRepository;
 import com.arthuurdp.e_commerce.services.mappers.ProductMapper;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -134,6 +134,11 @@ public class ProductService {
             throw new BadRequestException("Product " + product.getName() + " has insufficient stock.");
         }
         product.setStock(product.getStock() - quantity);
+        repo.save(product);
+    }
+
+    public void restoreStock(Product product, int quantity) {
+        product.setStock(product.getStock() + quantity);
         repo.save(product);
     }
 

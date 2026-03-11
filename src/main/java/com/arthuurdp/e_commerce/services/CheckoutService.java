@@ -8,7 +8,7 @@ import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.*;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 @Service

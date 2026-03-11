@@ -53,6 +53,7 @@ public class AuthService {
         }
 
         Cart cart = new Cart();
+
         User user = new User(
                 req.firstName(),
                 req.lastName(),

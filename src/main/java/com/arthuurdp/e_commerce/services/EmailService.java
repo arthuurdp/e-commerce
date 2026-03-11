@@ -10,7 +10,7 @@ import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.EmailVerificationTokenRepository;
 import com.arthuurdp.e_commerce.repositories.PasswordVerificationTokenRepository;
 import com.arthuurdp.e_commerce.repositories.UserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -121,7 +121,8 @@ public class EmailService {
         passwordVerificationTokenRepository.deleteByUserId(user.getId());
 
         String code = String.format("%06d", SECURE_RANDOM.nextInt(999999));
-        PasswordVerificationToken token = new PasswordVerificationToken(code, user, newPassword);
+        String encoded = passwordEncoder.encode(newPassword);
+        PasswordVerificationToken token = new PasswordVerificationToken(code, user, encoded);
 
         passwordVerificationTokenRepository.save(token);
 
@@ -139,7 +140,7 @@ public class EmailService {
             throw new BadRequestException("Code has expired");
         }
 
-        user.setPassword(passwordEncoder.encode(token.getPendingPassword()));
+        user.setPassword(token.getPendingPassword());
         user.setPasswordChangeVerified(true);
         token.setUsed(true);
 

@@ -6,7 +6,6 @@ import com.arthuurdp.e_commerce.repositories.StateRepository;
 import com.arthuurdp.e_commerce.services.mappers.AddressMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,7 +23,6 @@ public class StateService {
     }
 
     public Page<StateResponse> findAll(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return repo.findAll(pageable).map(mapper::toStateResponse);
+        return repo.findAll(PageRequest.of(page, size)).map(mapper::toStateResponse);
     }
 }

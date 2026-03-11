@@ -12,8 +12,9 @@ import com.arthuurdp.e_commerce.repositories.CartItemRepository;
 import com.arthuurdp.e_commerce.repositories.CartRepository;
 import com.arthuurdp.e_commerce.repositories.ProductRepository;
 import com.arthuurdp.e_commerce.services.mappers.CartMapper;
-import jakarta.transaction.Transactional;
+
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 

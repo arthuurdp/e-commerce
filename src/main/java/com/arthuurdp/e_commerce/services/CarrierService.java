@@ -10,10 +10,11 @@ import com.arthuurdp.e_commerce.exceptions.ConflictException;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.CarrierRepository;
 import com.arthuurdp.e_commerce.services.mappers.CarrierMapper;
-import jakarta.transaction.Transactional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CarrierService {

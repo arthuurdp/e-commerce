@@ -20,7 +20,9 @@ public class CartController {
 
     @GetMapping
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<CartResponse> display(@AuthenticationPrincipal User user) {
+    public ResponseEntity<CartResponse> display(
+            @AuthenticationPrincipal User user
+    ) {
         return ResponseEntity.ok().body(service.display(user));
     }
 
@@ -46,7 +48,9 @@ public class CartController {
 
     @DeleteMapping
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Void> clear(User user) {
+    public ResponseEntity<Void> clear(
+            @AuthenticationPrincipal User user
+    ) {
         service.clear(user);
         return ResponseEntity.noContent().build();
     }
