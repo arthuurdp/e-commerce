@@ -1,6 +1,6 @@
 package com.arthuurdp.e_commerce.controllers;
 
-import com.arthuurdp.e_commerce.domain.dtos.places.StateResponse;
+import com.arthuurdp.e_commerce.domain.dtos.address.StateResponse;
 import com.arthuurdp.e_commerce.services.StateService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;

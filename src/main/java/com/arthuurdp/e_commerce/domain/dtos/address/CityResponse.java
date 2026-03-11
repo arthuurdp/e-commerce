@@ -1,4 +1,4 @@
-package com.arthuurdp.e_commerce.domain.dtos.places;
+package com.arthuurdp.e_commerce.domain.dtos.address;
 
 public record CityResponse(
         Long id,

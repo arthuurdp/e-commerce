@@ -1,8 +1,5 @@
 package com.arthuurdp.e_commerce.domain.dtos.address;
 
-import com.arthuurdp.e_commerce.domain.dtos.places.CityResponse;
-import com.arthuurdp.e_commerce.domain.dtos.places.StateResponse;
-
 public record AddressResponse(
         Long id,
         String name,

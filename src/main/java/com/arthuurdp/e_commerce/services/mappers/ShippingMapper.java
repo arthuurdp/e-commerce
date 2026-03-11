@@ -7,7 +7,6 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface ShippingMapper {
-
     @Mapping(target = "orderId", source = "order.id")
     ShippingResponse toShippingResponse(Shipping shipping);
 }

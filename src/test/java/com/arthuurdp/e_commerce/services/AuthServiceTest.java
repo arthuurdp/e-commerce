@@ -11,6 +11,7 @@ import com.arthuurdp.e_commerce.exceptions.ConflictException;
 import com.arthuurdp.e_commerce.infrastructure.security.TokenService;
 import com.arthuurdp.e_commerce.repositories.UserRepository;
 import com.arthuurdp.e_commerce.services.mappers.AuthMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,140 +28,124 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
-    @Mock
-    private AuthenticationManager authManager;
 
-    @Mock
-    private TokenService tokenService;
-
-    @Mock
-    private UserRepository userRepository;
-
-    @Mock
-    private AuthMapper mapper;
-
-    @Mock
-    private PasswordEncoder passwordEncoder;
+    @Mock private AuthenticationManager authManager;
+    @Mock private TokenService tokenService;
+    @Mock private UserRepository userRepository;
+    @Mock private AuthMapper mapper;
+    @Mock private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private AuthService authService;
 
-    private RegisterRequest buildRegisterRequest() {
-        return new RegisterRequest(
-                "John",
-                "Doe",
-                "john@example.com",
-                "secret123",
-                "529.982.247-25",
-                "11987654321",
-                LocalDate.of(1995, 6, 15),
-                Gender.MALE
-        );
-    }
+    private RegisterRequest registerRequest;
+    private User user;
+    private RegisterResponse registerResponse;
 
-    private User buildUser(Role role) {
-        return new User(
-                "John",
-                "Doe",
-                "john@example.com",
-                "encoded_secret",
-                "52998224725",
-                "11987654321",
-                LocalDate.of(1995, 6, 15),
-                Gender.MALE,
-                role
+    @BeforeEach
+    void setUp() {
+        registerRequest = new RegisterRequest(
+                "John", "Doe", "john@example.com", "secret123",
+                "529.982.247-25", "11987654321",
+                LocalDate.of(1995, 6, 15), Gender.MALE
         );
+
+        user = new User(
+                "John", "Doe", "john@example.com", "encoded_secret",
+                "52998224725", "11987654321",
+                LocalDate.of(1995, 6, 15), Gender.MALE, Role.ROLE_USER
+        );
+
+        registerResponse = new RegisterResponse(1L, "John", "Doe", "john@example.com");
     }
 
     @Nested
     @DisplayName("login()")
     class Login {
-        @Test
-        @DisplayName("returns a token when credentials are valid")
-        void shouldReturnTokenOnValidCredentials() {
-            var request = new LoginRequest("john@example.com", "secret123");
-            var user = buildUser(Role.ROLE_USER);
 
+        @Test
+        @DisplayName("returns token when credentials are valid")
+        void shouldReturnTokenOnValidCredentials() {
             Authentication auth = mock(Authentication.class);
             when(auth.getPrincipal()).thenReturn(user);
-
             when(authManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(auth);
-
             when(tokenService.generateToken(user)).thenReturn("fake-jwt-token");
 
-            LoginResponse response = authService.login(request);
+            LoginResponse response = authService.login(new LoginRequest("john@example.com", "secret123"));
 
             assertThat(response.token()).isEqualTo("fake-jwt-token");
+            verify(tokenService).generateToken(user);
         }
 
         @Test
-        @DisplayName("throws when credentials are invalid")
+        @DisplayName("throws BadCredentialsException when credentials are invalid")
         void shouldThrowOnInvalidCredentials() {
-            var request = new LoginRequest("john@example.com", "wrong_password");
-
             when(authManager.authenticate(any())).thenThrow(new BadCredentialsException("Bad credentials"));
 
-            assertThatThrownBy(() -> authService.login(request)).isInstanceOf(BadCredentialsException.class);
+            assertThatThrownBy(() -> authService.login(new LoginRequest("john@example.com", "wrong"))).isInstanceOf(BadCredentialsException.class).hasMessage("Bad credentials");
+
+            verifyNoInteractions(tokenService);
         }
     }
 
     @Nested
     @DisplayName("registerUser()")
     class RegisterUser {
+
         @Test
         @DisplayName("saves user with ROLE_USER and returns response")
         void shouldSaveUserWithRoleUser() {
-            var request = buildRegisterRequest();
-            var savedUser = buildUser(Role.ROLE_USER);
-            var expectedResponse = new RegisterResponse(1L, "John", "Doe", "john@example.com");
+            when(userRepository.existsByEmail(registerRequest.email())).thenReturn(false);
+            when(passwordEncoder.encode(registerRequest.password())).thenReturn("encoded_secret");
+            when(mapper.toRegisterResponse(any(User.class))).thenReturn(registerResponse);
 
-            when(userRepository.existsByEmail(request.email())).thenReturn(false);
-            when(passwordEncoder.encode(request.password())).thenReturn("encoded_secret");
-            when(userRepository.save(any(User.class))).thenReturn(savedUser);
-            when(mapper.toRegisterResponse(savedUser)).thenReturn(expectedResponse);
-
-            RegisterResponse response = authService.registerUser(request);
+            RegisterResponse response = authService.registerUser(registerRequest);
 
             assertThat(response.email()).isEqualTo("john@example.com");
             assertThat(response.firstName()).isEqualTo("John");
         }
 
         @Test
-        @DisplayName("encodes the password before saving")
+        @DisplayName("encodes password before saving")
         void shouldEncodePasswordBeforeSaving() {
-            var request = buildRegisterRequest();
-            var savedUser = buildUser(Role.ROLE_USER);
-
             when(userRepository.existsByEmail(any())).thenReturn(false);
             when(passwordEncoder.encode("secret123")).thenReturn("encoded_secret");
-            when(userRepository.save(any(User.class))).thenReturn(savedUser);
-            when(mapper.toRegisterResponse(any())).thenReturn(
-                    new RegisterResponse(1L, "John", "Doe", "john@example.com")
-            );
+            when(mapper.toRegisterResponse(any())).thenReturn(registerResponse);
 
-            authService.registerUser(request);
+            authService.registerUser(registerRequest);
 
-            ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
-            verify(userRepository).save(userCaptor.capture());
+            ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+            verify(userRepository).save(captor.capture());
+            assertThat(captor.getValue().getPassword()).isEqualTo("encoded_secret");
+        }
 
-            assertThat(userCaptor.getValue().getPassword()).isEqualTo("encoded_secret");
+        @Test
+        @DisplayName("assigns a Cart to the user before saving")
+        void shouldAssignCartToUser() {
+            when(userRepository.existsByEmail(any())).thenReturn(false);
+            when(passwordEncoder.encode(any())).thenReturn("encoded_secret");
+            when(mapper.toRegisterResponse(any())).thenReturn(registerResponse);
+
+            authService.registerUser(registerRequest);
+
+            ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+            verify(userRepository).save(captor.capture());
+            assertThat(captor.getValue().getCart()).isNotNull();
         }
 
         @Test
         @DisplayName("throws ConflictException when email already exists")
         void shouldThrowWhenEmailAlreadyExists() {
-            var request = buildRegisterRequest();
+            when(userRepository.existsByEmail(registerRequest.email())).thenReturn(true);
 
-            when(userRepository.existsByEmail(request.email())).thenReturn(true);
-
-            assertThatThrownBy(() -> authService.registerUser(request)).isInstanceOf(ConflictException.class).hasMessage("E-mail already in use");
+            assertThatThrownBy(() -> authService.registerUser(registerRequest)).isInstanceOf(ConflictException.class).hasMessage("E-mail already in use");
 
             verify(userRepository, never()).save(any());
         }
@@ -169,25 +154,29 @@ class AuthServiceTest {
     @Nested
     @DisplayName("registerAdmin()")
     class RegisterAdmin {
+
         @Test
         @DisplayName("saves user with ROLE_ADMIN")
         void shouldSaveUserWithRoleAdmin() {
-            var request = buildRegisterRequest();
-            var savedUser = buildUser(Role.ROLE_ADMIN);
-
             when(userRepository.existsByEmail(any())).thenReturn(false);
             when(passwordEncoder.encode(any())).thenReturn("encoded_secret");
-            when(userRepository.save(any(User.class))).thenReturn(savedUser);
-            when(mapper.toRegisterResponse(any())).thenReturn(
-                    new RegisterResponse(1L, "John", "Doe", "john@example.com")
-            );
+            when(mapper.toRegisterResponse(any())).thenReturn(registerResponse);
 
-            authService.registerAdmin(request);
+            authService.registerAdmin(registerRequest);
 
-            ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
-            verify(userRepository).save(userCaptor.capture());
+            ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+            verify(userRepository).save(captor.capture());
+            assertThat(captor.getValue().getRole()).isEqualTo(Role.ROLE_ADMIN);
+        }
 
-            assertThat(userCaptor.getValue().getRole()).isEqualTo(Role.ROLE_ADMIN);
+        @Test
+        @DisplayName("throws ConflictException when email already exists")
+        void shouldThrowWhenEmailAlreadyExists() {
+            when(userRepository.existsByEmail(registerRequest.email())).thenReturn(true);
+
+            assertThatThrownBy(() -> authService.registerAdmin(registerRequest)).isInstanceOf(ConflictException.class).hasMessage("E-mail already in use");
+
+            verify(userRepository, never()).save(any());
         }
     }
 }

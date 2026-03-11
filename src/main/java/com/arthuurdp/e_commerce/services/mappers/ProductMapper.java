@@ -10,7 +10,6 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
-
     @Mapping(target = "imgs", source = "images")
     CreateProductResponse toCreateResponse(Product product);
 

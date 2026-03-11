@@ -1,6 +1,6 @@
 package com.arthuurdp.e_commerce.services;
 
-import com.arthuurdp.e_commerce.domain.dtos.places.StateResponse;
+import com.arthuurdp.e_commerce.domain.dtos.address.StateResponse;
 import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.repositories.StateRepository;
 import com.arthuurdp.e_commerce.services.mappers.AddressMapper;
