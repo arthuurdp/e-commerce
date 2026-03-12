@@ -1,0 +1,81 @@
+package com.arthuurdp.e_commerce.modules.shipping;
+
+import com.arthuurdp.e_commerce.modules.shipping.dtos.MelhorEnvioWebhookEvent;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.util.HexFormat;
+
+@RestController
+@RequestMapping("/webhooks/melhor-envio")
+public class MelhorEnvioWebhookController {
+
+    private static final Logger log = LoggerFactory.getLogger(MelhorEnvioWebhookController.class);
+    private static final String HMAC_ALGORITHM = "HmacSHA256";
+
+    private final ShippingService shippingService;
+    private final String webhookSecret;
+
+    public MelhorEnvioWebhookController(
+            ShippingService shippingService,
+            @Value("${melhorenvio.webhook-secret}") String webhookSecret) {
+        this.shippingService = shippingService;
+        this.webhookSecret   = webhookSecret;
+    }
+
+    @PostMapping
+    public ResponseEntity<Void> handleEvent(
+            @RequestHeader(value = "X-Melhor-Envio-Signature", required = false) String signature,
+            @RequestBody String rawPayload) {
+
+        if (!isValidSignature(rawPayload, signature)) {
+            log.warn("ME webhook received with invalid signature — rejecting");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        MelhorEnvioWebhookEvent event;
+        try {
+            event = new ObjectMapper().readValue(rawPayload, MelhorEnvioWebhookEvent.class);
+        } catch (Exception e) {
+            log.warn("ME webhook received with invalid payload — ignoring");
+            return ResponseEntity.ok().build();
+        }
+
+        if (event == null || event.orderId() == null) {
+            log.warn("ME webhook received with missing orderId — ignoring");
+            return ResponseEntity.ok().build();
+        }
+
+        log.info("ME webhook: order={} status={}", event.orderId(), event.status());
+
+        try {
+            shippingService.handleWebhookEvent(event);
+        } catch (Exception e) {
+            log.error("Error processing ME webhook for order {}: {}", event.orderId(), e.getMessage(), e);
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
+    private boolean isValidSignature(String payload, String receivedSignature) {
+        if (receivedSignature == null || receivedSignature.isBlank()) return false;
+        try {
+            Mac mac = Mac.getInstance(HMAC_ALGORITHM);
+            mac.init(new SecretKeySpec(webhookSecret.getBytes(StandardCharsets.UTF_8), HMAC_ALGORITHM));
+            byte[] hash = mac.doFinal(payload.getBytes(StandardCharsets.UTF_8));
+            String expected = HexFormat.of().formatHex(hash);
+            return expected.equalsIgnoreCase(receivedSignature);
+        } catch (Exception e) {
+            log.error("HMAC verification error: {}", e.getMessage());
+            return false;
+        }
+    }
+}

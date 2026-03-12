@@ -1,10 +1,11 @@
 package com.arthuurdp.e_commerce.services;
 
-import com.arthuurdp.e_commerce.domain.dtos.address.CityResponse;
-import com.arthuurdp.e_commerce.domain.entities.City;
-import com.arthuurdp.e_commerce.exceptions.ResourceNotFoundException;
-import com.arthuurdp.e_commerce.repositories.CityRepository;
-import com.arthuurdp.e_commerce.services.mappers.AddressMapper;
+import com.arthuurdp.e_commerce.modules.address.dtos.CityResponse;
+import com.arthuurdp.e_commerce.modules.address.entity.City;
+import com.arthuurdp.e_commerce.shared.exceptions.ResourceNotFoundException;
+import com.arthuurdp.e_commerce.modules.address.CityService;
+import com.arthuurdp.e_commerce.modules.address.CityRepository;
+import com.arthuurdp.e_commerce.modules.address.mapper.AddressMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

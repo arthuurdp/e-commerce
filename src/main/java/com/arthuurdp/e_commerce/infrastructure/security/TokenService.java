@@ -1,6 +1,6 @@
 package com.arthuurdp.e_commerce.infrastructure.security;
 
-import com.arthuurdp.e_commerce.domain.entities.User;
+import com.arthuurdp.e_commerce.modules.user.entity.User;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;

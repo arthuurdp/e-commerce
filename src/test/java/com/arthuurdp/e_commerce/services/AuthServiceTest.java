@@ -1,16 +1,17 @@
 package com.arthuurdp.e_commerce.services;
 
-import com.arthuurdp.e_commerce.domain.dtos.auth.LoginRequest;
-import com.arthuurdp.e_commerce.domain.dtos.auth.LoginResponse;
-import com.arthuurdp.e_commerce.domain.dtos.auth.RegisterRequest;
-import com.arthuurdp.e_commerce.domain.dtos.auth.RegisterResponse;
-import com.arthuurdp.e_commerce.domain.entities.User;
-import com.arthuurdp.e_commerce.domain.enums.Gender;
-import com.arthuurdp.e_commerce.domain.enums.Role;
-import com.arthuurdp.e_commerce.exceptions.ConflictException;
+import com.arthuurdp.e_commerce.modules.auth.dtos.LoginRequest;
+import com.arthuurdp.e_commerce.modules.auth.dtos.LoginResponse;
+import com.arthuurdp.e_commerce.modules.auth.dtos.RegisterRequest;
+import com.arthuurdp.e_commerce.modules.auth.dtos.RegisterResponse;
+import com.arthuurdp.e_commerce.modules.user.entity.User;
+import com.arthuurdp.e_commerce.modules.user.enums.Gender;
+import com.arthuurdp.e_commerce.modules.user.enums.Role;
+import com.arthuurdp.e_commerce.shared.exceptions.ConflictException;
 import com.arthuurdp.e_commerce.infrastructure.security.TokenService;
-import com.arthuurdp.e_commerce.repositories.UserRepository;
-import com.arthuurdp.e_commerce.services.mappers.AuthMapper;
+import com.arthuurdp.e_commerce.modules.auth.AuthService;
+import com.arthuurdp.e_commerce.modules.user.UserRepository;
+import com.arthuurdp.e_commerce.modules.auth.mapper.AuthMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

@@ -1,0 +1,16 @@
+package com.arthuurdp.e_commerce.modules.product.dtos;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+public record ProductDetailsResponse(
+        Long id,
+        String name,
+        String description,
+        BigDecimal price,
+        List<ProductImageResponse> imgs,
+        Double weight,
+        Integer width,
+        Integer height,
+        Integer length
+) {}

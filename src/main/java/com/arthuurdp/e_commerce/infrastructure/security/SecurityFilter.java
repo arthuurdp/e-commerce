@@ -1,6 +1,6 @@
 package com.arthuurdp.e_commerce.infrastructure.security;
 
-import com.arthuurdp.e_commerce.repositories.UserRepository;
+import com.arthuurdp.e_commerce.modules.user.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

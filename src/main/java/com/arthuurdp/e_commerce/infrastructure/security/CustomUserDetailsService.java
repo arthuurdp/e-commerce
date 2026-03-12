@@ -1,6 +1,6 @@
 package com.arthuurdp.e_commerce.infrastructure.security;
 
-import com.arthuurdp.e_commerce.repositories.UserRepository;
+import com.arthuurdp.e_commerce.modules.user.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
