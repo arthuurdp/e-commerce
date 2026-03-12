@@ -4,12 +4,12 @@ import com.arthuurdp.e_commerce.modules.category.dtos.CategoryResponse;
 import com.arthuurdp.e_commerce.modules.category.dtos.CreateCategoryRequest;
 import com.arthuurdp.e_commerce.modules.category.dtos.UpdateCategoryRequest;
 import com.arthuurdp.e_commerce.modules.category.entity.Category;
+import com.arthuurdp.e_commerce.modules.category.mapper.CategoryMapper;
 import com.arthuurdp.e_commerce.modules.product.entity.Product;
 import com.arthuurdp.e_commerce.shared.exceptions.BadRequestException;
 import com.arthuurdp.e_commerce.shared.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.modules.category.CategoryService;
 import com.arthuurdp.e_commerce.modules.category.CategoryRepository;
-import com.arthuurdp.e_commerce.modules.product.mapper.ProductMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -34,7 +34,7 @@ import static org.mockito.Mockito.*;
 class CategoryServiceTest {
 
     @Mock private CategoryRepository repo;
-    @Mock private ProductMapper mapper;
+    @Mock private CategoryMapper mapper;
 
     @InjectMocks
     private CategoryService categoryService;

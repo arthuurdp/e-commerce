@@ -1,20 +1,17 @@
 package com.arthuurdp.e_commerce.services;
 
-import com.arthuurdp.e_commerce.modules.address.dtos.AddressResponse;
-import com.arthuurdp.e_commerce.modules.address.dtos.CreateAddressRequest;
-import com.arthuurdp.e_commerce.modules.address.dtos.UpdateAddressRequest;
-import com.arthuurdp.e_commerce.modules.address.dtos.CityResponse;
-import com.arthuurdp.e_commerce.modules.address.dtos.StateResponse;
+import com.arthuurdp.e_commerce.modules.address.AddressRepository;
+import com.arthuurdp.e_commerce.modules.address.AddressService;
+import com.arthuurdp.e_commerce.modules.address.CityRepository;
+import com.arthuurdp.e_commerce.modules.address.CityService;
+import com.arthuurdp.e_commerce.modules.address.dtos.*;
 import com.arthuurdp.e_commerce.modules.address.entity.Address;
 import com.arthuurdp.e_commerce.modules.address.entity.City;
+import com.arthuurdp.e_commerce.modules.address.mapper.AddressMapper;
 import com.arthuurdp.e_commerce.modules.user.entity.User;
 import com.arthuurdp.e_commerce.modules.user.enums.Gender;
 import com.arthuurdp.e_commerce.modules.user.enums.Role;
 import com.arthuurdp.e_commerce.shared.exceptions.ResourceNotFoundException;
-import com.arthuurdp.e_commerce.modules.address.AddressService;
-import com.arthuurdp.e_commerce.modules.address.AddressRepository;
-import com.arthuurdp.e_commerce.modules.address.CityRepository;
-import com.arthuurdp.e_commerce.modules.address.mapper.AddressMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -42,6 +39,7 @@ class AddressServiceTest {
 
     @Mock private AddressRepository addressRepository;
     @Mock private CityRepository cityRepository;
+    @Mock private CityService cityService;
     @Mock private AddressMapper mapper;
 
     @InjectMocks
@@ -51,6 +49,7 @@ class AddressServiceTest {
     private City city;
     private Address address;
     private AddressResponse addressResponse;
+    private CepLookupResponse cepLookup;
 
     @BeforeEach
     void setUp() {
@@ -75,11 +74,17 @@ class AddressServiceTest {
                 new CityResponse(10L, "São Paulo"),
                 new StateResponse(1L, "São Paulo", "SP")
         );
+
+        cepLookup = new CepLookupResponse(
+                "01310100", "Main St", "Downtown",
+                10L, "São Paulo",
+                1L, "São Paulo", "SP"
+        );
     }
+
     @Nested
     @DisplayName("findById()")
     class FindById {
-
         @Test
         @DisplayName("returns AddressResponse when address belongs to user")
         void shouldReturnAddressResponse() {
@@ -104,7 +109,6 @@ class AddressServiceTest {
     @Nested
     @DisplayName("findAll()")
     class FindAll {
-
         @Test
         @DisplayName("returns paginated AddressResponse for the user")
         void shouldReturnPagedAddresses() {
@@ -122,8 +126,7 @@ class AddressServiceTest {
         @Test
         @DisplayName("returns empty page when user has no addresses")
         void shouldReturnEmptyPage() {
-            when(addressRepository.findByUserId(any(PageRequest.class), eq(1L)))
-                    .thenReturn(Page.empty());
+            when(addressRepository.findByUserId(any(PageRequest.class), eq(1L))).thenReturn(Page.empty());
 
             Page<AddressResponse> result = addressService.findAll(0, 10, 1L);
 
@@ -134,14 +137,14 @@ class AddressServiceTest {
     @Nested
     @DisplayName("create()")
     class Create {
-
         @Test
-        @DisplayName("creates address and returns AddressResponse")
+        @DisplayName("creates address using CEP lookup and returns AddressResponse")
         void shouldCreateAddressSuccessfully() {
             CreateAddressRequest req = new CreateAddressRequest(
-                    "Home", "Main St", 100, "Apt 1", "Downtown", 1L, "01310100", 10L
+                    "Home", "Main St", 100, "Apt 1", "Downtown", "01310100"
             );
 
+            when(cityService.lookupByCep("01310100")).thenReturn(cepLookup);
             when(cityRepository.findById(10L)).thenReturn(Optional.of(city));
             when(addressRepository.save(any(Address.class))).thenReturn(address);
             when(mapper.toAddressResponse(address)).thenReturn(addressResponse);
@@ -149,16 +152,39 @@ class AddressServiceTest {
             AddressResponse response = addressService.create(req, user);
 
             assertThat(response).isEqualTo(addressResponse);
+            verify(cityService).lookupByCep("01310100");
             verify(addressRepository).save(any(Address.class));
+        }
+
+        @Test
+        @DisplayName("falls back to CEP lookup street and neighborhood when not provided in request")
+        void shouldFallbackToCepLookupStreetAndNeighborhood() {
+            CreateAddressRequest req = new CreateAddressRequest(
+                    "Home", null, 100, null, null, "01310100"
+            );
+
+            when(cityService.lookupByCep("01310100")).thenReturn(cepLookup);
+            when(cityRepository.findById(10L)).thenReturn(Optional.of(city));
+            when(addressRepository.save(any(Address.class))).thenReturn(address);
+            when(mapper.toAddressResponse(any())).thenReturn(addressResponse);
+
+            addressService.create(req, user);
+
+            ArgumentCaptor<Address> captor = ArgumentCaptor.forClass(Address.class);
+            verify(addressRepository).save(captor.capture());
+
+            assertThat(captor.getValue().getStreet()).isEqualTo("Main St");
+            assertThat(captor.getValue().getNeighborhood()).isEqualTo("Downtown");
         }
 
         @Test
         @DisplayName("assigns city and user to address before saving")
         void shouldAssignCityAndUserBeforeSaving() {
             CreateAddressRequest req = new CreateAddressRequest(
-                    "Home", "Main St", 100, "Apt 1", "Downtown", 1L, "01310100", 10L
+                    "Home", "Main St", 100, "Apt 1", "Downtown", "01310100"
             );
 
+            when(cityService.lookupByCep("01310100")).thenReturn(cepLookup);
             when(cityRepository.findById(10L)).thenReturn(Optional.of(city));
             when(addressRepository.save(any(Address.class))).thenReturn(address);
             when(mapper.toAddressResponse(any())).thenReturn(addressResponse);
@@ -173,15 +199,30 @@ class AddressServiceTest {
         }
 
         @Test
-        @DisplayName("throws ResourceNotFoundException when city does not exist")
+        @DisplayName("throws ResourceNotFoundException when CEP lookup returns unknown city")
         void shouldThrowWhenCityNotFound() {
             CreateAddressRequest req = new CreateAddressRequest(
-                    "Home", "Main St", 100, "Apt 1", "Downtown", 1L, "01310100", 99L
+                    "Home", "Main St", 100, "Apt 1", "Downtown", "01310100"
             );
 
-            when(cityRepository.findById(99L)).thenReturn(Optional.empty());
+            when(cityService.lookupByCep("01310100")).thenReturn(cepLookup);
+            when(cityRepository.findById(10L)).thenReturn(Optional.empty());
 
             assertThatThrownBy(() -> addressService.create(req, user)).isInstanceOf(ResourceNotFoundException.class).hasMessage("City not found");
+
+            verify(addressRepository, never()).save(any());
+        }
+
+        @Test
+        @DisplayName("throws ResourceNotFoundException when CEP is not found")
+        void shouldThrowWhenCepNotFound() {
+            CreateAddressRequest req = new CreateAddressRequest(
+                    "Home", "Main St", 100, "Apt 1", "Downtown", "00000000"
+            );
+
+            when(cityService.lookupByCep("00000000")).thenThrow(new ResourceNotFoundException("CEP not found"));
+
+            assertThatThrownBy(() -> addressService.create(req, user)).isInstanceOf(ResourceNotFoundException.class).hasMessage("CEP not found");
 
             verify(addressRepository, never()).save(any());
         }
@@ -190,12 +231,11 @@ class AddressServiceTest {
     @Nested
     @DisplayName("update()")
     class Update {
-
         @Test
-        @DisplayName("updates only non-null fields and returns AddressResponse")
-        void shouldUpdateNonNullFields() {
+        @DisplayName("updates only non-null fields without postalCode")
+        void shouldUpdateNonNullFieldsWithoutPostalCode() {
             UpdateAddressRequest req = new UpdateAddressRequest(
-                    "Work", "Second Ave", null, null, null, null, null
+                    "Work", "Second Ave", null, null, null, null
             );
 
             when(addressRepository.findByIdAndUserId(1L, 1L)).thenReturn(Optional.of(address));
@@ -211,18 +251,24 @@ class AddressServiceTest {
         }
 
         @Test
-        @DisplayName("updates city when cityId is provided and exists")
-        void shouldUpdateCityWhenProvided() {
+        @DisplayName("updates city and street via CEP lookup when postalCode is provided")
+        void shouldUpdateCityAndStreetWhenPostalCodeProvided() {
             City newCity = new City();
             newCity.setId(20L);
             newCity.setName("Rio de Janeiro");
 
+            CepLookupResponse newLookup = new CepLookupResponse(
+                    "20040020", "Av. Rio Branco", "Centro",
+                    20L, "Rio de Janeiro",
+                    2L, "Rio de Janeiro", "RJ"
+            );
+
             UpdateAddressRequest req = new UpdateAddressRequest(
-                    null, null, null, null, null, 20L, null
+                    null, null, null, null, null, "20040020"
             );
 
             when(addressRepository.findByIdAndUserId(1L, 1L)).thenReturn(Optional.of(address));
-            when(cityRepository.existsById(20L)).thenReturn(true);
+            when(cityService.lookupByCep("20040020")).thenReturn(newLookup);
             when(cityRepository.findById(20L)).thenReturn(Optional.of(newCity));
             when(addressRepository.save(address)).thenReturn(address);
             when(mapper.toAddressResponse(address)).thenReturn(addressResponse);
@@ -230,31 +276,43 @@ class AddressServiceTest {
             addressService.update(1L, req, user);
 
             assertThat(address.getCity()).isEqualTo(newCity);
+            assertThat(address.getStreet()).isEqualTo("Av. Rio Branco");
+            assertThat(address.getNeighborhood()).isEqualTo("Centro");
+            assertThat(address.getPostalCode()).isEqualTo("20040020");
         }
 
         @Test
-        @DisplayName("does not update city when cityId does not exist")
-        void shouldNotUpdateCityWhenCityIdNotFound() {
+        @DisplayName("uses request street over CEP lookup street when postalCode and street are both provided")
+        void shouldPreferRequestStreetOverCepLookup() {
+            CepLookupResponse newLookup = new CepLookupResponse(
+                    "20040020", "Av. Rio Branco", "Centro",
+                    20L, "Rio de Janeiro",
+                    2L, "Rio de Janeiro", "RJ"
+            );
+
+            City newCity = new City();
+            newCity.setId(20L);
+
             UpdateAddressRequest req = new UpdateAddressRequest(
-                    null, null, null, null, null, 99L, null
+                    null, "My Custom Street", null, null, null, "20040020"
             );
 
             when(addressRepository.findByIdAndUserId(1L, 1L)).thenReturn(Optional.of(address));
-            when(cityRepository.existsById(99L)).thenReturn(false);
+            when(cityService.lookupByCep("20040020")).thenReturn(newLookup);
+            when(cityRepository.findById(20L)).thenReturn(Optional.of(newCity));
             when(addressRepository.save(address)).thenReturn(address);
             when(mapper.toAddressResponse(address)).thenReturn(addressResponse);
 
             addressService.update(1L, req, user);
 
-            assertThat(address.getCity()).isEqualTo(city);
-            verify(cityRepository, never()).findById(any());
+            assertThat(address.getStreet()).isEqualTo("My Custom Street");
         }
 
         @Test
         @DisplayName("throws ResourceNotFoundException when address does not belong to user")
         void shouldThrowWhenAddressNotFound() {
             UpdateAddressRequest req = new UpdateAddressRequest(
-                    "Work", null, null, null, null, null, null
+                    "Work", null, null, null, null, null
             );
 
             when(addressRepository.findByIdAndUserId(99L, 1L)).thenReturn(Optional.empty());
@@ -262,13 +320,12 @@ class AddressServiceTest {
             assertThatThrownBy(() -> addressService.update(99L, req, user)).isInstanceOf(ResourceNotFoundException.class).hasMessage("Address not found");
 
             verify(addressRepository, never()).save(any());
-        }}
-
+        }
+    }
 
     @Nested
     @DisplayName("delete()")
     class Delete {
-
         @Test
         @DisplayName("deletes address when it belongs to user")
         void shouldDeleteAddressSuccessfully() {
@@ -284,9 +341,7 @@ class AddressServiceTest {
         void shouldThrowWhenAddressNotFound() {
             when(addressRepository.findByIdAndUserId(99L, 1L)).thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> addressService.delete(99L, user))
-                    .isInstanceOf(ResourceNotFoundException.class)
-                    .hasMessage("Address not found");
+            assertThatThrownBy(() -> addressService.delete(99L, user)).isInstanceOf(ResourceNotFoundException.class).hasMessage("Address not found");
 
             verify(addressRepository, never()).delete(any());
         }
