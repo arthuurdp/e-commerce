@@ -16,19 +16,12 @@ public record CreateAddressRequest(
         @Positive(message = "Number must be greater than zero")
         Integer number,
 
-        @NotBlank(message = "Complement is required")
         String complement,
 
         @NotBlank(message = "Neighborhood is required")
         String neighborhood,
 
-        @NotNull(message = "State is required")
-        Long stateId,
-
-        @NotNull(message = "Postal code is required")
-        @Size(max = 9, message = "Postal code must have at most 9 chars")
-        String postalCode,
-
-        @NotNull(message = "City is required")
-        Long cityId
+        @NotBlank(message = "Postal code is required")
+        @Size(min = 8, max = 9, message = "Invalid postal code")
+        String postalCode
 ) {}

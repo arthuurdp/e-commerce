@@ -6,6 +6,5 @@ public record UpdateAddressRequest(
         Integer number,
         String complement,
         String neighborhood,
-        Long cityId,
-        Long stateId
+        String postalCode
 ) {}

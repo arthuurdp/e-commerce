@@ -1,5 +1,6 @@
 package com.arthuurdp.e_commerce.services;
 
+import com.arthuurdp.e_commerce.domain.dtos.address.CepLookupResponse;
 import com.arthuurdp.e_commerce.domain.entities.Address;
 import com.arthuurdp.e_commerce.domain.entities.City;
 import com.arthuurdp.e_commerce.domain.entities.User;
@@ -20,11 +21,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class AddressService {
     private final AddressRepository addressRepository;
     private final CityRepository cityRepository;
+    private final CityService cityService;
     private final AddressMapper mapper;
 
-    public AddressService(AddressRepository addressRepository, CityRepository cityRepository, AddressMapper mapper) {
+    public AddressService(AddressRepository addressRepository, CityRepository cityRepository, CityService cityService, AddressMapper mapper) {
         this.addressRepository = addressRepository;
         this.cityRepository = cityRepository;
+        this.cityService = cityService;
         this.mapper = mapper;
     }
 
@@ -38,14 +41,16 @@ public class AddressService {
 
     @Transactional
     public AddressResponse create(CreateAddressRequest req, User user) {
-        City city = cityRepository.findById(req.cityId()).orElseThrow(() -> new ResourceNotFoundException("City not found"));
+        CepLookupResponse lookup = cityService.lookupByCep(req.postalCode());
+
+        City city = cityRepository.findById(lookup.cityId()).orElseThrow(() -> new ResourceNotFoundException("City not found"));
 
         Address address = new Address(
                 req.name(),
-                req.street(),
+                req.street() != null ? req.street() : lookup.street(),
                 req.number(),
                 req.complement(),
-                req.neighborhood(),
+                req.neighborhood() != null ? req.neighborhood() : lookup.neighborhood(),
                 req.postalCode()
         );
 
@@ -62,22 +67,28 @@ public class AddressService {
         if (req.name() != null) {
             address.setName(req.name());
         }
-        if (req.street() != null) {
-            address.setStreet(req.street());
-        }
         if (req.number() != null) {
             address.setNumber(req.number());
         }
         if (req.complement() != null) {
             address.setComplement(req.complement());
         }
-        if (req.neighborhood() != null) {
-            address.setNeighborhood(req.neighborhood());
-        }
-        if (req.cityId() != null && cityRepository.existsById(req.cityId())) {
-            address.setCity(cityRepository.findById(req.cityId()).orElseThrow(() -> new ResourceNotFoundException("City not found")));
-        }
+        if (req.postalCode() != null) {
+            CepLookupResponse lookup = cityService.lookupByCep(req.postalCode());
+            City city = cityRepository.findById(lookup.cityId()).orElseThrow(() -> new ResourceNotFoundException("City not found"));
 
+            address.setPostalCode(req.postalCode());
+            address.setCity(city);
+            address.setStreet(req.street() != null ? req.street() : lookup.street());
+            address.setNeighborhood(req.neighborhood() != null ? req.neighborhood() : lookup.neighborhood());
+        } else {
+            if (req.street() != null) {
+                address.setStreet(req.street());
+            }
+            if (req.neighborhood() != null) {
+                address.setNeighborhood(req.neighborhood());
+            }
+        }
         return mapper.toAddressResponse(addressRepository.save(address));
     }
 

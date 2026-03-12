@@ -33,8 +33,8 @@ public class MelhorEnvioClient {
     public MelhorEnvioClient(
             @Value("${melhorenvio.base-url}") String baseUrl,
             @Value("${melhorenvio.token}")    String token,
-            @Value("${melhorenvio.app-email}") String appEmail) {
-
+            @Value("${melhorenvio.app-email}") String appEmail
+    ) {
         this.webClient = WebClient.builder()
                 .baseUrl(baseUrl)
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token)
