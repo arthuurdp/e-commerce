@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping
 public class EmailController {
@@ -19,54 +21,54 @@ public class EmailController {
     }
 
     @PostMapping("/verify-email/send")
-    public ResponseEntity<Void> sendVerification(
+    public ResponseEntity<Map<String, String>> sendVerification(
             @AuthenticationPrincipal User user
     ) {
         service.sendEmailVerification(user);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(Map.of("message", "Verification email sent successfully"));
     }
 
     @PostMapping("/verify-email/confirm")
-    public ResponseEntity<Void> verifyEmail(
+    public ResponseEntity<Map<String, String>> verifyEmail(
             @RequestBody @Valid VerifyCodeRequest req
     ) {
         service.verifyEmail(req.code());
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(Map.of("message", "Email verified successfully"));
     }
 
     @PostMapping("/email/change")
-    public ResponseEntity<Void> requestEmailChange(
+    public ResponseEntity<Map<String, String>> requestEmailChange(
             @RequestBody @Valid ChangeEmailRequest req,
             @AuthenticationPrincipal User user
     ) {
         service.requestEmailChange(req.email(), user);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(Map.of("message", "A confirmation code has been sent to your new email"));
     }
 
     @PostMapping("/email/confirm")
-    public ResponseEntity<Void> confirmEmailChange(
+    public ResponseEntity<Map<String, String>> confirmEmailChange(
             @RequestBody @Valid VerifyCodeRequest req,
             @AuthenticationPrincipal User user
     ) {
         service.confirmEmailChange(req.code(), user);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(Map.of("message", "Email changed successfully"));
     }
 
     @PostMapping("/password/change")
-    public ResponseEntity<Void> requestPasswordChange(
+    public ResponseEntity<Map<String, String>> requestPasswordChange(
             @RequestBody @Valid ChangePasswordRequest req,
             @AuthenticationPrincipal User user
-            ) {
+    ) {
         service.requestPasswordChange(req.password(), user);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(Map.of("message", "A confirmation code has been sent to your email"));
     }
 
     @PostMapping("/password/confirm")
-    public ResponseEntity<Void> confirmPasswordChange(
+    public ResponseEntity<Map<String, String>> confirmPasswordChange(
             @RequestBody @Valid VerifyCodeRequest req,
             @AuthenticationPrincipal User user
     ) {
         service.confirmPasswordChange(req.code(), user);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(Map.of("message", "Password changed successfully"));
     }
 }
