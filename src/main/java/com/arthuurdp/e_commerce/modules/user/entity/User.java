@@ -95,6 +95,10 @@ public class User implements UserDetails {
         this.role = role;
     }
 
+    public boolean isAdmin() {
+        return this.role == Role.ROLE_ADMIN;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         if (this.role == Role.ROLE_ADMIN)

@@ -3,7 +3,6 @@ package com.arthuurdp.e_commerce.modules.order;
 import com.arthuurdp.e_commerce.modules.order.dtos.OrderDetailsResponse;
 import com.arthuurdp.e_commerce.modules.order.dtos.OrderResponse;
 import com.arthuurdp.e_commerce.modules.user.entity.User;
-import com.arthuurdp.e_commerce.infrastructure.security.annotations.AdminOrSelf;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,10 +29,11 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    @AdminOrSelf
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<OrderDetailsResponse> findById(
-            @PathVariable Long id
+            @PathVariable Long id,
+            @AuthenticationPrincipal User user
     ) {
-        return ResponseEntity.ok(service.findById(id));
+        return ResponseEntity.ok(service.findById(id, user));
     }
 }

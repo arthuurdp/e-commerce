@@ -6,6 +6,7 @@ import com.arthuurdp.e_commerce.modules.cart.entity.CartItem;
 import com.arthuurdp.e_commerce.modules.order.dtos.OrderDetailsResponse;
 import com.arthuurdp.e_commerce.modules.order.dtos.OrderResponse;
 import com.arthuurdp.e_commerce.modules.order.enums.OrderStatus;
+import com.arthuurdp.e_commerce.shared.exceptions.AccessDeniedException;
 import com.arthuurdp.e_commerce.shared.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.modules.order.entity.Order;
 import com.arthuurdp.e_commerce.modules.order.entity.OrderItem;
@@ -31,8 +32,14 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderDetailsResponse findById(Long id) {
-        return mapper.toOrderDetailsResponse(repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Order not found")));
+    public OrderDetailsResponse findById(Long id, User user) {
+        Order order = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+
+        if (!user.getId().equals(order.getUser().getId()) && !user.isAdmin()) {
+            throw new AccessDeniedException("Access denied");
+        }
+
+        return mapper.toOrderDetailsResponse(order);
     }
 
     @Transactional

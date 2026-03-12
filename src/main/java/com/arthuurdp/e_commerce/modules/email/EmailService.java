@@ -67,11 +67,8 @@ public class EmailService {
 
     @Transactional
     public void requestEmailChange(String newEmail, User user) {
-        if (newEmail.equals(user.getEmail())) {
-            throw new BadRequestException("New email is the same as current");
-        }
-        if (userRepository.existsByEmail(newEmail)) {
-            throw new ConflictException("Email already in use");
+        if (newEmail.equals(user.getEmail()) || userRepository.existsByEmail(newEmail)) {
+            throw new BadRequestException("E-mail already taken");
         }
 
         emailVerificationTokenRepository.deleteByUserId(user.getId());
@@ -113,7 +110,7 @@ public class EmailService {
         }
 
         if (passwordEncoder.matches(newPassword, user.getPassword())) {
-            throw new BadRequestException("Password has to be different than the others");
+            throw new BadRequestException("Please set a different password");
         }
 
         passwordVerificationTokenRepository.deleteByUserId(user.getId());

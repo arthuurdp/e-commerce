@@ -3,6 +3,8 @@ package com.arthuurdp.e_commerce.modules.user;
 import com.arthuurdp.e_commerce.modules.user.entity.User;
 import com.arthuurdp.e_commerce.modules.user.dtos.UpdateUserRequest;
 import com.arthuurdp.e_commerce.modules.user.dtos.UserResponse;
+import com.arthuurdp.e_commerce.modules.user.enums.Role;
+import com.arthuurdp.e_commerce.shared.exceptions.AccessDeniedException;
 import com.arthuurdp.e_commerce.shared.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.modules.user.mapper.UserMapper;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +24,11 @@ public class UserService {
         this.mapper = mapper;
     }
 
-    public UserResponse findById(Long id) {
+    public UserResponse findById(Long id, User user) {
+        if (!user.getId().equals(id) && !user.isAdmin()) {
+            throw new AccessDeniedException("Access denied");
+        }
+
         return mapper.toResponse(repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found")));
     }
 
@@ -31,18 +37,26 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse update(Long id, UpdateUserRequest req) {
-        User user = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    public UserResponse update(Long id, UpdateUserRequest req, User user) {
+        if (!user.getId().equals(id) && !user.isAdmin()) {
+            throw new AccessDeniedException("Access denied");
+        }
 
-        Optional.ofNullable(req.firstName()).ifPresent(user::setFirstName);
-        Optional.ofNullable(req.lastName()).ifPresent(user::setLastName);
-        Optional.ofNullable(req.phone()).ifPresent(user::setPhone);
-        Optional.ofNullable(req.gender()).ifPresent(user::setGender);
+        User targetUser = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        return mapper.toResponse(repo.save(user));
+        Optional.ofNullable(req.firstName()).ifPresent(targetUser::setFirstName);
+        Optional.ofNullable(req.lastName()).ifPresent(targetUser::setLastName);
+        Optional.ofNullable(req.phone()).ifPresent(targetUser::setPhone);
+        Optional.ofNullable(req.gender()).ifPresent(targetUser::setGender);
+
+        return mapper.toResponse(repo.save(targetUser));
     }
 
-    public void delete(Long id) {
+    public void delete(Long id, User user) {
+        if (!user.getId().equals(id) && !user.isAdmin()) {
+            throw new AccessDeniedException("Access denied");
+        }
+
         repo.delete(repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found")));
     }
 }

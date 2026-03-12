@@ -11,4 +11,5 @@ import java.util.Optional;
 @Repository
 public interface CityRepository extends JpaRepository<City, Long> {
     Page<City> findByStateIdAndNameContainingIgnoreCase(Pageable pageable, Long stateId, String name);
-    Optional<City> findByNameIgnoreCaseAndStateId(String name, Long stateId);}
+    Optional<City> findByNameIgnoreCaseAndStateId(String name, Long stateId);
+}

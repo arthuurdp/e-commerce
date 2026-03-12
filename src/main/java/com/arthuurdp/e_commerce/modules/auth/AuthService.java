@@ -51,7 +51,6 @@ public class AuthService {
         if (userRepository.existsByEmail(req.email()) || userRepository.existsByCpf(req.cpf())) {
             throw new ConflictException("Credentials already in use");
         }
-        Cart cart = new Cart();
 
         User user = new User(
                 req.firstName(),
@@ -64,9 +63,8 @@ public class AuthService {
                 req.gender(),
                 role
         );
-        user.setCart(cart);
+        user.setCart(new Cart());
 
-        userRepository.save(user);
-        return mapper.toRegisterResponse(user);
+        return mapper.toRegisterResponse(userRepository.save(user));
     }
 }

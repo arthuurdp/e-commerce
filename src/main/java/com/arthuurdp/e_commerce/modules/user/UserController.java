@@ -2,11 +2,12 @@ package com.arthuurdp.e_commerce.modules.user;
 
 import com.arthuurdp.e_commerce.modules.user.dtos.UpdateUserRequest;
 import com.arthuurdp.e_commerce.modules.user.dtos.UserResponse;
-import com.arthuurdp.e_commerce.infrastructure.security.annotations.AdminOrSelf;
+import com.arthuurdp.e_commerce.modules.user.entity.User;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -28,28 +29,31 @@ public class UserController {
     }
     
     @GetMapping("/{id}")
-    @AdminOrSelf
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<UserResponse> findById(
-            @PathVariable Long id
+            @PathVariable Long id,
+            @AuthenticationPrincipal User user
     ) {
-        return ResponseEntity.ok().body(service.findById(id));
+        return ResponseEntity.ok().body(service.findById(id, user));
     }
 
     @PatchMapping("/{id}")
-    @AdminOrSelf
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<UserResponse> update(
             @PathVariable Long id,
-            @RequestBody @Valid UpdateUserRequest req
+            @RequestBody @Valid UpdateUserRequest req,
+            @AuthenticationPrincipal User user
     ) {
-        return ResponseEntity.ok().body(service.update(id, req));
+        return ResponseEntity.ok().body(service.update(id, req, user));
     }
 
     @DeleteMapping("/{id}")
-    @AdminOrSelf
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> delete(
-            @PathVariable Long id
+            @PathVariable Long id,
+            @AuthenticationPrincipal User user
     ) {
-        service.delete(id);
+        service.delete(id, user);
         return ResponseEntity.noContent().build();
     }
 }
