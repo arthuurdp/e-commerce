@@ -11,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class UserService {
     private final UserRepository repo;
@@ -33,18 +35,10 @@ public class UserService {
     public UserResponse update(Long id, UpdateUserRequest req) {
         User user = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        if (req.firstName() != null) {
-            user.setFirstName(req.firstName());
-        }
-        if (req.lastName() != null) {
-            user.setLastName(req.lastName());
-        }
-        if (req.phone() != null) {
-            user.setPhone(req.phone());
-        }
-        if (req.gender() != null) {
-            user.setGender(req.gender());
-        }
+        Optional.ofNullable(req.firstName()).ifPresent(user::setFirstName);
+        Optional.ofNullable(req.lastName()).ifPresent(user::setLastName);
+        Optional.ofNullable(req.phone()).ifPresent(user::setPhone);
+        Optional.ofNullable(req.gender()).ifPresent(user::setGender);
 
         return mapper.toResponse(repo.save(user));
     }

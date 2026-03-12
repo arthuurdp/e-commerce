@@ -42,8 +42,8 @@ public class CityService {
             throw new ResourceNotFoundException("CEP not found");
         }
 
-        State state = stateRepository.findByUf(viaCep.stateUf()).orElseThrow(() -> new ResourceNotFoundException("State not found for UF: " + viaCep.stateUf()));
-        City city = cityRepository.findByNameIgnoreCaseAndStateId(viaCep.city(), state.getId()).orElseThrow(() -> new ResourceNotFoundException("City not found: " + viaCep.city()));
+        State state = stateRepository.findByUf(viaCep.stateUf()).orElseThrow(() -> new ResourceNotFoundException("State not found"));
+        City city = cityRepository.findByNameIgnoreCaseAndStateId(viaCep.city(), state.getId()).orElseThrow(() -> new ResourceNotFoundException("City not found"));
 
         return new CepLookupResponse(
                 viaCep.cep(),

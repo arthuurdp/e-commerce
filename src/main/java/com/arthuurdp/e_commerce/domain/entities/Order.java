@@ -68,8 +68,4 @@ public class Order {
         this.total = total;
         this.originState = originState;
     }
-
-    public Integer getTotalItems() {
-        return items.stream().mapToInt(OrderItem::getQuantity).sum();
-    }
 }

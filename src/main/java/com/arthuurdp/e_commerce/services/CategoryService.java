@@ -13,6 +13,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 public class CategoryService {
     private final CategoryRepository repo;
@@ -43,9 +45,7 @@ public class CategoryService {
     public CategoryResponse update(Long id, UpdateCategoryRequest req) {
         Category category = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
 
-        if (req.name() != null) {
-            category.setName(req.name());
-        }
+        Optional.ofNullable(req.name()).ifPresent(category::setName);
 
         return mapper.toCategoryResponse(repo.save(category));
     }

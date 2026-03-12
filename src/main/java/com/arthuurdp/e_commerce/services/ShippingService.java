@@ -202,11 +202,11 @@ public class ShippingService {
 
     private ShippingStatus mapMeStatus(String meStatus) {
         if (meStatus == null) return null;
-        return switch (meStatus.toLowerCase()) {
-            case "released", "posted" -> ShippingStatus.POSTED;
-            case "in_transit", "with_carrier" -> ShippingStatus.IN_TRANSIT;
-            case "delivered" -> ShippingStatus.DELIVERED;
-            case "canceled", "cancelled" -> ShippingStatus.CANCELLED;
+        return switch (meStatus.toUpperCase()) {
+            case "RELEASED", "POSTED" -> ShippingStatus.POSTED;
+            case "IN_TRANSIT", "WITH_CARRIER" -> ShippingStatus.IN_TRANSIT;
+            case "DELIVERED" -> ShippingStatus.DELIVERED;
+            case "CANCELLED" -> ShippingStatus.CANCELLED;
             default -> null;
         };
     }

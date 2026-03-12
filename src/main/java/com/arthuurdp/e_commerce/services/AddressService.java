@@ -17,6 +17,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 public class AddressService {
     private final AddressRepository addressRepository;
@@ -64,31 +66,23 @@ public class AddressService {
     public AddressResponse update(Long id, UpdateAddressRequest req, User user) {
         Address address = addressRepository.findByIdAndUserId(id, user.getId()).orElseThrow(() -> new ResourceNotFoundException("Address not found"));
 
-        if (req.name() != null) {
-            address.setName(req.name());
-        }
-        if (req.number() != null) {
-            address.setNumber(req.number());
-        }
-        if (req.complement() != null) {
-            address.setComplement(req.complement());
-        }
+        Optional.ofNullable(req.name()).ifPresent(address::setName);
+        Optional.ofNullable(req.number()).ifPresent(address::setNumber);
+        Optional.ofNullable(req.complement()).ifPresent(address::setComplement);
+
         if (req.postalCode() != null) {
             CepLookupResponse lookup = cityService.lookupByCep(req.postalCode());
             City city = cityRepository.findById(lookup.cityId()).orElseThrow(() -> new ResourceNotFoundException("City not found"));
 
             address.setPostalCode(req.postalCode());
             address.setCity(city);
-            address.setStreet(req.street() != null ? req.street() : lookup.street());
-            address.setNeighborhood(req.neighborhood() != null ? req.neighborhood() : lookup.neighborhood());
+            address.setStreet(Optional.ofNullable(req.street()).orElse(lookup.street()));
+            address.setNeighborhood(Optional.ofNullable(req.neighborhood()).orElse(lookup.neighborhood()));
         } else {
-            if (req.street() != null) {
-                address.setStreet(req.street());
-            }
-            if (req.neighborhood() != null) {
-                address.setNeighborhood(req.neighborhood());
-            }
+            Optional.ofNullable(req.street()).ifPresent(address::setStreet);
+            Optional.ofNullable(req.neighborhood()).ifPresent(address::setNeighborhood);
         }
+
         return mapper.toAddressResponse(addressRepository.save(address));
     }
 

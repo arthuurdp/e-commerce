@@ -12,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class ProductService {
     private final ProductRepository repo;
@@ -50,10 +52,7 @@ public class ProductService {
         product.addImages(req.images().stream().map(mapper::toProductImage).toList());
 
         if (req.mainImageUrl() != null) {
-            product.getImages().stream()
-                    .filter(img -> img.getUrl().equals(req.mainImageUrl()))
-                    .findFirst()
-                    .ifPresent(product::setMainImage);
+            applyMainImage(product, req.mainImageUrl());
         } else if (!product.getImages().isEmpty()) {
             product.setMainImage(product.getImages().get(0));
         }
@@ -65,55 +64,26 @@ public class ProductService {
     public UpdateProductResponse update(Long id, UpdateProductRequest req) {
         Product product = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
-        if (req.name() != null) {
-            product.setName(req.name());
-        }
-
-        if (req.description() != null) {
-            product.setDescription(req.description());
-        }
-
-        if (req.price() != null) {
-            product.setPrice(req.price());
-        }
-
-        if (req.stock() != null) {
-            product.setStock(req.stock());
-        }
-        
-        if (req.weight() != null) {
-            product.setWeight(req.weight());
-        }
-
-        if (req.width() != null) {
-            product.setWidth(req.width());
-        }
-
-        if (req.height() != null) {
-            product.setHeight(req.height());
-        }
-
-        if (req.length() != null) {
-            product.setLength(req.length());
-        }
+        Optional.ofNullable(req.name()).ifPresent(product::setName);
+        Optional.ofNullable(req.description()).ifPresent(product::setDescription);
+        Optional.ofNullable(req.price()).ifPresent(product::setPrice);
+        Optional.ofNullable(req.stock()).ifPresent(product::setStock);
+        Optional.ofNullable(req.weight()).ifPresent(product::setWeight);
+        Optional.ofNullable(req.width()).ifPresent(product::setWidth);
+        Optional.ofNullable(req.height()).ifPresent(product::setHeight);
+        Optional.ofNullable(req.length()).ifPresent(product::setLength);
 
         if (req.imageUrls() != null) {
             product.removeAllImages();
             product.addImages(req.imageUrls().stream().map(mapper::toProductImage).toList());
 
             if (req.mainImageUrl() != null) {
-                product.getImages().stream()
-                        .filter(img -> img.getUrl().equals(req.mainImageUrl()))
-                        .findFirst()
-                        .ifPresent(product::setMainImage);
+                applyMainImage(product, req.mainImageUrl());
             } else if (!product.getImages().isEmpty()) {
                 product.setMainImage(product.getImages().get(0));
             }
         } else if (req.mainImageUrl() != null) {
-            product.getImages().stream()
-                    .filter(img -> img.getUrl().equals(req.mainImageUrl()))
-                    .findFirst()
-                    .ifPresent(product::setMainImage);
+            applyMainImage(product, req.mainImageUrl());
         }
 
         if (req.categoryIds() != null) {
@@ -125,7 +95,7 @@ public class ProductService {
     }
 
     public void delete(Long id) {
-        repo.delete(repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found")));
+        repo.delete(repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found")));
     }
 
     @Transactional
@@ -152,5 +122,12 @@ public class ProductService {
 
         product.setMainImage(image);
         repo.save(product);
+    }
+
+    private void applyMainImage(Product product, String mainImageUrl) {
+        product.getImages().stream()
+                .filter(img -> img.getUrl().equals(mainImageUrl))
+                .findFirst()
+                .ifPresent(product::setMainImage);
     }
 }
