@@ -116,7 +116,6 @@ public class Product {
     }
 
     public void removeAllImages() {
-        images.forEach(img -> img.setProduct(null));
         images.clear();
     }
 

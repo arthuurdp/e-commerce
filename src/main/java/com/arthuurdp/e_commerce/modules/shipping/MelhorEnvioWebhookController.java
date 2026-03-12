@@ -24,9 +24,7 @@ public class MelhorEnvioWebhookController {
     private final ShippingService shippingService;
     private final String webhookSecret;
 
-    public MelhorEnvioWebhookController(
-            ShippingService shippingService,
-            @Value("${melhorenvio.webhook-secret}") String webhookSecret) {
+    public MelhorEnvioWebhookController(ShippingService shippingService, @Value("${melhorenvio.webhook-secret}") String webhookSecret) {
         this.shippingService = shippingService;
         this.webhookSecret   = webhookSecret;
     }

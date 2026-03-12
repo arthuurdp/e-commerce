@@ -28,7 +28,7 @@ public class ProductService {
 
     @Transactional
     public Page<ProductResponse> findAll(int page, int size) {
-        return repo.findAll(PageRequest.of(page, size)).map(mapper::toProductDTO);
+        return repo.findAll(PageRequest.of(page, size)).map(mapper::toProductResponse);
     }
 
     @Transactional
@@ -76,6 +76,7 @@ public class ProductService {
         if (req.imageUrls() != null) {
             product.removeAllImages();
             product.addImages(req.imageUrls().stream().map(mapper::toProductImage).toList());
+            repo.saveAndFlush(product);
 
             if (req.mainImageUrl() != null) {
                 applyMainImage(product, req.mainImageUrl());
@@ -113,15 +114,15 @@ public class ProductService {
     }
 
     @Transactional
-    public void setMainImage(Long productId, SetMainImageRequest req) {
-        Product product = repo.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+    public ProductDetailsResponse setMainImage(Long id, SetMainImageRequest req) {
+        Product product = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         ProductImage image = product.getImages().stream()
                 .filter(img -> img.getId().equals(req.id()))
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("Image not found for this product"));
 
         product.setMainImage(image);
-        repo.save(product);
+        return mapper.toProductDetails(repo.save(product));
     }
 
     private void applyMainImage(Product product, String mainImageUrl) {

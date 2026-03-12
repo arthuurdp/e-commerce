@@ -20,7 +20,7 @@ public interface ProductMapper {
     UpdateProductResponse toUpdateResponse(Product product);
 
     @Mapping(target = "mainImage", expression = "java(product.getMainImageUrl())")
-    ProductResponse toProductDTO(Product product);
+    ProductResponse toProductResponse(Product product);
 
     @Mapping(target = "imgs", source = "images")
     ProductDetailsResponse toProductDetails(Product product);

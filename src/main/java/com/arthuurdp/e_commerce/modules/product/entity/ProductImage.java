@@ -15,10 +15,10 @@ import lombok.Setter;
 public class ProductImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @EqualsAndHashCode.Include
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "url", nullable = false)
+    @EqualsAndHashCode.Include
     private String url;
 
     @Column(name = "is_main", nullable = false)

@@ -1,6 +1,8 @@
 package com.arthuurdp.e_commerce.infrastructure.config;
 
 import com.arthuurdp.e_commerce.infrastructure.security.SecurityFilter;
+import com.arthuurdp.e_commerce.infrastructure.security.handlers.CustomAccessDeniedHandler;
+import com.arthuurdp.e_commerce.infrastructure.security.handlers.CustomAuthEntryPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -22,10 +24,14 @@ public class SecurityConfig {
 
     private final AuthenticationConfiguration authConfig;
     private final SecurityFilter securityFilter;
+    private final CustomAuthEntryPoint customAuthEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
-    public SecurityConfig(AuthenticationConfiguration authConfig, SecurityFilter securityFilter) {
+    public SecurityConfig(AuthenticationConfiguration authConfig, SecurityFilter securityFilter, CustomAuthEntryPoint customAuthEntryPoint, CustomAccessDeniedHandler customAccessDeniedHandler) {
         this.authConfig = authConfig;
         this.securityFilter = securityFilter;
+        this.customAuthEntryPoint = customAuthEntryPoint;
+        this.customAccessDeniedHandler = customAccessDeniedHandler;
     }
 
     @Bean
@@ -47,6 +53,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/checkout/failure").permitAll()
 
                         .anyRequest().authenticated()
+                )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(customAuthEntryPoint)
+                        .accessDeniedHandler(customAccessDeniedHandler)
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

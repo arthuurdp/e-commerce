@@ -49,7 +49,7 @@ public class AuthService {
 
     private RegisterResponse createUser(RegisterRequest req, Role role) {
         if (userRepository.existsByEmail(req.email()) || userRepository.existsByCpf(req.cpf())) {
-            throw new ConflictException("Credentials already in use");
+            throw new ConflictException("E-mail or CPF already in use");
         }
 
         User user = new User(

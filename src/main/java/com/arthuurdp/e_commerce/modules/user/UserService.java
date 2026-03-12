@@ -3,7 +3,6 @@ package com.arthuurdp.e_commerce.modules.user;
 import com.arthuurdp.e_commerce.modules.user.entity.User;
 import com.arthuurdp.e_commerce.modules.user.dtos.UpdateUserRequest;
 import com.arthuurdp.e_commerce.modules.user.dtos.UserResponse;
-import com.arthuurdp.e_commerce.modules.user.enums.Role;
 import com.arthuurdp.e_commerce.shared.exceptions.AccessDeniedException;
 import com.arthuurdp.e_commerce.shared.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.modules.user.mapper.UserMapper;
@@ -26,7 +25,7 @@ public class UserService {
 
     public UserResponse findById(Long id, User user) {
         if (!user.getId().equals(id) && !user.isAdmin()) {
-            throw new AccessDeniedException("Access denied");
+            throw new AccessDeniedException("You don't have permission to access this resource");
         }
 
         return mapper.toResponse(repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found")));
@@ -39,7 +38,7 @@ public class UserService {
     @Transactional
     public UserResponse update(Long id, UpdateUserRequest req, User user) {
         if (!user.getId().equals(id) && !user.isAdmin()) {
-            throw new AccessDeniedException("Access denied");
+            throw new AccessDeniedException("You don't have permission to access this resource");
         }
 
         User targetUser = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -54,7 +53,7 @@ public class UserService {
 
     public void delete(Long id, User user) {
         if (!user.getId().equals(id) && !user.isAdmin()) {
-            throw new AccessDeniedException("Access denied");
+            throw new AccessDeniedException("You don't have permission to access this resource");
         }
 
         repo.delete(repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found")));

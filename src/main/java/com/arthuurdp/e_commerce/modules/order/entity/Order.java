@@ -59,6 +59,7 @@ public class Order {
     @JoinColumn(name = "origin_state_id", nullable = false)
     private State originState;
 
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
