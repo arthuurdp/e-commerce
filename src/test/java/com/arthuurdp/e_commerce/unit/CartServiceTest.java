@@ -1,4 +1,4 @@
-package com.arthuurdp.e_commerce.services;
+package com.arthuurdp.e_commerce.unit;
 
 import com.arthuurdp.e_commerce.modules.cart.dtos.CartItemResponse;
 import com.arthuurdp.e_commerce.modules.cart.dtos.CartResponse;

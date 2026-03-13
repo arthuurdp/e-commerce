@@ -43,10 +43,10 @@ public class GlobalExceptionHandlerController {
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<StandardError> handleBadCredentialsException(BadCredentialsException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StandardError(
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new StandardError(
                 Instant.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                "Bad Request",
+                HttpStatus.UNAUTHORIZED.value(),
+                "Unauthorized",
                 "Invalid credentials"
         ));
     }

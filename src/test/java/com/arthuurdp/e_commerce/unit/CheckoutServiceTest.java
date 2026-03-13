@@ -1,4 +1,4 @@
-package com.arthuurdp.e_commerce.services;
+package com.arthuurdp.e_commerce.unit;
 
 import com.arthuurdp.e_commerce.modules.address.entity.Address;
 import com.arthuurdp.e_commerce.modules.cart.entity.Cart;
