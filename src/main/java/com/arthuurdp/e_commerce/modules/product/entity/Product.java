@@ -11,6 +11,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Entity
@@ -39,10 +40,10 @@ public class Product {
     private Integer stock;
 
     @Column(name = "created_at", nullable = false)
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
     @Column(name = "last_updated_at")
-    private Instant lastUpdatedAt;
+    private LocalDateTime lastUpdatedAt;
 
     @Column(name = "weight", nullable = false)
     private Double weight;
@@ -69,12 +70,12 @@ public class Product {
 
     @PrePersist
     public void prePersist() {
-        this.createdAt = Instant.now();
+        this.createdAt = LocalDateTime.now();
     }
 
     @PreUpdate
     public void preUpdate() {
-        this.lastUpdatedAt = Instant.now();
+        this.lastUpdatedAt = LocalDateTime.now();
     }
 
     public Product(String name, String description, BigDecimal price, Integer stock, Double weight, Integer width, Integer height, Integer length) {

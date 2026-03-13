@@ -3,7 +3,7 @@ package com.arthuurdp.e_commerce.modules.product.dtos;
 import com.arthuurdp.e_commerce.modules.category.dtos.CategoryResponse;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public record CreateProductResponse(
@@ -18,5 +18,5 @@ public record CreateProductResponse(
         Integer length,
         List<ProductImageResponse> imgs,
         List<CategoryResponse> categories,
-        Instant createdAt
+        LocalDateTime createdAt
 ) {}

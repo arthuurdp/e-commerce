@@ -5,10 +5,10 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/webhook")
-public class WebhookController {
+public class StripeWebhookController {
     private final WebhookService webhookService;
 
-    public WebhookController(WebhookService webhookService) {
+    public StripeWebhookController(WebhookService webhookService) {
         this.webhookService = webhookService;
     }
 

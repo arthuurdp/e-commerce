@@ -23,7 +23,7 @@ public class WebhookConfig {
                                             HttpServletResponse response,
                                             FilterChain filterChain)
                     throws ServletException, IOException {
-                if (request.getRequestURI().startsWith("/webhook/")) {
+                if (request.getRequestURI().startsWith("/webhook")) {
                     filterChain.doFilter(new ContentCachingRequestWrapper(request), response);
                 } else {
                     filterChain.doFilter(request, response);

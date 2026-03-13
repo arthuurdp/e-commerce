@@ -2,14 +2,15 @@ package com.arthuurdp.e_commerce.modules.product.dtos;
 
 import com.arthuurdp.e_commerce.modules.category.dtos.CategoryResponse;
 
-import java.time.Instant;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public record UpdateProductResponse(
         Long id,
         String name,
         String description,
-        java.math.BigDecimal price,
+        BigDecimal price,
         Integer stock,
         Double weight,
         Integer width,
@@ -17,5 +18,5 @@ public record UpdateProductResponse(
         Integer length,
         List<ProductImageResponse> imgs,
         List<CategoryResponse> categories,
-        Instant updatedAt
+        LocalDateTime updatedAt
 ) {}
