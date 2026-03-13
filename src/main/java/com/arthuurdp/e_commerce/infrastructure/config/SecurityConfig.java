@@ -1,5 +1,6 @@
 package com.arthuurdp.e_commerce.infrastructure.config;
 
+import com.arthuurdp.e_commerce.infrastructure.security.RateLimitFilter;
 import com.arthuurdp.e_commerce.infrastructure.security.SecurityFilter;
 import com.arthuurdp.e_commerce.infrastructure.security.handlers.CustomAccessDeniedHandler;
 import com.arthuurdp.e_commerce.infrastructure.security.handlers.CustomAuthEntryPoint;
@@ -26,12 +27,14 @@ public class SecurityConfig {
     private final SecurityFilter securityFilter;
     private final CustomAuthEntryPoint customAuthEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final RateLimitFilter rateLimitFilter;
 
-    public SecurityConfig(AuthenticationConfiguration authConfig, SecurityFilter securityFilter, CustomAuthEntryPoint customAuthEntryPoint, CustomAccessDeniedHandler customAccessDeniedHandler) {
+    public SecurityConfig(AuthenticationConfiguration authConfig, SecurityFilter securityFilter, CustomAuthEntryPoint customAuthEntryPoint, CustomAccessDeniedHandler customAccessDeniedHandler, RateLimitFilter rateLimitFilter) {
         this.authConfig = authConfig;
         this.securityFilter = securityFilter;
         this.customAuthEntryPoint = customAuthEntryPoint;
         this.customAccessDeniedHandler = customAccessDeniedHandler;
+        this.rateLimitFilter = rateLimitFilter;
     }
 
     @Bean
@@ -55,6 +58,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/checkout/success").permitAll()
                         .requestMatchers(HttpMethod.GET, "/checkout/failure").permitAll()
 
+
+
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
                         .anyRequest().authenticated()
@@ -64,6 +69,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(customAccessDeniedHandler)
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
