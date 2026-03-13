@@ -16,88 +16,116 @@ public class EmailSenderService {
     public void sendVerificationCode(String to, String code) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
-        message.setSubject("Email verification code");
-        message.setText("Your verification code is: " + code + "\n\nThis code expires in 15 minutes.");
+        message.setSubject("Your verification code");
+        message.setText("""
+                Hi! Here is your email verification code:
+
+                ── VERIFICATION CODE ───────────────────────
+                %s
+                ────────────────────────────────────────────
+
+                This code expires in 15 minutes.
+                If you didn't request this, you can safely ignore this email.
+                """.formatted(code));
         sender.send(message);
     }
 
     public void sendPasswordVerificationCode(String to, String code) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
-        message.setSubject("Password verification code");
-        message.setText("Your password verification code is: " + code + "\n\nThis code expires in 15 minutes.");
+        message.setSubject("Your password change code");
+        message.setText("""
+                You requested a password change. Here is your confirmation code:
+
+                ── CONFIRMATION CODE ───────────────────────
+                %s
+                ────────────────────────────────────────────
+
+                This code expires in 15 minutes.
+                If you didn't request this, please secure your account immediately.
+                """.formatted(code));
         sender.send(message);
     }
 
     public void sendWelcome(String to, String firstName) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
-        message.setSubject("Welcome to our store!");
-        message.setText("Hello " + firstName + ", welcome! Your account has been created successfully.");
+        message.setSubject("Welcome! Your account is ready 🎉");
+        message.setText("""
+                Hi %s, welcome!
+
+                Your email has been verified and your account is ready to use.
+                You can now browse our store, add products to your cart and place orders.
+
+                If you have any questions, reply to this email.
+                """.formatted(firstName));
         sender.send(message);
     }
 
     public void sendEmailChanged(String to) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
-        message.setSubject("Email changed successfully");
-        message.setText("Your email has been changed successfully.");
+        message.setSubject("Your email has been updated");
+        message.setText("""
+                This is a confirmation that your account email has been changed successfully.
+
+                Your new login email is: %s
+
+                If you did not make this change, please contact us immediately by replying to this email.
+                """.formatted(to));
         sender.send(message);
     }
 
     public void sendPasswordChanged(String to) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
-        message.setSubject("Password changed successfully");
-        message.setText("Your password has been changed successfully.");
+        message.setSubject("Your password has been updated");
+        message.setText("""
+                This is a confirmation that your account password has been changed successfully.
+
+                If you did not make this change, please contact us immediately by replying to this email.
+                """);
         sender.send(message);
     }
 
     public void sendPasswordResetCode(String to, String code) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
-        message.setSubject("Password reset code");
-        message.setText("Your password reset code is: " + code);
+        message.setSubject("Reset your password");
+        message.setText("""
+                You requested a password reset. Here is your code:
+
+                ── RESET CODE ──────────────────────────────
+                %s
+                ────────────────────────────────────────────
+
+                This code expires in 15 minutes.
+                If you didn't request a password reset, you can safely ignore this email.
+                """.formatted(code));
         sender.send(message);
     }
 
-    public void sendOrderConfirmation(String to) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(to);
-        message.setSubject("Order confirmation");
-        message.setText("Your order has been placed successfully!");
-        sender.send(message);
-    }
-
-    public void sendOrderCancelled(String to) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(to);
-        message.setSubject("Order cancelled");
-        message.setText("Your order has been cancelled.");
-    }
-
-    public void sendShippingConfirmation(String to, Shipping shipping) {
+    public void sendOrderConfirmation(String to, Shipping shipping) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
         message.setSubject("Your order has been shipped! 📦 Order #" + shipping.getOrder().getId());
+        message.setText("""
+                Good news! Your order #%d has been shipped.
 
-        String text = """
-            Good news! Your order #%d has been shipped.
+                ── SHIPPING DETAILS ────────────────────────
+                Carrier:        %s
+                Tracking code:  %s
+                Shipping cost:  R$ %s
 
-            ── SHIPPING DETAILS ────────────────────────
-            Carrier:        %s
-            Tracking code:  %s
-            Shipping cost:  R$ %s
+                ── TRACK YOUR PACKAGE ──────────────────────
+                %s
 
-            ── TRACK YOUR PACKAGE ──────────────────────
-            %s
+                ── DELIVERY ADDRESS ────────────────────────
+                %s, %s - %s
+                %s / %s - %s
 
-            ── DELIVERY ADDRESS ────────────────────────
-            %s, %s - %s
-            %s / %s - %s
-
-            If you have any questions, reply to this email.
-            """.formatted(
+                If you have any questions, reply to this email.
+                """.formatted(
                 shipping.getOrder().getId(),
                 shipping.getCarrier()      != null ? shipping.getCarrier()      : "N/A",
                 shipping.getTrackingCode() != null ? shipping.getTrackingCode() : "N/A",
@@ -109,9 +137,7 @@ public class EmailSenderService {
                 shipping.getOrder().getAddress().getCity().getName(),
                 shipping.getOrder().getAddress().getCity().getState().getUf(),
                 shipping.getOrder().getAddress().getPostalCode()
-        );
-
-        message.setText(text);
+        ));
         sender.send(message);
     }
 }

@@ -115,7 +115,7 @@ public class ShippingService {
                 shipping.setLabelUrl(labelInfo.labelUrl());
                 shipping.setStatus(ShippingStatus.LABEL_GENERATED);
                 repo.save(shipping);
-                emailSenderService.sendShippingConfirmation(shipping.getOrder().getUser().getEmail(), shipping);
+                emailSenderService.sendOrderConfirmation(shipping.getOrder().getUser().getEmail(), shipping);
                 log.info("Order {}: label generated — tracking {}", order.getId(), labelInfo.trackingCode());
             }
 
