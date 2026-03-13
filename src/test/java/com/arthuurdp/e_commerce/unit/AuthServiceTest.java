@@ -104,7 +104,9 @@ class AuthServiceTest {
         @DisplayName("saves user with ROLE_USER and returns response")
         void shouldSaveUserWithRoleUser() {
             when(userRepository.existsByEmail(registerRequest.email())).thenReturn(false);
+            when(userRepository.existsByCpf(registerRequest.cpf())).thenReturn(false);
             when(passwordEncoder.encode(registerRequest.password())).thenReturn("encoded_secret");
+            when(userRepository.save(any(User.class))).thenReturn(user);
             when(mapper.toRegisterResponse(any(User.class))).thenReturn(registerResponse);
 
             RegisterResponse response = authService.registerUser(registerRequest);
@@ -117,6 +119,7 @@ class AuthServiceTest {
         @DisplayName("encodes password before saving")
         void shouldEncodePasswordBeforeSaving() {
             when(userRepository.existsByEmail(any())).thenReturn(false);
+            when(userRepository.existsByCpf(any())).thenReturn(false);
             when(passwordEncoder.encode("secret123")).thenReturn("encoded_secret");
             when(mapper.toRegisterResponse(any())).thenReturn(registerResponse);
 
@@ -131,6 +134,7 @@ class AuthServiceTest {
         @DisplayName("assigns a Cart to the user before saving")
         void shouldAssignCartToUser() {
             when(userRepository.existsByEmail(any())).thenReturn(false);
+            when(userRepository.existsByCpf(any())).thenReturn(false);
             when(passwordEncoder.encode(any())).thenReturn("encoded_secret");
             when(mapper.toRegisterResponse(any())).thenReturn(registerResponse);
 
@@ -146,7 +150,18 @@ class AuthServiceTest {
         void shouldThrowWhenEmailAlreadyExists() {
             when(userRepository.existsByEmail(registerRequest.email())).thenReturn(true);
 
-            assertThatThrownBy(() -> authService.registerUser(registerRequest)).isInstanceOf(ConflictException.class).hasMessage("E-mail already in use");
+            assertThatThrownBy(() -> authService.registerUser(registerRequest)).isInstanceOf(ConflictException.class).hasMessage("E-mail or CPF already in use");
+
+            verify(userRepository, never()).save(any());
+        }
+
+        @Test
+        @DisplayName("throws ConflictException when CPF already exists")
+        void shouldThrowWhenCPFAlreadyExists() {
+            when(userRepository.existsByEmail(registerRequest.email())).thenReturn(false);
+            when(userRepository.existsByCpf(registerRequest.cpf())).thenReturn(true);
+
+            assertThatThrownBy(() -> authService.registerUser(registerRequest)).isInstanceOf(ConflictException.class).hasMessage("E-mail or CPF already in use");
 
             verify(userRepository, never()).save(any());
         }
@@ -175,7 +190,18 @@ class AuthServiceTest {
         void shouldThrowWhenEmailAlreadyExists() {
             when(userRepository.existsByEmail(registerRequest.email())).thenReturn(true);
 
-            assertThatThrownBy(() -> authService.registerAdmin(registerRequest)).isInstanceOf(ConflictException.class).hasMessage("E-mail already in use");
+            assertThatThrownBy(() -> authService.registerAdmin(registerRequest)).isInstanceOf(ConflictException.class).hasMessage("E-mail or CPF already in use");
+
+            verify(userRepository, never()).save(any());
+        }
+
+        @Test
+        @DisplayName("throws ConflictException when CPF already exists")
+        void shouldThrowConflictExceptionWhenCPFAlreadyExists() {
+            when(userRepository.existsByEmail(registerRequest.email())).thenReturn(false);
+            when(userRepository.existsByCpf(registerRequest.cpf())).thenReturn(true);
+
+            assertThatThrownBy(() -> authService.registerAdmin(registerRequest)).isInstanceOf(ConflictException.class).hasMessage("E-mail or CPF already in use");
 
             verify(userRepository, never()).save(any());
         }

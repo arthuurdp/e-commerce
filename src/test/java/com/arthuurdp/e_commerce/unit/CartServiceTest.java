@@ -110,9 +110,7 @@ class CartServiceTest {
         void shouldThrowWhenCartNotFound() {
             when(cartRepository.findById(1L)).thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> cartService.display(verifiedUser))
-                    .isInstanceOf(ResourceNotFoundException.class)
-                    .hasMessage("Cart not found");
+            assertThatThrownBy(() -> cartService.display(verifiedUser)).isInstanceOf(ResourceNotFoundException.class).hasMessage("Cart not found");
         }
     }
 

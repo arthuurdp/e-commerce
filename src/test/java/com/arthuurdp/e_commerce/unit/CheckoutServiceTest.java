@@ -104,8 +104,8 @@ class CheckoutServiceTest {
             CheckoutResponse response = checkoutService.checkout(req, user);
 
             assertThat(response.orderId()).isEqualTo(99L);
-            assertThat(response.preferenceId()).isEqualTo("sess_123");
-            assertThat(response.initPoint()).isEqualTo("https://stripe.com/pay/sess_123");
+            assertThat(response.sessionId()).isEqualTo("sess_123");
+            assertThat(response.checkoutUrl()).isEqualTo("https://stripe.com/pay/sess_123");
         }
 
         @Test
