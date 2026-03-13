@@ -10,8 +10,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -29,7 +27,7 @@ public class UserController {
     ) {
         return ResponseEntity.ok().body(service.findAll(page, size));
     }
-    
+
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<UserResponse> findById(
@@ -51,13 +49,37 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Map<String, String>> delete(
+    public ResponseEntity<Void> delete(
             @PathVariable Long id,
             @AuthenticationPrincipal User user
     ) {
         service.delete(id, user);
-        return ResponseEntity.ok().body(Map.of(
-                "message", "User deleted successfully!"
-        ));
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/me")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<UserResponse> findCurrentUser(
+            @AuthenticationPrincipal User user
+    ) {
+        return ResponseEntity.ok().body(service.findCurrentUser(user));
+    }
+
+    @PatchMapping("/me")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<UserResponse> updateCurrentUser(
+            @RequestBody @Valid UpdateUserRequest req,
+            @AuthenticationPrincipal User user
+    ) {
+        return ResponseEntity.ok().body(service.updateCurrentUser(req, user));
+    }
+
+    @DeleteMapping("/me")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Void> deleteCurrentUser(
+            @AuthenticationPrincipal User user
+    ) {
+        service.deleteCurrentUser(user);
+        return ResponseEntity.noContent().build();
     }
 }
