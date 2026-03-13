@@ -2,16 +2,19 @@ package com.arthuurdp.e_commerce.modules.product;
 
 import com.arthuurdp.e_commerce.modules.product.entity.Product;
 import com.arthuurdp.e_commerce.modules.product.entity.ProductImage;
+import com.arthuurdp.e_commerce.modules.product.entity.ProductSpecification;
 import com.arthuurdp.e_commerce.shared.exceptions.BadRequestException;
 import com.arthuurdp.e_commerce.shared.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.modules.product.dtos.*;
 import com.arthuurdp.e_commerce.modules.category.CategoryService;
 import com.arthuurdp.e_commerce.modules.product.mapper.ProductMapper;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -27,13 +30,18 @@ public class ProductService {
     }
 
     @Transactional
-    public Page<ProductResponse> findAll(int page, int size) {
-        return repo.findAll(PageRequest.of(page, size)).map(mapper::toProductResponse);
+    public Page<ProductResponse> findAll(int page, int size, String name, List<Long> categoryIds) {
+        Specification<Product> spec = Specification.allOf(
+                ProductSpecification.nameContains(name),
+                ProductSpecification.inCategories(categoryIds)
+        );
+
+        return repo.findAll(spec, PageRequest.of(page, size)).map(mapper::toProductResponse);
     }
 
     @Transactional
     public ProductDetailsResponse findById(Long id) {
-        return mapper.toProductDetails(repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found")));
+        return mapper.toProductDetailsResponse(repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found")));
     }
 
     @Transactional
@@ -51,8 +59,8 @@ public class ProductService {
         product.addCategories(req.categoryIds().stream().map(categoryService::findEntityById).toList());
         product.addImages(req.images().stream().map(mapper::toProductImage).toList());
 
-        if (req.mainImageUrl() != null) {
-            applyMainImage(product, req.mainImageUrl());
+        if (req.mainImageRequest() != null) {
+            applyMainImage(product, req.mainImageRequest());
         } else if (!product.getImages().isEmpty()) {
             product.setMainImage(product.getImages().get(0));
         }
@@ -78,13 +86,13 @@ public class ProductService {
             product.addImages(req.imageUrls().stream().map(mapper::toProductImage).toList());
             repo.saveAndFlush(product);
 
-            if (req.mainImageUrl() != null) {
-                applyMainImage(product, req.mainImageUrl());
+            if (req.mainImageRequest() != null) {
+                applyMainImage(product, req.mainImageRequest());
             } else if (!product.getImages().isEmpty()) {
                 product.setMainImage(product.getImages().get(0));
             }
-        } else if (req.mainImageUrl() != null) {
-            applyMainImage(product, req.mainImageUrl());
+        } else if (req.mainImageRequest() != null) {
+            applyMainImage(product, req.mainImageRequest());
         }
 
         if (req.categoryIds() != null) {
@@ -122,12 +130,12 @@ public class ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Image not found for this product"));
 
         product.setMainImage(image);
-        return mapper.toProductDetails(repo.save(product));
+        return mapper.toProductDetailsResponse(repo.save(product));
     }
 
-    private void applyMainImage(Product product, String mainImageUrl) {
+    private void applyMainImage(Product product, SetMainImageRequest mainImageRequest) {
         product.getImages().stream()
-                .filter(img -> img.getUrl().equals(mainImageUrl))
+                .filter(img -> img.getUrl().equals(mainImageRequest.id()))
                 .findFirst()
                 .ifPresent(product::setMainImage);
     }

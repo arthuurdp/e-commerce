@@ -1,5 +1,7 @@
 package com.arthuurdp.e_commerce.modules.product.dtos;
 
+import com.arthuurdp.e_commerce.modules.category.dtos.CategoryResponse;
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -12,5 +14,6 @@ public record ProductDetailsResponse(
         Double weight,
         Integer width,
         Integer height,
-        Integer length
+        Integer length,
+        List<CategoryResponse> categories
 ) {}

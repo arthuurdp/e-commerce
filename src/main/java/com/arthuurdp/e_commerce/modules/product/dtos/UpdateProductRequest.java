@@ -12,7 +12,7 @@ public record UpdateProductRequest(
         Integer width,
         Integer height,
         Integer length,
-        String mainImageUrl,
+        SetMainImageRequest mainImageRequest,
         List<String> imageUrls,
         List<Long> categoryIds
 ) {}

@@ -15,15 +15,16 @@ public interface ProductMapper {
     CreateProductResponse toCreateResponse(Product product);
 
     @Mapping(target = "imgs", source = "images")
-    @Mapping(target = "category", source = "categories")
+    @Mapping(target = "categories", source = "categories")
     @Mapping(target = "updatedAt", source = "lastUpdatedAt")
     UpdateProductResponse toUpdateResponse(Product product);
 
     @Mapping(target = "mainImage", expression = "java(product.getMainImageUrl())")
     ProductResponse toProductResponse(Product product);
 
+    @Mapping(target = "categories", source = "categories")
     @Mapping(target = "imgs", source = "images")
-    ProductDetailsResponse toProductDetails(Product product);
+    ProductDetailsResponse toProductDetailsResponse(Product product);
 
     default ProductImage toProductImage(String url) {
         return new ProductImage(url);

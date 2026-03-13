@@ -10,6 +10,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -49,11 +51,13 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Void> delete(
+    public ResponseEntity<Map<String, String>> delete(
             @PathVariable Long id,
             @AuthenticationPrincipal User user
     ) {
         service.delete(id, user);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().body(Map.of(
+                "message", "User deleted successfully!"
+        ));
     }
 }

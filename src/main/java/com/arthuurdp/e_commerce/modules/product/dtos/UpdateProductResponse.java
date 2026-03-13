@@ -16,6 +16,6 @@ public record UpdateProductResponse(
         Integer height,
         Integer length,
         List<ProductImageResponse> imgs,
-        List<CategoryResponse> category,
+        List<CategoryResponse> categories,
         Instant updatedAt
 ) {}

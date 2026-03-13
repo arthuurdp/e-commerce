@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/products")
@@ -22,9 +23,11 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<Page<ProductResponse>> findAll(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) List<Long> categoryIds
     ) {
-        return ResponseEntity.ok().body(service.findAll(page, size));
+        return ResponseEntity.ok().body(service.findAll(page, size, name, categoryIds));
     }
 
     @GetMapping("/{id}")

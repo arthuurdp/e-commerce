@@ -41,7 +41,7 @@ public record CreateProductRequest(
         @NotEmpty(message = "Images are required")
         List<@NotBlank(message = "Image URL cannot be blank") String> images,
 
-        String mainImageUrl,
+        SetMainImageRequest mainImageRequest,
 
         @NotEmpty(message = "Categories are required")
         List<@NotNull(message = "Category cannot be null") Long> categoryIds

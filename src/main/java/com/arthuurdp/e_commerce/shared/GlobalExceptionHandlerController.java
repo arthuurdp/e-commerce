@@ -1,6 +1,8 @@
 package com.arthuurdp.e_commerce.shared;
 
 import com.arthuurdp.e_commerce.shared.exceptions.*;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,10 +17,11 @@ import java.time.Instant;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class GlobalExceptionHandlerController {
     // spring exceptions
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ResponseEntity<StandardError> handleAccessDeniedException(HttpRequestMethodNotSupportedException ex) {
+    public ResponseEntity<StandardError> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StandardError(
                 Instant.now(),
                 HttpStatus.BAD_REQUEST.value(),
@@ -29,7 +32,7 @@ public class GlobalExceptionHandlerController {
 
     // spring security AccessDeniedException
     @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
-    public ResponseEntity<StandardError> handleAccessDeniedException(org.springframework.security.access.AccessDeniedException ex) {
+    public ResponseEntity<StandardError> handleSpringAccessDeniedException(org.springframework.security.access.AccessDeniedException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new StandardError(
                 Instant.now(),
                 HttpStatus.FORBIDDEN.value(),
@@ -39,7 +42,7 @@ public class GlobalExceptionHandlerController {
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<StandardError> handleAccessDeniedException(BadCredentialsException ex) {
+    public ResponseEntity<StandardError> handleBadCredentialsException(BadCredentialsException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StandardError(
                 Instant.now(),
                 HttpStatus.BAD_REQUEST.value(),
@@ -49,7 +52,7 @@ public class GlobalExceptionHandlerController {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<StandardError> handleAccessDeniedException(MethodArgumentNotValidException ex) {
+    public ResponseEntity<StandardError> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         String message = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
