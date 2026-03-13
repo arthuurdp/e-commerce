@@ -11,5 +11,6 @@ public interface OrderMapper {
     @Mapping(target = "items", source = "items")
     OrderDetailsResponse toOrderDetailsResponse(Order order);
 
+    @Mapping(target = "totalItems", expression = "java(order.getItems().size())")
     OrderResponse toOrderResponse(Order order);
 }

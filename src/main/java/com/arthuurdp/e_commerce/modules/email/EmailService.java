@@ -1,6 +1,7 @@
 package com.arthuurdp.e_commerce.modules.email;
 
 import com.arthuurdp.e_commerce.modules.email.entity.EmailVerificationToken;
+import com.arthuurdp.e_commerce.modules.email.entity.PasswordResetToken;
 import com.arthuurdp.e_commerce.modules.email.entity.PasswordVerificationToken;
 import com.arthuurdp.e_commerce.modules.user.entity.User;
 import com.arthuurdp.e_commerce.shared.exceptions.AccessDeniedException;
@@ -18,15 +19,17 @@ import java.security.SecureRandom;
 public class EmailService {
     private final EmailVerificationTokenRepository emailVerificationTokenRepository;
     private final PasswordVerificationTokenRepository passwordVerificationTokenRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final UserRepository userRepository;
     private final EmailSenderService emailSenderService;
     private final PasswordEncoder passwordEncoder;
 
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
-    public EmailService(EmailVerificationTokenRepository emailVerificationTokenRepository, PasswordVerificationTokenRepository passwordVerificationTokenRepository, UserRepository userRepository, EmailSenderService emailSenderService, PasswordEncoder passwordEncoder) {
+    public EmailService(EmailVerificationTokenRepository emailVerificationTokenRepository, PasswordVerificationTokenRepository passwordVerificationTokenRepository, PasswordResetTokenRepository passwordResetTokenRepository, UserRepository userRepository, EmailSenderService emailSenderService, PasswordEncoder passwordEncoder) {
         this.emailVerificationTokenRepository = emailVerificationTokenRepository;
         this.passwordVerificationTokenRepository = passwordVerificationTokenRepository;
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
         this.userRepository = userRepository;
         this.emailSenderService = emailSenderService;
         this.passwordEncoder = passwordEncoder;
@@ -120,7 +123,6 @@ public class EmailService {
         PasswordVerificationToken token = new PasswordVerificationToken(code, user, encoded);
 
         passwordVerificationTokenRepository.save(token);
-
         emailSenderService.sendPasswordVerificationCode(user.getEmail(), code);
     }
 
@@ -141,6 +143,43 @@ public class EmailService {
 
         userRepository.save(user);
         passwordVerificationTokenRepository.save(token);
+        emailSenderService.sendPasswordChanged(user.getEmail());
+    }
+
+    @Transactional
+    public void requestPasswordReset(String email) {
+        User user = (User) userRepository.findByEmail(email.toLowerCase());
+
+        if (user == null) return;
+
+        passwordResetTokenRepository.deleteByUserId(user.getId());
+
+        String code = String.format("%06d", SECURE_RANDOM.nextInt(999999));
+        PasswordResetToken token = new PasswordResetToken(code, user);
+        passwordResetTokenRepository.save(token);
+
+        emailSenderService.sendPasswordResetCode(user.getEmail(), code);
+    }
+
+    @Transactional
+    public void confirmPasswordReset(String code, String newPassword) {
+        PasswordResetToken token = passwordResetTokenRepository.findByCodeAndUsedFalse(code).orElseThrow(() -> new ResourceNotFoundException("Invalid or already used code"));
+
+        if (token.isExpired()) {
+            throw new BadRequestException("Code has expired");
+        }
+
+        User user = token.getUser();
+
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
+            throw new BadRequestException("New password must be different from your current password");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        token.setUsed(true);
+
+        userRepository.save(user);
+        passwordResetTokenRepository.save(token);
         emailSenderService.sendPasswordChanged(user.getEmail());
     }
 }

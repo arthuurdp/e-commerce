@@ -1,5 +1,6 @@
 package com.arthuurdp.e_commerce.modules.shipping;
 
+import com.arthuurdp.e_commerce.modules.email.EmailSenderService;
 import com.arthuurdp.e_commerce.modules.shipping.client.MelhorEnvioClient;
 import com.arthuurdp.e_commerce.modules.shipping.client.MelhorEnvioClient.AddToCartRequest;
 import com.arthuurdp.e_commerce.modules.shipping.client.MelhorEnvioClient.FreightOption;
@@ -31,6 +32,7 @@ public class ShippingService {
     private final ShippingRepository repo;
     private final MelhorEnvioClient client;
     private final ShippingMapper mapper;
+    private final EmailSenderService emailSenderService;
 
     @Value("${melhorenvio.from-postal-code}")
     private String fromPostalCode;
@@ -62,10 +64,11 @@ public class ShippingService {
     @Value("${melhorenvio.store-state}")
     private String storeState;
 
-    public ShippingService(ShippingRepository repo, MelhorEnvioClient client, ShippingMapper mapper) {
+    public ShippingService(ShippingRepository repo, MelhorEnvioClient client, ShippingMapper mapper, EmailSenderService emailSenderService) {
         this.repo = repo;
         this.client  = client;
         this.mapper = mapper;
+        this.emailSenderService = emailSenderService;
     }
 
     @Transactional
@@ -112,6 +115,7 @@ public class ShippingService {
                 shipping.setLabelUrl(labelInfo.labelUrl());
                 shipping.setStatus(ShippingStatus.LABEL_GENERATED);
                 repo.save(shipping);
+                emailSenderService.sendShippingConfirmation(shipping.getOrder().getUser().getEmail(), shipping);
                 log.info("Order {}: label generated — tracking {}", order.getId(), labelInfo.trackingCode());
             }
 

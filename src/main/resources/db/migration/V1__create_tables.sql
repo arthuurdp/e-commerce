@@ -5,14 +5,6 @@ CREATE TABLE states (
     region VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE state_neighbors (
-    state_id BIGINT NOT NULL,
-    neighbor_id BIGINT NOT NULL,
-    PRIMARY KEY (state_id, neighbor_id),
-    CONSTRAINT fk_state_neighbors_state FOREIGN KEY (state_id) REFERENCES states(id),
-    CONSTRAINT fk_state_neighbors_neighbor FOREIGN KEY (neighbor_id) REFERENCES states(id)
-);
-
 CREATE TABLE cities (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
@@ -75,14 +67,13 @@ CREATE TABLE password_verification_tokens (
     CONSTRAINT fk_password_tokens_user FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
-CREATE TABLE carriers (
+CREATE TABLE password_reset_tokens (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    cnpj VARCHAR(14) NOT NULL UNIQUE,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    phone VARCHAR(11),
-    region VARCHAR(255) NOT NULL,
-    status VARCHAR(255) NOT NULL
+    code VARCHAR(6) NOT NULL UNIQUE,
+    user_id BIGINT NOT NULL,
+    expires_at DATETIME NOT NULL,
+    used BOOLEAN NOT NULL DEFAULT FALSE,
+    CONSTRAINT fk_password_reset_tokens_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE products (

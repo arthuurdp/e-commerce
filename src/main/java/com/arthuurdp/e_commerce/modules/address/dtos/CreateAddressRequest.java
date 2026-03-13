@@ -9,7 +9,6 @@ public record CreateAddressRequest(
         @NotBlank(message = "Name is required")
         String name,
 
-        @NotBlank(message = "Street is required")
         String street,
 
         @NotNull(message = "Number is required")
@@ -18,7 +17,6 @@ public record CreateAddressRequest(
 
         String complement,
 
-        @NotBlank(message = "Neighborhood is required")
         String neighborhood,
 
         @NotBlank(message = "Postal code is required")

@@ -67,6 +67,7 @@ public class WebhookHandlerService {
             log.info("Order {} marked as PAID", orderId);
         } else {
             payment.setStatus(PaymentStatus.PENDING);
+            emailSenderService.sendOrderCancelled(order.getUser().getEmail());
             log.info("Order {} payment pending (status: {})", orderId, paymentStatus);
         }
 
