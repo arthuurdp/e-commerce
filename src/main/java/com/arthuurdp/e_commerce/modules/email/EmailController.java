@@ -25,7 +25,7 @@ public class EmailController {
             @AuthenticationPrincipal User user
     ) {
         service.sendEmailVerification(user);
-        return ResponseEntity.ok(Map.of("message", "Verification email sent successfully"));
+        return ResponseEntity.ok(Map.of("message", "Verification email sent successfully!"));
     }
 
     @PostMapping("/verify-email/confirm")
@@ -33,7 +33,7 @@ public class EmailController {
             @RequestBody @Valid VerifyCodeRequest req
     ) {
         service.verifyEmail(req.code());
-        return ResponseEntity.ok(Map.of("message", "Email verified successfully"));
+        return ResponseEntity.ok(Map.of("message", "Email verified successfully!"));
     }
 
     @PostMapping("/email/change")
@@ -42,7 +42,7 @@ public class EmailController {
             @AuthenticationPrincipal User user
     ) {
         service.requestEmailChange(req.email(), user);
-        return ResponseEntity.ok(Map.of("message", "A confirmation code has been sent to your new email"));
+        return ResponseEntity.ok(Map.of("message", "A confirmation code has been sent to your new email!"));
     }
 
     @PostMapping("/email/confirm")
@@ -51,7 +51,7 @@ public class EmailController {
             @AuthenticationPrincipal User user
     ) {
         service.confirmEmailChange(req.code(), user);
-        return ResponseEntity.ok(Map.of("message", "Email changed successfully"));
+        return ResponseEntity.ok(Map.of("message", "Email changed successfully!"));
     }
 
     @PostMapping("/password/change")
@@ -60,7 +60,7 @@ public class EmailController {
             @AuthenticationPrincipal User user
     ) {
         service.requestPasswordChange(req.password(), user);
-        return ResponseEntity.ok(Map.of("message", "A confirmation code has been sent to your email"));
+        return ResponseEntity.ok(Map.of("message", "A confirmation code has been sent to your email!"));
     }
 
     @PostMapping("/password/confirm")
@@ -69,6 +69,6 @@ public class EmailController {
             @AuthenticationPrincipal User user
     ) {
         service.confirmPasswordChange(req.code(), user);
-        return ResponseEntity.ok(Map.of("message", "Password changed successfully"));
+        return ResponseEntity.ok(Map.of("message", "Password changed successfully!"));
     }
 }

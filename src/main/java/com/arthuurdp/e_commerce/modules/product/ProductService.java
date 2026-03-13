@@ -59,8 +59,8 @@ public class ProductService {
         product.addCategories(req.categoryIds().stream().map(categoryService::findEntityById).toList());
         product.addImages(req.images().stream().map(mapper::toProductImage).toList());
 
-        if (req.mainImageRequest() != null) {
-            applyMainImage(product, req.mainImageRequest());
+        if (req.mainImageId() != null) {
+            applyMainImage(product, req.mainImageId());
         } else if (!product.getImages().isEmpty()) {
             product.setMainImage(product.getImages().get(0));
         }
@@ -86,13 +86,13 @@ public class ProductService {
             product.addImages(req.imageUrls().stream().map(mapper::toProductImage).toList());
             repo.saveAndFlush(product);
 
-            if (req.mainImageRequest() != null) {
-                applyMainImage(product, req.mainImageRequest());
+            if (req.mainImageId() != null) {
+                applyMainImage(product, req.mainImageId());
             } else if (!product.getImages().isEmpty()) {
                 product.setMainImage(product.getImages().get(0));
             }
-        } else if (req.mainImageRequest() != null) {
-            applyMainImage(product, req.mainImageRequest());
+        } else if (req.mainImageId() != null) {
+            applyMainImage(product, req.mainImageId());
         }
 
         if (req.categoryIds() != null) {
@@ -122,10 +122,11 @@ public class ProductService {
     }
 
     @Transactional
-    public ProductDetailsResponse setMainImage(Long id, SetMainImageRequest req) {
+    public ProductDetailsResponse setMainImage(Long id, Long mainImageId) {
         Product product = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+
         ProductImage image = product.getImages().stream()
-                .filter(img -> img.getId().equals(req.id()))
+                .filter(img -> img.getId().equals(mainImageId))
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("Image not found for this product"));
 
@@ -133,9 +134,9 @@ public class ProductService {
         return mapper.toProductDetailsResponse(repo.save(product));
     }
 
-    private void applyMainImage(Product product, SetMainImageRequest mainImageRequest) {
+    private void applyMainImage(Product product, Long mainImageId) {
         product.getImages().stream()
-                .filter(img -> img.getUrl().equals(mainImageRequest.id()))
+                .filter(img -> img.getId().equals(mainImageId))
                 .findFirst()
                 .ifPresent(product::setMainImage);
     }

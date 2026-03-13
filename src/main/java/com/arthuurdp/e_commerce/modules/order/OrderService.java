@@ -36,7 +36,7 @@ public class OrderService {
         Order order = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
         if (!user.getId().equals(order.getUser().getId()) && !user.isAdmin()) {
-            throw new AccessDeniedException("Access denied");
+            throw new AccessDeniedException("You don't have permission to access this resource");
         }
 
         return mapper.toOrderDetailsResponse(order);
