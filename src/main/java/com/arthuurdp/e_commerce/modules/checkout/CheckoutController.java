@@ -1,5 +1,6 @@
 package com.arthuurdp.e_commerce.modules.checkout;
 
+import com.arthuurdp.e_commerce.infrastructure.security.UserAuthenticated;
 import com.arthuurdp.e_commerce.modules.checkout.dtos.CheckoutRequest;
 import com.arthuurdp.e_commerce.modules.checkout.dtos.CheckoutResponse;
 import com.arthuurdp.e_commerce.modules.user.entity.User;
@@ -22,9 +23,9 @@ public class CheckoutController {
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<CheckoutResponse> checkout(
             @RequestBody @Valid CheckoutRequest req,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) throws StripeException {
-        return ResponseEntity.ok(service.checkout(req, user));
+        return ResponseEntity.ok(service.checkout(req, authenticatedUser.getUser()));
     }
 
     @GetMapping("/checkout/success")

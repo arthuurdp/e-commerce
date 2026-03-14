@@ -10,6 +10,7 @@ import com.arthuurdp.e_commerce.modules.shipping.dtos.ShippingResponse;
 import com.arthuurdp.e_commerce.modules.address.entity.Address;
 import com.arthuurdp.e_commerce.modules.order.entity.Order;
 import com.arthuurdp.e_commerce.modules.shipping.enums.ShippingStatus;
+import com.arthuurdp.e_commerce.modules.user.entity.User;
 import com.arthuurdp.e_commerce.shared.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.modules.shipping.entity.Shipping;
 import com.arthuurdp.e_commerce.modules.shipping.mapper.ShippingMapper;
@@ -148,9 +149,8 @@ public class ShippingService {
         log.info("Shipping for ME order {} updated to {}", event.orderId(), newStatus);
     }
 
-    public ShippingResponse getShippingForUser(Long orderId, Long userId) {
-        Shipping shipping = repo.findByOrderIdAndOrderUserId(orderId, userId).orElseThrow(() -> new ResourceNotFoundException("Shipping not found for this order"));
-        return mapper.toShippingResponse(shipping);
+    public ShippingResponse getShippingForUser(Long orderId, User user) {
+        return mapper.toShippingResponse(repo.findByOrderIdAndOrderUserId(orderId, user.getId()).orElseThrow(() -> new ResourceNotFoundException("Shipping not found for this order")));
     }
 
     private AddToCartRequest buildCartRequest(Order order, FreightOption option, String toPostalCode) {

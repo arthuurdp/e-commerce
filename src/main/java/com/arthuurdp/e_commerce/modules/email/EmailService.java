@@ -148,9 +148,7 @@ public class EmailService {
 
     @Transactional
     public void requestPasswordReset(String email) {
-        User user = (User) userRepository.findByEmail(email.toLowerCase());
-
-        if (user == null) return;
+        User user = userRepository.findByEmail(email.toLowerCase()).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         passwordResetTokenRepository.deleteByUserId(user.getId());
 

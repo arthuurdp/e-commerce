@@ -1,5 +1,6 @@
 package com.arthuurdp.e_commerce.modules.shipping;
 
+import com.arthuurdp.e_commerce.infrastructure.security.UserAuthenticated;
 import com.arthuurdp.e_commerce.modules.shipping.dtos.FreightResponse;
 import com.arthuurdp.e_commerce.modules.user.entity.User;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +24,8 @@ public class FreightController {
     @GetMapping
     public ResponseEntity<List<FreightResponse>> findAll(
             @RequestParam String postalCode,
-            @AuthenticationPrincipal User user
-    ) {
-        return ResponseEntity.ok().body(service.calculate(postalCode, user));
+            @AuthenticationPrincipal UserAuthenticated authenticatedUser
+            ) {
+        return ResponseEntity.ok().body(service.calculate(postalCode, authenticatedUser.getUser()));
     }
 }

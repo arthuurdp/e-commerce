@@ -28,14 +28,12 @@ public class WebhookHandlerService {
     private final OrderRepository orderRepository;
     private final PaymentRepository paymentRepository;
     private final ShippingService shippingService;
-    private final EmailSenderService emailSenderService;
     private final ProductService productService;
 
-    public WebhookHandlerService(OrderRepository orderRepository, PaymentRepository paymentRepository, ShippingService shippingService, EmailSenderService emailSenderService, ProductService productService) {
+    public WebhookHandlerService(OrderRepository orderRepository, PaymentRepository paymentRepository, ShippingService shippingService, ProductService productService) {
         this.orderRepository = orderRepository;
         this.paymentRepository = paymentRepository;
         this.shippingService = shippingService;
-        this.emailSenderService = emailSenderService;
         this.productService = productService;
     }
 

@@ -31,12 +31,12 @@ public class AddressService {
         this.mapper = mapper;
     }
 
-    public AddressResponse findById(Long id, Long userId) {
-        return addressRepository.findByIdAndUserId(id, userId).map(mapper::toAddressResponse).orElseThrow(() -> new ResourceNotFoundException("Address not found"));
+    public AddressResponse findById(Long id, User user) {
+        return addressRepository.findByIdAndUserId(id, user.getId()).map(mapper::toAddressResponse).orElseThrow(() -> new ResourceNotFoundException("Address not found"));
     }
 
-    public Page<AddressResponse> findAll(int page, int size, Long userId) {
-        return addressRepository.findByUserId(PageRequest.of(page, size), userId).map(mapper::toAddressResponse);
+    public Page<AddressResponse> findAll(int page, int size, User user) {
+        return addressRepository.findByUserId(PageRequest.of(page, size), user.getId()).map(mapper::toAddressResponse);
     }
 
     @Transactional

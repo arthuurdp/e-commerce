@@ -1,6 +1,7 @@
 package com.arthuurdp.e_commerce.infrastructure.security;
 
 import com.arthuurdp.e_commerce.modules.user.UserRepository;
+import com.arthuurdp.e_commerce.shared.exceptions.ResourceNotFoundException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,11 +30,10 @@ public class SecurityFilter extends OncePerRequestFilter {
         if (token != null) {
             var login = tokenService.validateToken(token);
             if (login != null && !login.isBlank()) {
-                UserDetails user = userRepository.findByEmail(login);
-                if (user != null) {
-                    var auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-                    SecurityContextHolder.getContext().setAuthentication(auth);
-                }
+                UserDetails user = userRepository.findByEmail(login).map(UserAuthenticated::new).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+                var auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(auth);
             }
         }
         filterChain.doFilter(req, response);

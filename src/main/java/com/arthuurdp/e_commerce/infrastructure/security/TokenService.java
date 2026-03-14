@@ -19,10 +19,14 @@ public class TokenService {
 
     public String generateToken(User user) {
         try {
+            if (user == null) throw new IllegalArgumentException("User cannot be null");
+            if (user.getId() == null) throw new IllegalArgumentException("User ID is null — was the user persisted?");
+            if (user.getEmail() == null) throw new IllegalArgumentException("User email is null");
             Algorithm algorithm = Algorithm.HMAC256(secret);
             return JWT.create()
                     .withIssuer("auth-api")
                     .withSubject(user.getEmail())
+                    .withClaim("id", user.getId())
                     .withExpiresAt(genExpirationDate())
                     .sign(algorithm);
         } catch (JWTCreationException e) {

@@ -7,10 +7,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CustomUserDetailsService implements UserDetailsService {
+public class UserDetailsServiceImpl implements UserDetailsService {
     private final UserRepository repo;
 
-    public CustomUserDetailsService(UserRepository repo) {
+    public UserDetailsServiceImpl(UserRepository repo) {
         this.repo = repo;
     }
 
@@ -18,16 +18,16 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String credential) throws UsernameNotFoundException {
         boolean isCpf = credential.matches("^\\d{3}\\.?\\d{3}\\.?\\d{3}-?\\d{2}$");
 
-        UserDetails user = isCpf ? repo.findByCpf(normalizeCpf(credential)) : repo.findByEmail(credential.toLowerCase());
-
-        if (user == null) {
-            throw new UsernameNotFoundException("Invalid credentials");
-        }
-
-        return user;
+        return isCpf ?
+                repo.findByCpf(normalizeCpf(credential))
+                        .map(UserAuthenticated::new)
+                        .orElseThrow(() -> new UsernameNotFoundException("Invalid credentials")) :
+                repo.findByEmail(credential.toLowerCase())
+                        .map(UserAuthenticated::new)
+                        .orElseThrow(() -> new UsernameNotFoundException("Invalid credentials"));
     }
 
-    public String normalizeCpf(String cpf) {
+    private String normalizeCpf(String cpf) {
         return cpf.replaceAll("[^\\d]", "");
     }
 }

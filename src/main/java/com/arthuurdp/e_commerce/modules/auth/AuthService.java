@@ -1,5 +1,6 @@
 package com.arthuurdp.e_commerce.modules.auth;
 
+import com.arthuurdp.e_commerce.infrastructure.security.UserAuthenticated;
 import com.arthuurdp.e_commerce.modules.cart.entity.Cart;
 import com.arthuurdp.e_commerce.modules.user.entity.User;
 import com.arthuurdp.e_commerce.modules.auth.dtos.LoginRequest;
@@ -35,7 +36,8 @@ public class AuthService {
     public LoginResponse login(LoginRequest dto) {
         var tokenAuth = new UsernamePasswordAuthenticationToken(dto.credential(), dto.password());
         var auth = authManager.authenticate(tokenAuth);
-        var token = tokenService.generateToken((User) auth.getPrincipal());
+        var userAuthenticated = (UserAuthenticated) auth.getPrincipal();
+        var token = tokenService.generateToken(userAuthenticated.getUser());
         return new LoginResponse(token);
     }
 

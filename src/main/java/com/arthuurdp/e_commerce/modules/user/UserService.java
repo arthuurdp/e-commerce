@@ -1,5 +1,6 @@
 package com.arthuurdp.e_commerce.modules.user;
 
+import com.arthuurdp.e_commerce.infrastructure.security.UserAuthenticated;
 import com.arthuurdp.e_commerce.modules.user.entity.User;
 import com.arthuurdp.e_commerce.modules.user.dtos.UpdateUserRequest;
 import com.arthuurdp.e_commerce.modules.user.dtos.UserResponse;

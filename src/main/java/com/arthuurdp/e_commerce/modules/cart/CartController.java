@@ -1,5 +1,6 @@
 package com.arthuurdp.e_commerce.modules.cart;
 
+import com.arthuurdp.e_commerce.infrastructure.security.UserAuthenticated;
 import com.arthuurdp.e_commerce.modules.cart.dtos.CartItemResponse;
 import com.arthuurdp.e_commerce.modules.cart.dtos.CartResponse;
 import com.arthuurdp.e_commerce.modules.user.entity.User;
@@ -20,27 +21,27 @@ public class CartController {
     @GetMapping
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<CartResponse> display(
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        return ResponseEntity.ok().body(service.display(user));
+        return ResponseEntity.ok().body(service.display(authenticatedUser.getUser()));
     }
 
     @PatchMapping("/{productId}/increment")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<CartItemResponse> addProduct(
             @PathVariable Long productId,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        return ResponseEntity.ok().body(service.addProduct(productId, user));
+        return ResponseEntity.ok().body(service.addProduct(productId, authenticatedUser.getUser()));
     }
 
     @PatchMapping("/{productId}/decrement")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<CartItemResponse> removeProduct(
             @PathVariable Long productId,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        return service.removeProduct(productId, user)
+        return service.removeProduct(productId, authenticatedUser.getUser())
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.noContent().build());
     }
@@ -48,9 +49,9 @@ public class CartController {
     @DeleteMapping
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> clear(
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        service.clear(user);
+        service.clear(authenticatedUser.getUser());
         return ResponseEntity.noContent().build();
     }
 }

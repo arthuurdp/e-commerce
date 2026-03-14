@@ -1,5 +1,6 @@
 package com.arthuurdp.e_commerce.modules.user;
 
+import com.arthuurdp.e_commerce.infrastructure.security.UserAuthenticated;
 import com.arthuurdp.e_commerce.modules.user.dtos.UpdateUserRequest;
 import com.arthuurdp.e_commerce.modules.user.dtos.UserResponse;
 import com.arthuurdp.e_commerce.modules.user.entity.User;
@@ -32,9 +33,9 @@ public class UserController {
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<UserResponse> findById(
             @PathVariable Long id,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        return ResponseEntity.ok().body(service.findById(id, user));
+        return ResponseEntity.ok().body(service.findById(id, authenticatedUser.getUser()));
     }
 
     @PatchMapping("/{id}")
@@ -42,44 +43,44 @@ public class UserController {
     public ResponseEntity<UserResponse> update(
             @PathVariable Long id,
             @RequestBody @Valid UpdateUserRequest req,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        return ResponseEntity.ok().body(service.update(id, req, user));
+        return ResponseEntity.ok().body(service.update(id, req, authenticatedUser.getUser()));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> delete(
             @PathVariable Long id,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        service.delete(id, user);
+        service.delete(id, authenticatedUser.getUser());
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/me")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<UserResponse> findCurrentUser(
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        return ResponseEntity.ok().body(service.findCurrentUser(user));
+        return ResponseEntity.ok().body(service.findCurrentUser(authenticatedUser.getUser()));
     }
 
     @PatchMapping("/me")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<UserResponse> updateCurrentUser(
             @RequestBody @Valid UpdateUserRequest req,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        return ResponseEntity.ok().body(service.updateCurrentUser(req, user));
+        return ResponseEntity.ok().body(service.updateCurrentUser(req, authenticatedUser.getUser()));
     }
 
     @DeleteMapping("/me")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> deleteCurrentUser(
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        service.deleteCurrentUser(user);
+        service.deleteCurrentUser(authenticatedUser.getUser());
         return ResponseEntity.noContent().build();
     }
 }

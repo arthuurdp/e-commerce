@@ -1,5 +1,6 @@
 package com.arthuurdp.e_commerce.modules.address;
 
+import com.arthuurdp.e_commerce.infrastructure.security.UserAuthenticated;
 import com.arthuurdp.e_commerce.modules.user.entity.User;
 import com.arthuurdp.e_commerce.modules.address.dtos.AddressResponse;
 import com.arthuurdp.e_commerce.modules.address.dtos.CreateAddressRequest;
@@ -28,27 +29,27 @@ public class AddressController {
     public Page<AddressResponse> findAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        return service.findAll(page, size, user.getId());
+        return service.findAll(page, size, authenticatedUser.getUser());
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<AddressResponse> findById(
             @PathVariable Long id,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        return ResponseEntity.ok().body(service.findById(id, user.getId()));
+        return ResponseEntity.ok().body(service.findById(id, authenticatedUser.getUser()));
     }
 
     @PostMapping
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<AddressResponse> create(
             @RequestBody @Valid CreateAddressRequest req,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        AddressResponse response = service.create(req, user);
+        AddressResponse response = service.create(req, authenticatedUser.getUser());
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(response.id()).toUri();
         return ResponseEntity.created(uri).body(response);
     }
@@ -58,18 +59,18 @@ public class AddressController {
     public ResponseEntity<AddressResponse> update(
             @PathVariable Long id,
             @RequestBody @Valid UpdateAddressRequest req,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        return ResponseEntity.ok().body(service.update(id, req, user));
+        return ResponseEntity.ok().body(service.update(id, req, authenticatedUser.getUser()));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> delete(
             @PathVariable Long id,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        service.delete(id, user);
+        service.delete(id, authenticatedUser.getUser());
         return ResponseEntity.noContent().build();
     }
 }

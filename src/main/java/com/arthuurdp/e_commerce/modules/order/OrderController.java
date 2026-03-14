@@ -1,5 +1,6 @@
 package com.arthuurdp.e_commerce.modules.order;
 
+import com.arthuurdp.e_commerce.infrastructure.security.UserAuthenticated;
 import com.arthuurdp.e_commerce.modules.order.dtos.OrderDetailsResponse;
 import com.arthuurdp.e_commerce.modules.order.dtos.OrderResponse;
 import com.arthuurdp.e_commerce.modules.user.entity.User;
@@ -23,17 +24,17 @@ public class OrderController {
     public ResponseEntity<Page<OrderResponse>> findByUser(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        return ResponseEntity.ok(service.findByUser(page, size, user));
+        return ResponseEntity.ok(service.findByUser(page, size, authenticatedUser.getUser()));
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<OrderDetailsResponse> findById(
             @PathVariable Long id,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        return ResponseEntity.ok(service.findById(id, user));
+        return ResponseEntity.ok(service.findById(id, authenticatedUser.getUser()));
     }
 }

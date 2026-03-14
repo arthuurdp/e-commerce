@@ -1,5 +1,6 @@
 package com.arthuurdp.e_commerce.modules.shipping;
 
+import com.arthuurdp.e_commerce.infrastructure.security.UserAuthenticated;
 import com.arthuurdp.e_commerce.modules.shipping.dtos.ShippingResponse;
 import com.arthuurdp.e_commerce.modules.user.entity.User;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +21,8 @@ public class ShippingController {
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ShippingResponse> getShipping(
             @PathVariable Long orderId,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        return ResponseEntity.ok(service.getShippingForUser(orderId, user.getId()));
+        return ResponseEntity.ok(service.getShippingForUser(orderId, authenticatedUser.getUser()));
     }
 }
