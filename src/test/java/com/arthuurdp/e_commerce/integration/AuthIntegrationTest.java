@@ -25,7 +25,7 @@ class AuthIntegrationTest extends BaseIntegrationTest {
         void shouldRegisterSuccessfully() throws Exception {
             RegisterRequest req = new RegisterRequest(
                     "Jane", "Doe", "jane@test.com", "password123",
-                    "529.982.247-25", "11987654321",
+                    "39209275080", "11987654321",
                     LocalDate.of(1995, 6, 15), Gender.FEMALE
             );
 
@@ -140,6 +140,23 @@ class AuthIntegrationTest extends BaseIntegrationTest {
                             .content(objectMapper.writeValueAsString(req)))
                     .andExpect(status().isUnauthorized());
         }
+        @Test
+        @DisplayName("returns 429 when rate limit is exceeded")
+        void shouldReturnTooManyRequestsWhenRateLimitExceeded() throws Exception {
+            LoginRequest req = new LoginRequest("user@test.com", "wrongpassword");
+
+            for (int i = 0; i < 5; i++) {
+                mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)));
+            }
+
+            mockMvc.perform(post("/auth/login")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(req)))
+                    .andExpect(status().isTooManyRequests());
+        }
+
 
         @Test
         @DisplayName("can login with CPF as credential")
@@ -172,7 +189,7 @@ class AuthIntegrationTest extends BaseIntegrationTest {
         void shouldReturnForbiddenWhenRequesterIsUser() throws Exception {
             RegisterRequest req = new RegisterRequest(
                     "Fake", "Admin", "fakeadmin@test.com", "password123",
-                    "871.943.710-89", "11987654321",
+                    "98058100030", "11987654321",
                     LocalDate.of(1990, 1, 1), Gender.MALE
             );
 

@@ -58,8 +58,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/checkout/success").permitAll()
                         .requestMatchers(HttpMethod.GET, "/checkout/failure").permitAll()
 
-
-
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
                         .anyRequest().authenticated()

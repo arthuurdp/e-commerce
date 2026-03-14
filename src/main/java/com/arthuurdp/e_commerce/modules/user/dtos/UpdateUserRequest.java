@@ -1,7 +1,7 @@
 package com.arthuurdp.e_commerce.modules.user.dtos;
 
 import com.arthuurdp.e_commerce.modules.user.enums.Gender;
-import com.arthuurdp.e_commerce.infrastructure.security.annotations.ValidPhone;
+import com.arthuurdp.e_commerce.shared.validators.annotations.ValidPhone;
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;

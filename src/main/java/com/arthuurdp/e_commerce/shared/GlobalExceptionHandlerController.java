@@ -21,12 +21,12 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandlerController {
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ResponseEntity<StandardError> handleMethodNotSupported(HttpRequestMethodNotSupportedException ex) {
+    public ResponseEntity<StandardError> HttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
         return build(HttpStatus.BAD_REQUEST, "Method Not Allowed", ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<StandardError> handleValidation(MethodArgumentNotValidException ex) {
+    public ResponseEntity<StandardError> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         String message = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
@@ -36,52 +36,52 @@ public class GlobalExceptionHandlerController {
     }
 
     @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<StandardError> handleBadRequest(BadRequestException ex) {
+    public ResponseEntity<StandardError> handleBadRequestException(BadRequestException ex) {
         return build(HttpStatus.BAD_REQUEST, "Bad Request", ex.getMessage());
     }
 
     @ExceptionHandler(WebhookException.class)
-    public ResponseEntity<StandardError> handleWebhook(WebhookException ex) {
+    public ResponseEntity<StandardError> handleWebhookException(WebhookException ex) {
         return build(HttpStatus.BAD_REQUEST, "Webhook Error", ex.getMessage());
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<StandardError> handleBadCredentials(BadCredentialsException ex) {
+    public ResponseEntity<StandardError> handleBadCredentialsException(BadCredentialsException ex) {
         return build(HttpStatus.UNAUTHORIZED, "Unauthorized", "Invalid credentials");
     }
 
     @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<StandardError> handleAuthentication(AuthenticationException ex) {
+    public ResponseEntity<StandardError> handleAuthenticationException(AuthenticationException ex) {
         return build(HttpStatus.UNAUTHORIZED, "Unauthorized", ex.getMessage());
     }
 
     @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
-    public ResponseEntity<StandardError> handleSpringAccessDenied(org.springframework.security.access.AccessDeniedException ex) {
+    public ResponseEntity<StandardError> handleSpringAccessDeniedException(org.springframework.security.access.AccessDeniedException ex) {
         return build(HttpStatus.FORBIDDEN, "Forbidden", "You don't have permission to access this resource");
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<StandardError> handleAccessDenied(AccessDeniedException ex) {
+    public ResponseEntity<StandardError> handleAccessDeniedException(AccessDeniedException ex) {
         return build(HttpStatus.FORBIDDEN, "Forbidden", ex.getMessage());
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<StandardError> handleNotFound(ResourceNotFoundException ex) {
+    public ResponseEntity<StandardError> handleResourceNotFoundException(ResourceNotFoundException ex) {
         return build(HttpStatus.NOT_FOUND, "Not Found", ex.getMessage());
     }
 
     @ExceptionHandler(ConflictException.class)
-    public ResponseEntity<StandardError> handleConflict(ConflictException ex) {
+    public ResponseEntity<StandardError> handleConflictException(ConflictException ex) {
         return build(HttpStatus.CONFLICT, "Conflict", ex.getMessage());
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<StandardError> handleDataIntegrity(DataIntegrityViolationException ex) {
-        return build(HttpStatus.CONFLICT, "Conflict", "This record cannot be deleted because it is referenced by other records");
+    public ResponseEntity<StandardError> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+        return build(HttpStatus.CONFLICT, "Conflict", ex.getMessage());
     }
 
     @ExceptionHandler(ProductOutOfStockException.class)
-    public ResponseEntity<StandardError> handleOutOfStock(ProductOutOfStockException ex) {
+    public ResponseEntity<StandardError> handleProductOutOfStockException(ProductOutOfStockException ex) {
         return build(HttpStatus.UNPROCESSABLE_ENTITY, "Out of Stock", ex.getMessage());
     }
 

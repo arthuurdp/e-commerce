@@ -1,17 +1,17 @@
-package com.arthuurdp.e_commerce.infrastructure.security.annotations;
+package com.arthuurdp.e_commerce.shared.validators.annotations;
 
-import com.arthuurdp.e_commerce.infrastructure.security.CpfValidator;
+import com.arthuurdp.e_commerce.shared.validators.PhoneValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
 import java.lang.annotation.*;
 
 @Documented
-@Constraint(validatedBy = CpfValidator.class)
+@Constraint(validatedBy = PhoneValidator.class)
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ValidCpf {
-    String message() default "Invalid CPF";
+public @interface ValidPhone {
+    String message() default "Invalid Phone";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

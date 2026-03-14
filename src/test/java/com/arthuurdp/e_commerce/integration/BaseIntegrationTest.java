@@ -1,5 +1,6 @@
 package com.arthuurdp.e_commerce.integration;
 
+import com.arthuurdp.e_commerce.infrastructure.security.RateLimitFilter;
 import com.arthuurdp.e_commerce.modules.auth.dtos.LoginRequest;
 import com.arthuurdp.e_commerce.modules.auth.dtos.LoginResponse;
 import com.arthuurdp.e_commerce.modules.cart.CartRepository;
@@ -46,6 +47,7 @@ public abstract class BaseIntegrationTest {
     @Autowired protected CategoryRepository categoryRepository;
     @Autowired protected CartRepository cartRepository;
     @Autowired protected PasswordEncoder passwordEncoder;
+    @Autowired protected RateLimitFilter rateLimitFilter;
 
     @MockitoBean
     protected JavaMailSender javaMailSender;
@@ -61,6 +63,11 @@ public abstract class BaseIntegrationTest {
         savedAdmin = createUser("admin@test.com", "11144477735", Role.ROLE_ADMIN, true);
         savedCategory = createCategory("Electronics");
         savedProduct  = createProduct(savedCategory, 10);
+    }
+
+    @BeforeEach
+    void resetRateLimit() {
+        rateLimitFilter.clearBuckets();
     }
 
     protected User createUser(String email, String cpf, Role role, boolean emailVerified) {

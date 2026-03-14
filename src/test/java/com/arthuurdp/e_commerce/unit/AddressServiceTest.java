@@ -91,7 +91,7 @@ class AddressServiceTest {
             when(addressRepository.findByIdAndUserId(1L, 1L)).thenReturn(Optional.of(address));
             when(mapper.toAddressResponse(address)).thenReturn(addressResponse);
 
-            AddressResponse response = addressService.findById(1L, 1L);
+            AddressResponse response = addressService.findById(1L, user);
 
             assertThat(response).isEqualTo(addressResponse);
             verify(addressRepository).findByIdAndUserId(1L, 1L);
@@ -102,7 +102,7 @@ class AddressServiceTest {
         void shouldThrowWhenAddressNotFound() {
             when(addressRepository.findByIdAndUserId(99L, 1L)).thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> addressService.findById(99L, 1L)).isInstanceOf(ResourceNotFoundException.class).hasMessage("Address not found");
+            assertThatThrownBy(() -> addressService.findById(99L, user)).isInstanceOf(ResourceNotFoundException.class).hasMessage("Address not found");
         }
     }
 
@@ -117,7 +117,7 @@ class AddressServiceTest {
             when(addressRepository.findByUserId(any(PageRequest.class), eq(1L))).thenReturn(addressPage);
             when(mapper.toAddressResponse(address)).thenReturn(addressResponse);
 
-            Page<AddressResponse> result = addressService.findAll(0, 10, 1L);
+            Page<AddressResponse> result = addressService.findAll(0, 10, user);
 
             assertThat(result.getContent()).hasSize(1);
             assertThat(result.getContent().get(0)).isEqualTo(addressResponse);
@@ -128,7 +128,7 @@ class AddressServiceTest {
         void shouldReturnEmptyPage() {
             when(addressRepository.findByUserId(any(PageRequest.class), eq(1L))).thenReturn(Page.empty());
 
-            Page<AddressResponse> result = addressService.findAll(0, 10, 1L);
+            Page<AddressResponse> result = addressService.findAll(0, 10, user);
 
             assertThat(result.getContent()).isEmpty();
         }

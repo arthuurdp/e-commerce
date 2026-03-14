@@ -1,6 +1,6 @@
-package com.arthuurdp.e_commerce.infrastructure.security;
+package com.arthuurdp.e_commerce.shared.validators;
 
-import com.arthuurdp.e_commerce.infrastructure.security.annotations.ValidCpf;
+import com.arthuurdp.e_commerce.shared.validators.annotations.ValidCpf;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

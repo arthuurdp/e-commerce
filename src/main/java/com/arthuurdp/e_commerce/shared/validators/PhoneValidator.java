@@ -1,6 +1,6 @@
-package com.arthuurdp.e_commerce.infrastructure.security;
+package com.arthuurdp.e_commerce.shared.validators;
 
-import com.arthuurdp.e_commerce.infrastructure.security.annotations.ValidPhone;
+import com.arthuurdp.e_commerce.shared.validators.annotations.ValidPhone;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

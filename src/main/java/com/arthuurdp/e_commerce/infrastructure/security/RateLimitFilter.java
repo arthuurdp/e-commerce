@@ -66,6 +66,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
                     "Too Many Requests",
                     "You have exceeded the rate limit for this resource"
                     );
+
             response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setCharacterEncoding("UTF-8");
@@ -79,5 +80,9 @@ public class RateLimitFilter extends OncePerRequestFilter {
             return forwarded.split(",")[0].trim();
         }
         return request.getRemoteAddr();
+    }
+
+    public void clearBuckets() {
+        BUCKETS.clear();
     }
 }

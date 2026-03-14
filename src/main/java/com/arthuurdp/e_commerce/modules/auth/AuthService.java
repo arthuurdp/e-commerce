@@ -8,6 +8,7 @@ import com.arthuurdp.e_commerce.modules.auth.dtos.LoginResponse;
 import com.arthuurdp.e_commerce.modules.auth.dtos.RegisterRequest;
 import com.arthuurdp.e_commerce.modules.auth.dtos.RegisterResponse;
 import com.arthuurdp.e_commerce.modules.user.enums.Role;
+import com.arthuurdp.e_commerce.shared.CpfUtils;
 import com.arthuurdp.e_commerce.shared.exceptions.ConflictException;
 import com.arthuurdp.e_commerce.infrastructure.security.TokenService;
 import com.arthuurdp.e_commerce.modules.user.UserRepository;
@@ -50,7 +51,7 @@ public class AuthService {
     }
 
     private RegisterResponse createUser(RegisterRequest req, Role role) {
-        if (userRepository.existsByEmail(req.email()) || userRepository.existsByCpf(req.cpf())) {
+        if (userRepository.existsByEmail(req.email()) || userRepository.existsByCpf(CpfUtils.normalize(req.cpf()))) {
             throw new ConflictException("E-mail or CPF already in use");
         }
 
@@ -59,7 +60,7 @@ public class AuthService {
                 req.lastName(),
                 req.email(),
                 passwordEncoder.encode(req.password()),
-                req.cpf(),
+                CpfUtils.normalize(req.cpf()),
                 req.phone(),
                 req.birthDate(),
                 req.gender(),
