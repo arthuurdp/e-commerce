@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.Instant;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -26,13 +28,20 @@ public class GlobalExceptionHandlerController {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<StandardError> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
-        String message = ex.getBindingResult()
+    public ResponseEntity<ValidationError> handleMethodArgumentNotValidException(
+            MethodArgumentNotValidException ex) {
+
+        Map<String, String> fields = new LinkedHashMap<>();
+        ex.getBindingResult()
                 .getFieldErrors()
-                .stream()
-                .map(FieldError::getDefaultMessage)
-                .collect(Collectors.joining(", "));
-        return build(HttpStatus.BAD_REQUEST, "Validation Error", message);
+                .forEach(error -> fields.put(error.getField(), error.getDefaultMessage()));
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ValidationError(
+                Instant.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Validation Error",
+                fields
+        ));
     }
 
     @ExceptionHandler(BadRequestException.class)
