@@ -1,4 +1,4 @@
-package com.arthuurdp.e_commerce.modules.shipping;
+package com.arthuurdp.e_commerce.modules.cart;
 
 import com.arthuurdp.e_commerce.modules.shipping.client.MelhorEnvioClient;
 import com.arthuurdp.e_commerce.modules.shipping.dtos.FreightResponse;
@@ -6,7 +6,6 @@ import com.arthuurdp.e_commerce.modules.cart.entity.Cart;
 import com.arthuurdp.e_commerce.modules.user.entity.User;
 import com.arthuurdp.e_commerce.shared.exceptions.BadRequestException;
 import com.arthuurdp.e_commerce.shared.exceptions.ResourceNotFoundException;
-import com.arthuurdp.e_commerce.modules.cart.CartRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

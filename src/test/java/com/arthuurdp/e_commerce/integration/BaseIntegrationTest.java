@@ -1,6 +1,13 @@
 package com.arthuurdp.e_commerce.integration;
 
 import com.arthuurdp.e_commerce.infrastructure.security.RateLimitFilter;
+import com.arthuurdp.e_commerce.modules.address.CityRepository;
+import com.arthuurdp.e_commerce.modules.address.StateRepository;
+import com.arthuurdp.e_commerce.modules.address.client.ViaCepClient;
+import com.arthuurdp.e_commerce.modules.address.entity.City;
+import com.arthuurdp.e_commerce.modules.address.entity.State;
+import com.arthuurdp.e_commerce.modules.address.enums.Region;
+import com.arthuurdp.e_commerce.modules.payment.PaymentService;
 import com.arthuurdp.e_commerce.modules.auth.dtos.LoginRequest;
 import com.arthuurdp.e_commerce.modules.auth.dtos.LoginResponse;
 import com.arthuurdp.e_commerce.modules.cart.CartRepository;
@@ -14,6 +21,7 @@ import com.arthuurdp.e_commerce.modules.user.entity.User;
 import com.arthuurdp.e_commerce.modules.user.enums.Gender;
 import com.arthuurdp.e_commerce.modules.user.enums.Role;
 import com.arthuurdp.e_commerce.modules.cart.entity.Cart;
+import com.arthuurdp.e_commerce.modules.shipping.client.MelhorEnvioClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +29,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,9 +56,20 @@ public abstract class BaseIntegrationTest {
     @Autowired protected CartRepository cartRepository;
     @Autowired protected PasswordEncoder passwordEncoder;
     @Autowired protected RateLimitFilter rateLimitFilter;
+    @Autowired protected StateRepository stateRepository;
+    @Autowired protected CityRepository cityRepository;
 
     @MockitoBean
     protected JavaMailSender javaMailSender;
+
+    @MockitoBean
+    protected MelhorEnvioClient melhorEnvioClient;
+
+    @MockitoBean
+    protected ViaCepClient viaCepClient;
+
+    @MockitoSpyBean
+    protected PaymentService paymentService;
 
     protected User savedUser;
     protected User savedAdmin;
@@ -63,6 +82,17 @@ public abstract class BaseIntegrationTest {
         savedAdmin = createUser("admin@test.com", "11144477735", Role.ROLE_ADMIN, true);
         savedCategory = createCategory("Electronics");
         savedProduct  = createProduct(savedCategory, 10);
+        
+        State state = new State();
+        state.setName("Teste State");
+        state.setUf("TS");
+        state.setRegion(Region.SOUTH);
+        stateRepository.save(state);
+
+        City city = new City();
+        city.setName("Teste City");
+        city.setState(state);
+        cityRepository.save(city);
     }
 
     @BeforeEach

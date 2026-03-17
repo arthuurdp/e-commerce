@@ -31,12 +31,13 @@ public class PaymentService {
 
     @Transactional
     public Payment createPayment(Order order, PaymentMethod method) {
-        Payment payment = new Payment(
-                order,
-                method,
-                order.getTotal()
-      );
-        return paymentRepository.save(payment);
+        Payment payment = new Payment();
+        payment.setOrder(order);
+        payment.setMethod(method);
+        payment.setAmount(order.getTotal());
+        payment = paymentRepository.saveAndFlush(payment);
+        order.setPayment(payment);
+        return payment;
     }
 
     public Session createStripeSession(Order order, User user, Cart cart, PaymentMethod method) throws StripeException {
@@ -75,7 +76,7 @@ public class PaymentService {
     @Transactional
     public void updateTransactionId(Payment payment, String transactionId) {
         payment.setTransactionId(transactionId);
-        paymentRepository.save(payment);
+        paymentRepository.saveAndFlush(payment);
     }
 
     private List<SessionCreateParams.PaymentMethodType> resolvePaymentMethods(PaymentMethod method) {

@@ -50,7 +50,7 @@ public class WebhookHandlerService {
 
         Order order = orderRepository.findById(Long.parseLong(orderId)).orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
-        Payment payment = order.getPayment();
+        Payment payment = paymentRepository.findByOrderId(order.getId()).orElseThrow(() -> new ResourceNotFoundException("Payment not found for order"));
 
         String paymentStatus = session.getPaymentStatus();
         log.info("Session {} paymentStatus: {}", session.getId(), paymentStatus);

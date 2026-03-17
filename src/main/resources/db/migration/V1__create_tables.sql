@@ -120,29 +120,29 @@ CREATE TABLE cart_items (
     CONSTRAINT fk_cart_items_product FOREIGN KEY (product_id) REFERENCES products(id)
 );
 
-CREATE TABLE payments (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    method VARCHAR(255),
-    status VARCHAR(255) NOT NULL,
-    amount DECIMAL(19, 2) NOT NULL,
-    transaction_id VARCHAR(255),
-    paid_at DATETIME,
-    created_at DATETIME NOT NULL
-);
-
 CREATE TABLE orders (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
     address_id BIGINT NOT NULL,
     status VARCHAR(255) NOT NULL,
     total DECIMAL(19, 2) NOT NULL,
-    payment_id BIGINT,
     origin_state_id BIGINT NOT NULL,
     created_at DATETIME,
     CONSTRAINT fk_orders_user FOREIGN KEY (user_id) REFERENCES users(id),
     CONSTRAINT fk_orders_address FOREIGN KEY (address_id) REFERENCES address(id),
-    CONSTRAINT fk_orders_payment FOREIGN KEY (payment_id) REFERENCES payments(id),
     CONSTRAINT fk_orders_origin_state FOREIGN KEY (origin_state_id) REFERENCES states(id)
+);
+
+CREATE TABLE payments (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    order_id BIGINT,
+    method VARCHAR(255),
+    status VARCHAR(255) NOT NULL,
+    amount DECIMAL(19, 2) NOT NULL,
+    transaction_id VARCHAR(255),
+    paid_at DATETIME,
+    created_at DATETIME NOT NULL,
+    CONSTRAINT fk_payments_order FOREIGN KEY (order_id) REFERENCES orders(id)
 );
 
 CREATE TABLE order_items (

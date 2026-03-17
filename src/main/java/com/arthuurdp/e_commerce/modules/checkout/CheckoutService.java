@@ -44,7 +44,6 @@ public class CheckoutService {
 
         Order order = orderService.createOrder(user, address, cart);
         Payment payment = paymentService.createPayment(order, req.paymentMethod());
-        order.setPayment(payment);
 
         Session session = paymentService.createStripeSession(order, user, cart, req.paymentMethod());
 
