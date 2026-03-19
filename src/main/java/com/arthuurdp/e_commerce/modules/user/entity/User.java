@@ -38,7 +38,7 @@ public class User {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "newPassword", nullable = false)
+    @Column(name = "password", nullable = false)
     private String password;
 
     @Column(name = "cpf", unique = true, length = 11)

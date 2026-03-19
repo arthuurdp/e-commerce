@@ -19,7 +19,7 @@ public class PasswordVerificationToken {
     @Column(name = "id")
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "code", nullable = false, unique = true)
     private String code;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -29,7 +29,7 @@ public class PasswordVerificationToken {
     @Column(name = "pending_password", nullable = false)
     private String pendingPassword;
 
-    @Column(name = "expiresAt", nullable = false)
+    @Column(name = "expires_at", nullable = false)
     private LocalDateTime expiresAt;
 
     @Column(name = "used", nullable = false)

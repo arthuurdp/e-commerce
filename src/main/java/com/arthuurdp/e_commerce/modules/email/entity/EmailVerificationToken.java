@@ -19,20 +19,20 @@ public class EmailVerificationToken {
     @Column(name = "id")
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "code", nullable = false, unique = true)
     private String code;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(nullable = false)
+    @Column(name = "pending_email", nullable = false)
     private String pendingEmail;
 
-    @Column(nullable = false)
+    @Column(name = "expires_at", nullable = false)
     private LocalDateTime expiresAt;
 
-    @Column(nullable = false)
+    @Column(name = "used", nullable = false)
     private boolean used = false;
 
     @PrePersist

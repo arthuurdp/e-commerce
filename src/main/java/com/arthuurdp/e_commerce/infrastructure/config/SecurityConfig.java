@@ -49,6 +49,7 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.POST, "/password/forgot").permitAll()
                         .requestMatchers(HttpMethod.POST, "/password/reset").permitAll()
+                        .requestMatchers(HttpMethod.POST, "password/set").permitAll()
 
                         .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()

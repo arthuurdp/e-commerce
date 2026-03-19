@@ -19,7 +19,7 @@ public class PasswordResetToken {
     @Column(name = "id")
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "code", nullable = false, unique = true)
     private String code;
 
     @ManyToOne(fetch = FetchType.LAZY)
