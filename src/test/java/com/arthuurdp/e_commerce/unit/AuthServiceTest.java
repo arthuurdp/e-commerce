@@ -116,7 +116,7 @@ class AuthServiceTest {
         }
 
         @Test
-        @DisplayName("encodes password before saving")
+        @DisplayName("encodes newPassword before saving")
         void shouldEncodePasswordBeforeSaving() {
             when(userRepository.existsByEmail(any())).thenReturn(false);
             when(userRepository.existsByCpf(any())).thenReturn(false);

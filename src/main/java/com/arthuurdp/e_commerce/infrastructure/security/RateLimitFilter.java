@@ -25,7 +25,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
     private static final Map<String, int[]> LIMITS = Map.of(
             "/auth/login",          new int[]{5, 1},
-            "/password/forgot",     new int[]{5, 1},
+            "/newPassword/forgot",     new int[]{5, 1},
             "/verify-email/send",   new int[]{5, 1}
     );
 

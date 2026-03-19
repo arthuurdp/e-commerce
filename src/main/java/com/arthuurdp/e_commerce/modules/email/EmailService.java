@@ -113,7 +113,7 @@ public class EmailService {
         }
 
         if (passwordEncoder.matches(newPassword, user.getPassword())) {
-            throw new BadRequestException("Please set a different password");
+            throw new BadRequestException("Please set a different newPassword");
         }
 
         passwordVerificationTokenRepository.deleteByUserId(user.getId());
@@ -160,6 +160,15 @@ public class EmailService {
     }
 
     @Transactional
+    public void confirmResetCode(String code) {
+        PasswordResetToken token = passwordResetTokenRepository.findByCodeAndUsedFalse(code).orElseThrow(() -> new ResourceNotFoundException("Invalid or already used code"));
+
+        if (token.isExpired()) {
+            throw new BadRequestException("Code has expired");
+        }
+    }
+
+    @Transactional
     public void confirmPasswordReset(String code, String newPassword) {
         PasswordResetToken token = passwordResetTokenRepository.findByCodeAndUsedFalse(code).orElseThrow(() -> new ResourceNotFoundException("Invalid or already used code"));
 
@@ -168,11 +177,6 @@ public class EmailService {
         }
 
         User user = token.getUser();
-
-        if (passwordEncoder.matches(newPassword, user.getPassword())) {
-            throw new BadRequestException("New password must be different from your current password");
-        }
-
         user.setPassword(passwordEncoder.encode(newPassword));
         token.setUsed(true);
 

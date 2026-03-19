@@ -33,9 +33,9 @@ public class EmailSenderService {
     public void sendPasswordVerificationCode(String to, String code) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
-        message.setSubject("Your password change code");
+        message.setSubject("Your newPassword change code");
         message.setText("""
-                You requested a password change. Here is your confirmation code:
+                You requested a newPassword change. Here is your confirmation code:
 
                 ── CONFIRMATION CODE ───────────────────────
                 %s
@@ -79,9 +79,9 @@ public class EmailSenderService {
     public void sendPasswordChanged(String to) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
-        message.setSubject("Your password has been updated");
+        message.setSubject("Your newPassword has been updated");
         message.setText("""
-                This is a confirmation that your account password has been changed successfully.
+                This is a confirmation that your account newPassword has been changed successfully.
 
                 If you did not make this change, please contact us immediately by replying to this email.
                 """);
@@ -91,16 +91,16 @@ public class EmailSenderService {
     public void sendPasswordResetCode(String to, String code) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
-        message.setSubject("Reset your password");
+        message.setSubject("Reset your newPassword");
         message.setText("""
-                You requested a password reset. Here is your code:
+                You requested a newPassword reset. Here is your code:
 
                 ── RESET CODE ──────────────────────────────
                 %s
                 ────────────────────────────────────────────
 
                 This code expires in 15 minutes.
-                If you didn't request a password reset, you can safely ignore this email.
+                If you didn't request a newPassword reset, you can safely ignore this email.
                 """.formatted(code));
         sender.send(message);
     }

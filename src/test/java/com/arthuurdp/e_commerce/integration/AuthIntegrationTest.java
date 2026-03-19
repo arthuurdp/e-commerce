@@ -120,7 +120,7 @@ class AuthIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("returns 401 when password is wrong")
+        @DisplayName("returns 401 when newPassword is wrong")
         void shouldReturnUnauthorizedWhenPasswordIsWrong() throws Exception {
             LoginRequest req = new LoginRequest("user@test.com", "wrongpassword");
 

@@ -2,7 +2,6 @@ package com.arthuurdp.e_commerce.modules.email;
 
 import com.arthuurdp.e_commerce.infrastructure.security.UserAuthenticated;
 import com.arthuurdp.e_commerce.modules.email.dtos.*;
-import com.arthuurdp.e_commerce.modules.user.entity.User;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -58,7 +57,7 @@ public class EmailController {
             @RequestBody @Valid ChangePasswordRequest req,
             @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        service.requestPasswordChange(req.password(), authenticatedUser.getUser());
+        service.requestPasswordChange(req.newPassword(), authenticatedUser.getUser());
         return ResponseEntity.ok(Map.of("message", "A confirmation code has been sent to your email!"));
     }
 
@@ -81,6 +80,14 @@ public class EmailController {
 
     @PostMapping("/password/reset")
     public ResponseEntity<Map<String, String>> resetPassword(
+            @RequestBody @Valid VerifyCodeRequest req
+    ) {
+        service.confirmResetCode(req.code());
+        return ResponseEntity.ok(Map.of("message", "Code verified successfully!"));
+    }
+
+    @PostMapping("/password/set")
+    public ResponseEntity<Map<String, String>> setPassword(
             @RequestBody @Valid ResetPasswordRequest req
     ) {
         service.confirmPasswordReset(req.code(), req.newPassword());
