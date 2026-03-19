@@ -32,9 +32,12 @@ public class PasswordResetToken {
     @Column(name = "used", nullable = false)
     private boolean used = false;
 
+    @Column(name = "verified", nullable = false)
+    private boolean verified = false;
+
     @PrePersist
     public void prePersist() {
-        this.expiresAt = LocalDateTime.now().plusMinutes(15);
+        this.expiresAt = LocalDateTime.now().plusMinutes(5);
     }
 
     public PasswordResetToken(String code, User user) {

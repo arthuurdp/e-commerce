@@ -148,7 +148,7 @@ public class EmailService {
 
     @Transactional
     public void requestPasswordReset(String email) {
-        User user = userRepository.findByEmail(email.toLowerCase()).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User user = userRepository.findByEmail(email.toLowerCase()).orElseThrow(() -> new ResourceNotFoundException("Please enter a registered e-mail"));
 
         passwordResetTokenRepository.deleteByUserId(user.getId());
 
@@ -166,11 +166,14 @@ public class EmailService {
         if (token.isExpired()) {
             throw new BadRequestException("Code has expired");
         }
+
+        token.setVerified(true);
+        passwordResetTokenRepository.save(token);
     }
 
     @Transactional
-    public void confirmPasswordReset(String code, String newPassword) {
-        PasswordResetToken token = passwordResetTokenRepository.findByCodeAndUsedFalse(code).orElseThrow(() -> new ResourceNotFoundException("Invalid or already used code"));
+    public void confirmPasswordReset(String newPassword) {
+        PasswordResetToken token = passwordResetTokenRepository.findByVerifiedTrueAndUsedFalse().orElseThrow(() -> new ConflictException("No pending password reset code"));
 
         if (token.isExpired()) {
             throw new BadRequestException("Code has expired");

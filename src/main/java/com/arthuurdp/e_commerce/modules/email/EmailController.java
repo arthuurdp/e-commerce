@@ -90,7 +90,7 @@ public class EmailController {
     public ResponseEntity<Map<String, String>> setPassword(
             @RequestBody @Valid ResetPasswordRequest req
     ) {
-        service.confirmPasswordReset(req.code(), req.newPassword());
+        service.confirmPasswordReset(req.newPassword());
         return ResponseEntity.ok(Map.of("message", "Password reset successfully!"));
     }
 }
