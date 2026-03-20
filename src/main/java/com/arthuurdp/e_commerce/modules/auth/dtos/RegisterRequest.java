@@ -22,6 +22,7 @@ public record RegisterRequest(
         String email,
 
         @NotBlank(message = "Password is required")
+        @Size(min = 6, message = "Password must have at least 6 chars")
         String password,
 
         @NotBlank(message = "CPF is required")

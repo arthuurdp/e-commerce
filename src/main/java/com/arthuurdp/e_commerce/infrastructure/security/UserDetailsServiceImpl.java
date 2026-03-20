@@ -22,9 +22,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return isCpf ?
                 repo.findByCpf(CpfUtils.normalize(credential))
                         .map(UserAuthenticated::new)
-                        .orElseThrow(() -> new UsernameNotFoundException("Invalid credentials")) :
+                        .orElseThrow(() -> new UsernameNotFoundException("Wrong credentials")) :
                 repo.findByEmail(credential.toLowerCase())
                         .map(UserAuthenticated::new)
-                        .orElseThrow(() -> new UsernameNotFoundException("Invalid credentials"));
+                        .orElseThrow(() -> new UsernameNotFoundException("Wrong credentials"));
     }
 }
