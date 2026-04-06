@@ -45,8 +45,6 @@ class CityServiceTest {
         city = new City();
         city.setId(1L);
         city.setName("São Paulo");
-
-        cityResponse = new CityResponse(1L, "São Paulo");
     }
 
     @Nested

@@ -69,12 +69,6 @@ class AddressServiceTest {
         address.setCity(city);
         address.setUser(user);
 
-        addressResponse = new AddressResponse(
-                1L, "Home", "Main St", 100, "Apt 1", "Downtown",
-                new CityResponse(10L, "São Paulo"),
-                new StateResponse(1L, "São Paulo", "SP")
-        );
-
         cepLookup = new CepLookupResponse(
                 "01310100", "Main St", "Downtown",
                 10L, "São Paulo",

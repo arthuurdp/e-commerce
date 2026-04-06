@@ -15,6 +15,7 @@ public interface AddressMapper {
     @Mapping(target = "state", source = "city.state")
     AddressResponse toAddressResponse(Address address);
 
+    @Mapping(target = "state", source = "state")
     CityResponse toCityResponse(City city);
 
     StateResponse toStateResponse(State state);
