@@ -17,12 +17,11 @@ public class CityController {
 
     @GetMapping
     public ResponseEntity<Page<CityResponse>> searchCities(
-            @RequestParam Long stateId,
             @RequestParam String query,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ){
-        return ResponseEntity.ok().body(service.searchCities(stateId, query, page, size));
+        return ResponseEntity.ok().body(service.searchCities(query, page, size));
     }
 
     @GetMapping("/{id}")

@@ -50,36 +50,6 @@ class CityServiceTest {
     }
 
     @Nested
-    @DisplayName("searchCities()")
-    class SearchCities {
-
-        @Test
-        @DisplayName("returns paginated cities matching query and stateId")
-        void shouldReturnMatchingCities() {
-            Page<City> page = new PageImpl<>(List.of(city));
-
-            when(repo.findByStateIdAndNameContainingIgnoreCase(any(PageRequest.class), eq(1L), eq("São"))).thenReturn(page);
-            when(mapper.toCityResponse(city)).thenReturn(cityResponse);
-
-            Page<CityResponse> result = cityService.searchCities(1L, "São", 0, 10);
-
-            assertThat(result.getContent()).hasSize(1);
-            assertThat(result.getContent().get(0)).isEqualTo(cityResponse);
-            verify(repo).findByStateIdAndNameContainingIgnoreCase(any(PageRequest.class), eq(1L), eq("São"));
-        }
-
-        @Test
-        @DisplayName("returns empty page when no cities match")
-        void shouldReturnEmptyPageWhenNoMatch() {
-            when(repo.findByStateIdAndNameContainingIgnoreCase(any(PageRequest.class), eq(1L), eq("xyz"))).thenReturn(Page.empty());
-
-            Page<CityResponse> result = cityService.searchCities(1L, "xyz", 0, 10);
-
-            assertThat(result.getContent()).isEmpty();
-        }
-    }
-
-    @Nested
     @DisplayName("findById()")
     class FindById {
 

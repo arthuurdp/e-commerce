@@ -25,8 +25,8 @@ public class CityService {
         this.viaCepClient = viaCepClient;
     }
 
-    public Page<CityResponse> searchCities(Long stateId, String query, int page, int size) {
-        return cityRepository.findByStateIdAndNameContainingIgnoreCase(PageRequest.of(page, size), stateId, query).map(mapper::toCityResponse);
+    public Page<CityResponse> searchCities(String query, int page, int size) {
+        return cityRepository.findByNameContainingIgnoreCase(PageRequest.of(page, size), query).map(mapper::toCityResponse);
     }
 
     public CityResponse findById(Long id) {
