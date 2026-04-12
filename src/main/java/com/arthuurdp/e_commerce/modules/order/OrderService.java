@@ -19,6 +19,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 @Service
 public class OrderService {
     private final OrderRepository repo;
@@ -48,27 +50,24 @@ public class OrderService {
     }
 
     @Transactional
-    public Order createOrder(User user, Address address, Cart cart) {
+    public Order createOrder(User user, Address address, Cart cart, BigDecimal totalWithFreight) {
         Order order = new Order(
                 user,
                 address,
                 OrderStatus.PENDING,
-                cart.total(),
+                totalWithFreight,
                 address.getCity().getState()
         );
 
         for (CartItem cartItem : cart.getItems()) {
             Product product = cartItem.getProduct();
-
             productService.decreaseStock(product, cartItem.getQuantity());
-
             OrderItem orderItem = new OrderItem(
                     order,
                     product,
                     cartItem.getQuantity(),
                     product.getPrice()
             );
-
             order.getItems().add(orderItem);
         }
         return repo.save(order);

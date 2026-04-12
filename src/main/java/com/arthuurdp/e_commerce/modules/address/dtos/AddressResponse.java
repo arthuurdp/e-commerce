@@ -7,6 +7,7 @@ public record AddressResponse(
         Integer number,
         String complement,
         String neighborhood,
+        String postalCode,
         CityResponse city,
         StateResponse state
 ) {}

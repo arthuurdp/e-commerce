@@ -1,5 +1,6 @@
 package com.arthuurdp.e_commerce.modules.product;
 
+import com.arthuurdp.e_commerce.modules.category.dtos.CategoryResponse;
 import com.arthuurdp.e_commerce.modules.product.entity.Product;
 import com.arthuurdp.e_commerce.modules.product.entity.ProductImage;
 import com.arthuurdp.e_commerce.modules.product.entity.ProductSpecification;
@@ -37,6 +38,27 @@ public class ProductService {
         );
 
         return repo.findAll(spec, PageRequest.of(page, size)).map(mapper::toProductResponse);
+    }
+
+    @Transactional
+    public List<HomeProductsResponse> findHomeProducts(int productsPerCategory) {
+        return categoryService.findAllEntities().stream()
+                .map(category -> {
+                    Specification<Product> spec = ProductSpecification.inCategories(
+                            List.of(category.getId())
+                    );
+                    List<ProductResponse> products = repo
+                            .findAll(spec, PageRequest.of(0, productsPerCategory))
+                            .stream()
+                            .map(mapper::toProductResponse)
+                            .toList();
+                    return new HomeProductsResponse(
+                            new CategoryResponse(category.getId(), category.getName()),
+                            products
+                    );
+                })
+                .filter(group -> !group.products().isEmpty())
+                .toList();
     }
 
     @Transactional

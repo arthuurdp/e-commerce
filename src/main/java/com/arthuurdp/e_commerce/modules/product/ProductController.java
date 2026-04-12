@@ -30,6 +30,13 @@ public class ProductController {
         return ResponseEntity.ok().body(service.findAll(page, size, name, categoryIds));
     }
 
+    @GetMapping("/home")
+    public ResponseEntity<List<HomeProductsResponse>> getHomeProducts(
+            @RequestParam(defaultValue = "10") int productsPerCategory
+    ) {
+        return ResponseEntity.ok().body(service.findHomeProducts(productsPerCategory));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ProductDetailsResponse> findById(
             @PathVariable Long id

@@ -40,23 +40,43 @@ public class PaymentService {
         return payment;
     }
 
-    public Session createStripeSession(Order order, User user, Cart cart, PaymentMethod method) throws StripeException {
-        List<SessionCreateParams.LineItem> lineItems = cart.getItems().stream()
-                .map(item -> SessionCreateParams.LineItem.builder()
-                        .setQuantity((long) item.getQuantity())
-                        .setPriceData(SessionCreateParams.LineItem.PriceData.builder()
-                                .setCurrency("brl")
-                                .setUnitAmount(item.getProduct().getPrice()
-                                        .multiply(BigDecimal.valueOf(100))
-                                        .longValue())
-                                .setProductData(SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                        .setName(item.getProduct().getName())
-                                        .setDescription(item.getProduct().getDescription())
-                                        .addImage(item.getProduct().getMainImageUrl())
+    public Session createStripeSession(Order order, User user, Cart cart, PaymentMethod method, BigDecimal freightPrice, String freightName) throws StripeException {
+        List<SessionCreateParams.LineItem> lineItems = new java.util.ArrayList<>(
+                cart.getItems().stream()
+                        .map(item -> SessionCreateParams.LineItem.builder()
+                                .setQuantity((long) item.getQuantity())
+                                .setPriceData(SessionCreateParams.LineItem.PriceData.builder()
+                                        .setCurrency("brl")
+                                        .setUnitAmount(item.getProduct().getPrice()
+                                                .multiply(BigDecimal.valueOf(100))
+                                                .longValue())
+                                        .setProductData(SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                                                .setName(item.getProduct().getName())
+                                                .setDescription(item.getProduct().getDescription())
+                                                .addImage(item.getProduct().getMainImageUrl())
+                                                .build())
                                         .build())
                                 .build())
-                        .build())
-                .toList();
+                        .toList()
+        );
+
+        if (freightPrice != null && freightPrice.compareTo(BigDecimal.ZERO) > 0) {
+            lineItems.add(
+                    SessionCreateParams.LineItem.builder()
+                            .setQuantity(1L)
+                            .setPriceData(SessionCreateParams.LineItem.PriceData.builder()
+                                    .setCurrency("brl")
+                                    .setUnitAmount(freightPrice
+                                            .multiply(BigDecimal.valueOf(100))
+                                            .longValue())
+                                    .setProductData(SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                                            .setName("Frete - " + freightName)
+                                            .setDescription("Custo de entrega")
+                                            .build())
+                                    .build())
+                            .build()
+            );
+        }
 
         List<SessionCreateParams.PaymentMethodType> paymentMethods = resolvePaymentMethods(method);
 
@@ -65,8 +85,8 @@ public class PaymentService {
                 .setCustomerEmail(user.getEmail())
                 .addAllPaymentMethodType(paymentMethods)
                 .addAllLineItem(lineItems)
-                .setSuccessUrl(successUrl + "?session_id={CHECKOUT_SESSION_ID}")
-                .setCancelUrl(failureUrl)
+                .setSuccessUrl(successUrl + "?orderId=" + order.getId())
+                .setCancelUrl(failureUrl + "?orderId=" + order.getId())
                 .putMetadata("orderId", order.getId().toString())
                 .build();
 
