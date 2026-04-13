@@ -7,5 +7,7 @@ public record ProductResponse(
         String name,
         String description,
         BigDecimal price,
-        String mainImage
+        String mainImage,
+        Double averageRating,
+        Long reviewCount
 ) {}

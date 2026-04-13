@@ -2,6 +2,7 @@ package com.arthuurdp.e_commerce.modules.user.entity;
 
 import com.arthuurdp.e_commerce.modules.address.entity.Address;
 import com.arthuurdp.e_commerce.modules.cart.entity.Cart;
+import com.arthuurdp.e_commerce.modules.product.entity.Product;
 import com.arthuurdp.e_commerce.modules.email.entity.EmailVerificationToken;
 import com.arthuurdp.e_commerce.modules.email.entity.PasswordVerificationToken;
 import com.arthuurdp.e_commerce.modules.user.enums.Gender;
@@ -82,6 +83,14 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PasswordVerificationToken> passwordTokens = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "favorites",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "product_id")
+    )
+    private Set<Product> favoriteProducts = new HashSet<>();
 
     public User(String firstName, String lastName, String email, String password, String cpf, String phone, LocalDate birthDate, Gender gender, Role role) {
         this.firstName = firstName;

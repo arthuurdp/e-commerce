@@ -15,5 +15,7 @@ public record ProductDetailsResponse(
         Integer width,
         Integer height,
         Integer length,
-        List<CategoryResponse> categories
+        List<CategoryResponse> categories,
+        Double averageRating,
+        Long reviewCount
 ) {}
