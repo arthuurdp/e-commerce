@@ -79,13 +79,6 @@ public class ProductService {
                 req.length()
         );
         product.addCategories(req.categoryIds().stream().map(categoryService::findEntityById).toList());
-        product.addImages(req.images().stream().map(mapper::toProductImage).toList());
-
-        if (req.mainImageId() != null) {
-            applyMainImage(product, req.mainImageId());
-        } else if (!product.getImages().isEmpty()) {
-            product.setMainImage(product.getImages().get(0));
-        }
 
         return mapper.toCreateResponse(repo.save(product));
     }
@@ -102,20 +95,6 @@ public class ProductService {
         Optional.ofNullable(req.width()).ifPresent(product::setWidth);
         Optional.ofNullable(req.height()).ifPresent(product::setHeight);
         Optional.ofNullable(req.length()).ifPresent(product::setLength);
-
-        if (req.imageUrls() != null) {
-            product.removeAllImages();
-            product.addImages(req.imageUrls().stream().map(mapper::toProductImage).toList());
-            repo.saveAndFlush(product);
-
-            if (req.mainImageId() != null) {
-                applyMainImage(product, req.mainImageId());
-            } else if (!product.getImages().isEmpty()) {
-                product.setMainImage(product.getImages().get(0));
-            }
-        } else if (req.mainImageId() != null) {
-            applyMainImage(product, req.mainImageId());
-        }
 
         if (req.categoryIds() != null) {
             product.removeAllCategories();
@@ -153,6 +132,24 @@ public class ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Image not found for this product"));
 
         product.setMainImage(image);
+        return mapper.toProductDetailsResponse(repo.save(product));
+    }
+
+    @Transactional
+    public ProductDetailsResponse addImages(Long id, List<String> fileNames) {
+        Product product = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+
+        List<ProductImage> images = fileNames.stream()
+                .map(fileName -> "/uploads/" + fileName)
+                .map(ProductImage::new)
+                .toList();
+
+        product.addImages(images);
+
+        if (product.getImages().size() == images.size()) {
+            product.setMainImage(product.getImages().get(0));
+        }
+
         return mapper.toProductDetailsResponse(repo.save(product));
     }
 

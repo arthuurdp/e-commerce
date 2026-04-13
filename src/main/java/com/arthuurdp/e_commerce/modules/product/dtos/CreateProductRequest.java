@@ -38,11 +38,6 @@ public record CreateProductRequest(
         @Positive(message = "Length must be positive")
         Integer length,
 
-        @NotEmpty(message = "Images are required")
-        List<@NotBlank(message = "Image URL cannot be blank") String> images,
-
-        Long mainImageId,
-
         @NotEmpty(message = "Categories are required")
         List<@NotNull(message = "Category cannot be null") Long> categoryIds
 ) {}

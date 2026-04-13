@@ -12,8 +12,6 @@ public record UpdateProductRequest(
         Integer width,
         Integer height,
         Integer length,
-        Long mainImageId,
-        List<String> imageUrls,
         List<Long> categoryIds
 ) {}
 

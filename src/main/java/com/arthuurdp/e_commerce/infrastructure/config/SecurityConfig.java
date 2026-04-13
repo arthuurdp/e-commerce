@@ -53,6 +53,7 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/webhook/stripe").permitAll()
                         .requestMatchers(HttpMethod.POST, "/webhooks/melhor-envio").permitAll()

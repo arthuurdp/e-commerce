@@ -71,13 +71,4 @@ public class ProductController {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
-
-    @PatchMapping("/{id}/main-image/{mainImageId}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ProductDetailsResponse> setMainImage(
-            @PathVariable Long id,
-            @PathVariable Long mainImageId
-    ) {
-        return ResponseEntity.ok().body(service.setMainImage(id, mainImageId));
-    }
 }
