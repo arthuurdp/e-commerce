@@ -59,7 +59,6 @@ public class HappyPathTest extends BaseIntegrationTest {
         Session mockStripeSession = mock(Session.class);
         when(mockStripeSession.getId()).thenReturn("cs_test_123");
         when(mockStripeSession.getUrl()).thenReturn("https://checkout.stripe.com/test");
-        doReturn(mockStripeSession).when(paymentService).createStripeSession(any(), any(), any(), any());
 
         // 1. Register
         RegisterRequest registerReq = new RegisterRequest(
