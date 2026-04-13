@@ -64,6 +64,9 @@ public class User {
     @Enumerated(value = EnumType.STRING)
     private Role role;
 
+    @Column(name = "profile_picture_url")
+    private String profilePictureUrl;
+
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id", nullable = false)
     private Cart cart;

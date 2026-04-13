@@ -12,5 +12,6 @@ public record UserResponse(
         String cpf,
         String phone,
         LocalDate birthDate,
-        Gender gender
+        Gender gender,
+        String profilePictureUrl
 ) {}

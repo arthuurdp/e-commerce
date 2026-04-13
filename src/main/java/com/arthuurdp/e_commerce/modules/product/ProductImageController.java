@@ -2,7 +2,6 @@ package com.arthuurdp.e_commerce.modules.product;
 
 import com.arthuurdp.e_commerce.modules.product.dtos.ProductDetailsResponse;
 import com.arthuurdp.e_commerce.shared.storage.FileStorageService;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -25,8 +24,7 @@ public class ProductImageController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductDetailsResponse> uploadImages(
             @PathVariable Long id,
-            @RequestParam("files") List<MultipartFile> files,
-            HttpServletRequest request
+            @RequestParam("files") List<MultipartFile> files
     ) {
 
         String baseUrl = "http://192.168.200.114:8080";

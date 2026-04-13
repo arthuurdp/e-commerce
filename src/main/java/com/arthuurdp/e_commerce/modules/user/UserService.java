@@ -6,6 +6,7 @@ import com.arthuurdp.e_commerce.modules.user.dtos.UserResponse;
 import com.arthuurdp.e_commerce.shared.exceptions.AccessDeniedException;
 import com.arthuurdp.e_commerce.shared.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.modules.user.mapper.UserMapper;
+import com.arthuurdp.e_commerce.shared.storage.FileStorageService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,10 +18,12 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository repo;
     private final UserMapper mapper;
+    private final FileStorageService fileStorageService;
 
-    public UserService(UserRepository repo, UserMapper mapper) {
+    public UserService(UserRepository repo, UserMapper mapper, FileStorageService fileStorageService) {
         this.repo = repo;
         this.mapper = mapper;
+        this.fileStorageService = fileStorageService;
     }
 
     public UserResponse findById(Long id, User user) {
@@ -57,6 +60,32 @@ public class UserService {
         User targetUser = repo.findById(user.getId()).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         updateUserHelper(req, targetUser);
+
+        return mapper.toResponse(repo.save(targetUser));
+    }
+
+    @Transactional
+    public UserResponse updateProfilePicture(String imageUrl, User user) {
+        User targetUser = repo.findById(user.getId()).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if (targetUser.getProfilePictureUrl() != null) {
+            String oldFileName = targetUser.getProfilePictureUrl().substring(targetUser.getProfilePictureUrl().lastIndexOf("/") + 1);
+            fileStorageService.deleteFile(oldFileName);
+        }
+
+        targetUser.setProfilePictureUrl(imageUrl);
+        return mapper.toResponse(repo.save(targetUser));
+    }
+
+    @Transactional
+    public UserResponse deleteProfilePicture(User user) {
+        User targetUser = repo.findById(user.getId()).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if (targetUser.getProfilePictureUrl() != null) {
+            String fileName = targetUser.getProfilePictureUrl().substring(targetUser.getProfilePictureUrl().lastIndexOf("/") + 1);
+            fileStorageService.deleteFile(fileName);
+            targetUser.setProfilePictureUrl(null);
+        }
 
         return mapper.toResponse(repo.save(targetUser));
     }
