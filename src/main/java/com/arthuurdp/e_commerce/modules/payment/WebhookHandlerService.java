@@ -1,5 +1,6 @@
 package com.arthuurdp.e_commerce.modules.payment;
 
+import com.arthuurdp.e_commerce.modules.cart.CartRepository;
 import com.arthuurdp.e_commerce.modules.order.entity.Order;
 import com.arthuurdp.e_commerce.modules.payment.entity.Payment;
 import com.arthuurdp.e_commerce.modules.order.enums.OrderStatus;
@@ -29,12 +30,14 @@ public class WebhookHandlerService {
     private final PaymentRepository paymentRepository;
     private final ShippingService shippingService;
     private final ProductService productService;
+    private final CartRepository cartRepository;
 
-    public WebhookHandlerService(OrderRepository orderRepository, PaymentRepository paymentRepository, ShippingService shippingService, ProductService productService) {
+    public WebhookHandlerService(OrderRepository orderRepository, PaymentRepository paymentRepository, ShippingService shippingService, ProductService productService, CartRepository cartRepository) {
         this.orderRepository = orderRepository;
         this.paymentRepository = paymentRepository;
         this.shippingService = shippingService;
         this.productService = productService;
+        this.cartRepository = cartRepository;
     }
 
     @Transactional
@@ -61,6 +64,16 @@ public class WebhookHandlerService {
             payment.setTransactionId(session.getPaymentIntent());
             order.setStatus(OrderStatus.PAID);
             shippingService.createForOrder(order);
+
+            String cartId = session.getMetadata() != null ? session.getMetadata().get("cartId") : null;
+            if (cartId != null) {
+                cartRepository.findById(Long.parseLong(cartId)).ifPresent(cart -> {
+                    cart.clear();
+                    cartRepository.save(cart);
+                    log.info("Cart {} cleared for order {}", cartId, orderId);
+                });
+            }
+
             log.info("Order {} marked as PAID", orderId);
         } else {
             payment.setStatus(PaymentStatus.PENDING);

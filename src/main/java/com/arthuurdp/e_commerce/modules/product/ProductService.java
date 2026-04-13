@@ -136,11 +136,10 @@ public class ProductService {
     }
 
     @Transactional
-    public ProductDetailsResponse addImages(Long id, List<String> fileNames) {
+    public ProductDetailsResponse addImages(Long id, List<String> imageUrls) {
         Product product = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
-        List<ProductImage> images = fileNames.stream()
-                .map(fileName -> "/uploads/" + fileName)
+        List<ProductImage> images = imageUrls.stream()
                 .map(ProductImage::new)
                 .toList();
 

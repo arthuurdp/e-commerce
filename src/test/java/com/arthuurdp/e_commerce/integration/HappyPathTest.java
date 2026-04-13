@@ -168,17 +168,16 @@ public class HappyPathTest extends BaseIntegrationTest {
         Long addressId = objectMapper.readTree(addressResponse).get("id").asLong();
 
         // 10. Create Order
-        String orderReq = """
-        {
-          "addressId": %d,
-          "paymentMethod": "CREDIT_CARD"
-        }
-        """.formatted(addressId);
-
         String orderCheckout = mockMvc.perform(post("/orders/checkout")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(orderReq))
+                        .content("""
+                        {
+                          "addressId": %d,
+                          "paymentMethod": "CREDIT_CARD",
+                          "freightServiceId": 1
+                        }
+                        """.formatted(addressId)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.orderId").isNumber())
                 .andExpect(jsonPath("$.sessionId").value("cs_test_123"))
@@ -186,6 +185,13 @@ public class HappyPathTest extends BaseIntegrationTest {
                 .andReturn().getResponse().getContentAsString();
 
         Long orderId = objectMapper.readTree(orderCheckout).get("orderId").asLong();
+
+        // 10.1 Verify Cart is NOT cleared yet
+        mockMvc.perform(get("/cart")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.items").isNotEmpty());
 
         // 11. Simulate Stripe Webhook
         String payload = """
@@ -198,14 +204,15 @@ public class HappyPathTest extends BaseIntegrationTest {
                       "id": "cs_test_123",
                       "object": "checkout.session",
                       "metadata": {
-                        "orderId": "%d"
+                        "orderId": "%d",
+                        "cartId": "%d"
                       },
                       "payment_status": "paid",
                       "status": "complete"
                     }
                   }
                 }
-                """.formatted(orderId);
+                """.formatted(orderId, 1); // Assuming cartId 1 for the first user
 
         long timestamp = Instant.now().getEpochSecond();
         String signedPayload = timestamp + "." + payload;
@@ -242,5 +249,12 @@ public class HappyPathTest extends BaseIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("LABEL_GENERATED"));
+
+        // 14. Verify Cart IS cleared now
+        mockMvc.perform(get("/cart")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.items").isEmpty());
     }
 }

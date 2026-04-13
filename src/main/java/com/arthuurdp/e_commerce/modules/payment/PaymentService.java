@@ -88,6 +88,7 @@ public class PaymentService {
                 .setSuccessUrl(successUrl + "?orderId=" + order.getId())
                 .setCancelUrl(failureUrl + "?orderId=" + order.getId())
                 .putMetadata("orderId", order.getId().toString())
+                .putMetadata("cartId", cart.getId().toString())
                 .build();
 
         return Session.create(params);

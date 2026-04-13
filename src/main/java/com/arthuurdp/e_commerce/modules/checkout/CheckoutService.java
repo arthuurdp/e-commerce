@@ -80,10 +80,7 @@ public class CheckoutService {
         );
 
         paymentService.updateTransactionId(payment, session.getId());
-
-        cart.clear();
-        cartRepository.save(cart);
-
+        
         return new CheckoutResponse(order.getId(), session.getId(), session.getUrl());
     }
 }
