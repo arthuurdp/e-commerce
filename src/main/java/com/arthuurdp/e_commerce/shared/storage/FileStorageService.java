@@ -54,4 +54,15 @@ public class FileStorageService {
             throw new FileException("Could not store file " + fileName + ". Please try again!");
         }
     }
+
+    public void deleteFile(String fileName) {
+        try {
+            Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
+            if (Files.exists(filePath)) {
+                Files.delete(filePath);
+            }
+        } catch (IOException ex) {
+            throw new FileException("Could not delete file " + fileName + ". Please try again!");
+        }
+    }
 }

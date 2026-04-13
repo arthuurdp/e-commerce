@@ -47,4 +47,13 @@ public class ProductImageController {
     ) {
         return ResponseEntity.ok().body(service.setMainImage(id, mainImageId));
     }
+
+    @DeleteMapping("/{imageId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ProductDetailsResponse> deleteImage(
+            @PathVariable Long id,
+            @PathVariable Long imageId
+    ) {
+        return ResponseEntity.ok().body(service.removeImage(id, imageId, fileStorageService));
+    }
 }

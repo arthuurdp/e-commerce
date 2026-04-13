@@ -9,6 +9,7 @@ import com.arthuurdp.e_commerce.shared.exceptions.ResourceNotFoundException;
 import com.arthuurdp.e_commerce.modules.product.dtos.*;
 import com.arthuurdp.e_commerce.modules.category.CategoryService;
 import com.arthuurdp.e_commerce.modules.product.mapper.ProductMapper;
+import com.arthuurdp.e_commerce.shared.storage.FileStorageService;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
@@ -146,6 +147,28 @@ public class ProductService {
         product.addImages(images);
 
         if (product.getImages().size() == images.size()) {
+            product.setMainImage(product.getImages().get(0));
+        }
+
+        return mapper.toProductDetailsResponse(repo.save(product));
+    }
+
+    @Transactional
+    public ProductDetailsResponse removeImage(Long id, Long imageId, FileStorageService fileStorageService) {
+        Product product = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+
+        ProductImage image = product.getImages().stream()
+                .filter(img -> img.getId().equals(imageId))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Image not found for this product"));
+
+        String url = image.getUrl();
+        String fileName = url.substring(url.lastIndexOf("/") + 1);
+        fileStorageService.deleteFile(fileName);
+
+        product.getImages().remove(image);
+
+        if (image.isMainImage() && !product.getImages().isEmpty()) {
             product.setMainImage(product.getImages().get(0));
         }
 
