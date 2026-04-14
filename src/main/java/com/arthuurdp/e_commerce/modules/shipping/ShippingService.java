@@ -67,7 +67,7 @@ public class ShippingService {
 
     public ShippingService(ShippingRepository repo, MelhorEnvioClient client, ShippingMapper mapper, EmailSenderService emailSenderService) {
         this.repo = repo;
-        this.client  = client;
+        this.client = client;
         this.mapper = mapper;
         this.emailSenderService = emailSenderService;
     }
@@ -111,6 +111,15 @@ public class ShippingService {
 
             if (shipping.getStatus() == ShippingStatus.PURCHASED) {
                 var labelInfo = client.generateLabel(shipping.getMeOrderId());
+
+                if (labelInfo.trackingCode() == null || labelInfo.trackingCode().isBlank()) {
+                    shipping.setTrackingUrl(TRACKING_URL + "pendente");
+                    shipping.setStatus(ShippingStatus.PENDING);
+                    repo.save(shipping);
+                    log.info("Order {}: label purchased but tracking not yet available — keeping PENDING", order.getId());
+                    return;
+                }
+
                 shipping.setTrackingCode(labelInfo.trackingCode());
                 shipping.setTrackingUrl(TRACKING_URL + labelInfo.trackingCode());
                 shipping.setLabelUrl(labelInfo.labelUrl());
