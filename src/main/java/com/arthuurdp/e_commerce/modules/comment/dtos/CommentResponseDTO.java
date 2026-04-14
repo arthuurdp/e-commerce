@@ -1,15 +1,14 @@
-package com.arthuurdp.e_commerce.modules.review.dtos;
+package com.arthuurdp.e_commerce.modules.comment.dtos;
 
 import lombok.Data;
-
 import java.time.LocalDateTime;
 
 @Data
-public class ReviewResponseDTO {
+public class CommentResponseDTO {
     private Long id;
     private Long userId;
     private String userName;
     private Long productId;
-    private Integer rating;
+    private String content;
     private LocalDateTime createdAt;
 }

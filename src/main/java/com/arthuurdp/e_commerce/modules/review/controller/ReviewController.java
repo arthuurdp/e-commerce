@@ -3,6 +3,7 @@ package com.arthuurdp.e_commerce.modules.review.controller;
 import com.arthuurdp.e_commerce.infrastructure.security.UserAuthenticated;
 import com.arthuurdp.e_commerce.modules.review.dtos.ReviewDTO;
 import com.arthuurdp.e_commerce.modules.review.dtos.ReviewResponseDTO;
+import com.arthuurdp.e_commerce.modules.review.dtos.UpdateReviewDTO;
 import com.arthuurdp.e_commerce.modules.review.service.ReviewService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,16 @@ public class ReviewController {
             @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
         return ResponseEntity.ok(reviewService.createReview(reviewDTO, authenticatedUser.getUser()));
+    }
+
+    @PutMapping("/reviews/{reviewId}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ReviewResponseDTO> updateReview(
+            @PathVariable Long reviewId,
+            @Valid @RequestBody UpdateReviewDTO updateReviewDTO,
+            @AuthenticationPrincipal UserAuthenticated authenticatedUser
+    ) {
+        return ResponseEntity.ok(reviewService.updateReview(reviewId, updateReviewDTO, authenticatedUser.getUser()));
     }
 
     @GetMapping("/{productId}/reviews")

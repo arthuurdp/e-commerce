@@ -6,10 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class ReviewDTO {
-    @NotNull(message = "Product ID is required")
-    private Long productId;
-
+public class UpdateReviewDTO {
     @NotNull(message = "Rating is required")
     @Min(value = 1, message = "Rating must be at least 1")
     @Max(value = 5, message = "Rating must be at most 5")

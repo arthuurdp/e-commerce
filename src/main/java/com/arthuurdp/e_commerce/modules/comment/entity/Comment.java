@@ -1,4 +1,4 @@
-package com.arthuurdp.e_commerce.modules.review.entity;
+package com.arthuurdp.e_commerce.modules.comment.entity;
 
 import com.arthuurdp.e_commerce.modules.product.entity.Product;
 import com.arthuurdp.e_commerce.modules.user.entity.User;
@@ -11,12 +11,12 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "reviews")
+@Table(name = "comments")
 @Getter
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Review {
+public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -31,8 +31,8 @@ public class Review {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @Column(name = "rating", nullable = false)
-    private Integer rating;
+    @Column(name = "content", nullable = false, columnDefinition = "TEXT")
+    private String content;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -42,9 +42,9 @@ public class Review {
         this.createdAt = LocalDateTime.now();
     }
 
-    public Review(User user, Product product, Integer rating) {
+    public Comment(User user, Product product, String content) {
         this.user = user;
         this.product = product;
-        this.rating = rating;
+        this.content = content;
     }
 }

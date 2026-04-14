@@ -5,9 +5,11 @@ import com.arthuurdp.e_commerce.modules.product.ProductRepository;
 import com.arthuurdp.e_commerce.modules.product.entity.Product;
 import com.arthuurdp.e_commerce.modules.review.dtos.ReviewDTO;
 import com.arthuurdp.e_commerce.modules.review.dtos.ReviewResponseDTO;
+import com.arthuurdp.e_commerce.modules.review.dtos.UpdateReviewDTO;
 import com.arthuurdp.e_commerce.modules.review.entity.Review;
 import com.arthuurdp.e_commerce.modules.review.repository.ReviewRepository;
 import com.arthuurdp.e_commerce.modules.user.entity.User;
+import com.arthuurdp.e_commerce.shared.exceptions.AccessDeniedException;
 import com.arthuurdp.e_commerce.shared.exceptions.BadRequestException;
 import com.arthuurdp.e_commerce.shared.exceptions.ConflictException;
 import com.arthuurdp.e_commerce.shared.exceptions.ResourceNotFoundException;
@@ -38,14 +40,25 @@ public class ReviewService {
             throw new ConflictException("You have already reviewed this product");
         }
 
-        if (!orderRepository.hasPurchasedProduct(user.getId(), product.getId())) {
-            throw new BadRequestException("You can only review products you have purchased and received");
-        }
-
-        Review review = new Review(user, product, reviewDTO.getRating(), reviewDTO.getComment());
+        Review review = new Review(user, product, reviewDTO.getRating());
         Review savedReview = reviewRepository.save(review);
 
         return mapToResponseDTO(savedReview);
+    }
+
+    @Transactional
+    public ReviewResponseDTO updateReview(Long reviewId, UpdateReviewDTO updateReviewDTO, User user) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ResourceNotFoundException("Review not found"));
+
+        if (!review.getUser().getId().equals(user.getId())) {
+            throw new AccessDeniedException("You can only update your own reviews");
+        }
+
+        review.setRating(updateReviewDTO.getRating());
+
+        Review updatedReview = reviewRepository.save(review);
+        return mapToResponseDTO(updatedReview);
     }
 
     public List<ReviewResponseDTO> getProductReviews(Long productId) {
@@ -73,7 +86,6 @@ public class ReviewService {
         dto.setUserName(review.getUser().getFirstName() + " " + review.getUser().getLastName());
         dto.setProductId(review.getProduct().getId());
         dto.setRating(review.getRating());
-        dto.setComment(review.getComment());
         dto.setCreatedAt(review.getCreatedAt());
         return dto;
     }
