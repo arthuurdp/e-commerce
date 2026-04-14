@@ -1,9 +1,9 @@
 package com.arthuurdp.e_commerce.modules.review.controller;
 
 import com.arthuurdp.e_commerce.infrastructure.security.UserAuthenticated;
-import com.arthuurdp.e_commerce.modules.review.dtos.ReviewDTO;
-import com.arthuurdp.e_commerce.modules.review.dtos.ReviewResponseDTO;
-import com.arthuurdp.e_commerce.modules.review.dtos.UpdateReviewDTO;
+import com.arthuurdp.e_commerce.modules.review.dtos.CreateReviewRequest;
+import com.arthuurdp.e_commerce.modules.review.dtos.ReviewResponse;
+import com.arthuurdp.e_commerce.modules.review.dtos.UpdateReviewRequest;
 import com.arthuurdp.e_commerce.modules.review.service.ReviewService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -24,25 +24,25 @@ public class ReviewController {
 
     @PostMapping("/reviews")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ReviewResponseDTO> createReview(
-            @Valid @RequestBody ReviewDTO reviewDTO,
+    public ResponseEntity<ReviewResponse> createReview(
+            @Valid @RequestBody CreateReviewRequest createReviewRequest,
             @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        return ResponseEntity.ok(reviewService.createReview(reviewDTO, authenticatedUser.getUser()));
+        return ResponseEntity.ok(reviewService.createReview(createReviewRequest, authenticatedUser.getUser()));
     }
 
     @PutMapping("/reviews/{reviewId}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ReviewResponseDTO> updateReview(
+    public ResponseEntity<ReviewResponse> updateReview(
             @PathVariable Long reviewId,
-            @Valid @RequestBody UpdateReviewDTO updateReviewDTO,
+            @Valid @RequestBody UpdateReviewRequest updateReviewRequest,
             @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        return ResponseEntity.ok(reviewService.updateReview(reviewId, updateReviewDTO, authenticatedUser.getUser()));
+        return ResponseEntity.ok(reviewService.updateReview(reviewId, updateReviewRequest, authenticatedUser.getUser()));
     }
 
     @GetMapping("/{productId}/reviews")
-    public ResponseEntity<List<ReviewResponseDTO>> getProductReviews(@PathVariable Long productId) {
+    public ResponseEntity<List<ReviewResponse>> getProductReviews(@PathVariable Long productId) {
         return ResponseEntity.ok(reviewService.getProductReviews(productId));
     }
 
