@@ -10,6 +10,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
-    @Query("SELECT COUNT(o) > 0 FROM Order o JOIN o.items i WHERE o.user.id = :userId AND i.product.id = :productId AND o.status = com.arthuurdp.e_commerce.modules.order.enums.OrderStatus.DELIVERED")
+    @Query("SELECT o FROM Order o WHERE o.user.id = :userId ORDER BY o.createdAt DESC")
+    Page<Order> findByUserId(Pageable pageable, @Param("userId") Long userId);
+
+    @Query("SELECT COUNT(o) > 0 FROM Order o JOIN o.items i WHERE o.user.id = :userId AND i.product.id = :productId AND o.status = OrderStatus.DELIVERED")
     boolean hasPurchasedProduct(@Param("userId") Long userId, @Param("productId") Long productId);
 }
