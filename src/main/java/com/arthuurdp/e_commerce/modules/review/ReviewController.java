@@ -1,10 +1,9 @@
-package com.arthuurdp.e_commerce.modules.review.controller;
+package com.arthuurdp.e_commerce.modules.review;
 
 import com.arthuurdp.e_commerce.infrastructure.security.UserAuthenticated;
 import com.arthuurdp.e_commerce.modules.review.dtos.CreateReviewRequest;
 import com.arthuurdp.e_commerce.modules.review.dtos.ReviewResponse;
 import com.arthuurdp.e_commerce.modules.review.dtos.UpdateReviewRequest;
-import com.arthuurdp.e_commerce.modules.review.service.ReviewService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

@@ -1,10 +1,9 @@
-package com.arthuurdp.e_commerce.modules.comment.controller;
+package com.arthuurdp.e_commerce.modules.comment;
 
 import com.arthuurdp.e_commerce.infrastructure.security.UserAuthenticated;
 import com.arthuurdp.e_commerce.modules.comment.dtos.CommentDTO;
 import com.arthuurdp.e_commerce.modules.comment.dtos.CommentResponseDTO;
 import com.arthuurdp.e_commerce.modules.comment.dtos.UpdateCommentDTO;
-import com.arthuurdp.e_commerce.modules.comment.service.CommentService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

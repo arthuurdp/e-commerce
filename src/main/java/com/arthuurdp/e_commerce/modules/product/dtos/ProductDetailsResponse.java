@@ -10,6 +10,7 @@ public record ProductDetailsResponse(
         String name,
         String description,
         BigDecimal price,
+        Integer stock,
         List<ProductImageResponse> imgs,
         Double weight,
         Integer width,

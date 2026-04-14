@@ -1,4 +1,4 @@
-package com.arthuurdp.e_commerce.modules.comment.repository;
+package com.arthuurdp.e_commerce.modules.comment;
 
 import com.arthuurdp.e_commerce.modules.comment.entity.Comment;
 import org.springframework.data.jpa.repository.JpaRepository;

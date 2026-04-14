@@ -116,10 +116,6 @@ public class Product {
         imgs.forEach(this::addImage);
     }
 
-    public void removeAllImages() {
-        images.clear();
-    }
-
     public void addCategory(Category category) {
         if (categories.add(category)) {
             category.getProducts().add(this);

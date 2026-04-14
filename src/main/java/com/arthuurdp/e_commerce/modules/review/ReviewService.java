@@ -1,4 +1,4 @@
-package com.arthuurdp.e_commerce.modules.review.service;
+package com.arthuurdp.e_commerce.modules.review;
 
 import com.arthuurdp.e_commerce.modules.product.ProductRepository;
 import com.arthuurdp.e_commerce.modules.product.entity.Product;
@@ -6,7 +6,7 @@ import com.arthuurdp.e_commerce.modules.review.dtos.CreateReviewRequest;
 import com.arthuurdp.e_commerce.modules.review.dtos.ReviewResponse;
 import com.arthuurdp.e_commerce.modules.review.dtos.UpdateReviewRequest;
 import com.arthuurdp.e_commerce.modules.review.entity.Review;
-import com.arthuurdp.e_commerce.modules.review.repository.ReviewRepository;
+import com.arthuurdp.e_commerce.modules.review.mapper.ReviewMapper;
 import com.arthuurdp.e_commerce.modules.user.entity.User;
 import com.arthuurdp.e_commerce.shared.exceptions.AccessDeniedException;
 import com.arthuurdp.e_commerce.shared.exceptions.ConflictException;
@@ -20,10 +20,12 @@ import java.util.List;
 public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final ProductRepository productRepository;
+    private final ReviewMapper mapper;
 
-    public ReviewService(ReviewRepository reviewRepository, ProductRepository productRepository) {
+    public ReviewService(ReviewRepository reviewRepository, ProductRepository productRepository, ReviewMapper mapper) {
         this.reviewRepository = reviewRepository;
         this.productRepository = productRepository;
+        this.mapper = mapper;
     }
 
     @Transactional
@@ -37,7 +39,7 @@ public class ReviewService {
         Review review = new Review(user, product, createReviewRequest.getRating());
         Review savedReview = reviewRepository.save(review);
 
-        return mapToResponseDTO(savedReview);
+        return mapper.toReviewResponse(savedReview);
     }
 
     @Transactional
@@ -50,15 +52,15 @@ public class ReviewService {
 
         review.setRating(updateReviewRequest.getRating());
 
-        Review updatedReview = reviewRepository.save(review);
-        return mapToResponseDTO(updatedReview);
+        return mapper.toReviewResponse(reviewRepository.save(review));
     }
 
+    @Transactional(readOnly = true)
     public List<ReviewResponse> getProductReviews(Long productId) {
         if (!productRepository.existsById(productId)) {
             throw new ResourceNotFoundException("Product not found");
         }
-        return reviewRepository.findByProductId(productId).stream().map(this::mapToResponseDTO).toList();
+        return mapper.toReviewResponseList(reviewRepository.findByProductId(productId));
     }
 
     public Double getAverageRating(Long productId) {
@@ -68,16 +70,5 @@ public class ReviewService {
 
     public Long getReviewCount(Long productId) {
         return reviewRepository.countByProductId(productId);
-    }
-
-    private ReviewResponse mapToResponseDTO(Review review) {
-        ReviewResponse dto = new ReviewResponse();
-        dto.setId(review.getId());
-        dto.setUserId(review.getUser().getId());
-        dto.setUserName(review.getUser().getFirstName() + " " + review.getUser().getLastName());
-        dto.setProductId(review.getProduct().getId());
-        dto.setRating(review.getRating());
-        dto.setCreatedAt(review.getCreatedAt());
-        return dto;
     }
 }

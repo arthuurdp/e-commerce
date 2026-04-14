@@ -3,7 +3,6 @@ package com.arthuurdp.e_commerce.modules.checkout;
 import com.arthuurdp.e_commerce.infrastructure.security.UserAuthenticated;
 import com.arthuurdp.e_commerce.modules.checkout.dtos.CheckoutRequest;
 import com.arthuurdp.e_commerce.modules.checkout.dtos.CheckoutResponse;
-import com.arthuurdp.e_commerce.modules.user.entity.User;
 import com.stripe.exception.StripeException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
