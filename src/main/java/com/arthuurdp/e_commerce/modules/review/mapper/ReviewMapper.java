@@ -13,6 +13,7 @@ public interface ReviewMapper {
     @Mapping(target = "userId", source = "user.id")
     @Mapping(target = "userName", expression = "java(review.getUser().getFirstName() + \" \" + review.getUser().getLastName())")
     @Mapping(target = "productId", source = "product.id")
+    @Mapping(target = "comment", expression = "java(null)")
     ReviewResponse toReviewResponse(Review review);
 
     List<ReviewResponse> toReviewResponseList(List<Review> reviews);

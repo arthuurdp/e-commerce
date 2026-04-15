@@ -1,9 +1,9 @@
 package com.arthuurdp.e_commerce.modules.comment;
 
 import com.arthuurdp.e_commerce.infrastructure.security.UserAuthenticated;
-import com.arthuurdp.e_commerce.modules.comment.dtos.CommentDTO;
-import com.arthuurdp.e_commerce.modules.comment.dtos.CommentResponseDTO;
-import com.arthuurdp.e_commerce.modules.comment.dtos.UpdateCommentDTO;
+import com.arthuurdp.e_commerce.modules.comment.dtos.CreateCommentRequest;
+import com.arthuurdp.e_commerce.modules.comment.dtos.CommentResponse;
+import com.arthuurdp.e_commerce.modules.comment.dtos.UpdateCommentRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/products")
+@RequestMapping("/products/review")
 public class CommentController {
     private final CommentService commentService;
 
@@ -21,23 +21,14 @@ public class CommentController {
         this.commentService = commentService;
     }
 
-    @PostMapping("/comments")
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<CommentResponseDTO> createComment(
-            @Valid @RequestBody CommentDTO commentDTO,
-            @AuthenticationPrincipal UserAuthenticated authenticatedUser
-    ) {
-        return ResponseEntity.ok(commentService.createComment(commentDTO, authenticatedUser.getUser()));
-    }
-
     @PutMapping("/comments/{commentId}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<CommentResponseDTO> updateComment(
+    public ResponseEntity<CommentResponse> updateComment(
             @PathVariable Long commentId,
-            @Valid @RequestBody UpdateCommentDTO updateCommentDTO,
+            @Valid @RequestBody UpdateCommentRequest req,
             @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        return ResponseEntity.ok(commentService.updateComment(commentId, updateCommentDTO, authenticatedUser.getUser()));
+        return ResponseEntity.ok(commentService.updateComment(commentId, req, authenticatedUser.getUser()));
     }
 
     @DeleteMapping("/comments/{commentId}")
@@ -51,7 +42,7 @@ public class CommentController {
     }
 
     @GetMapping("/{productId}/comments")
-    public ResponseEntity<List<CommentResponseDTO>> getProductComments(@PathVariable Long productId) {
+    public ResponseEntity<List<CommentResponse>> getProductComments(@PathVariable Long productId) {
         return ResponseEntity.ok(commentService.getProductComments(productId));
     }
 }

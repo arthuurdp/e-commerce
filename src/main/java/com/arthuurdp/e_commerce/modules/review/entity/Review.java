@@ -1,5 +1,6 @@
 package com.arthuurdp.e_commerce.modules.review.entity;
 
+import com.arthuurdp.e_commerce.modules.comment.entity.Comment;
 import com.arthuurdp.e_commerce.modules.product.entity.Product;
 import com.arthuurdp.e_commerce.modules.user.entity.User;
 import jakarta.persistence.*;

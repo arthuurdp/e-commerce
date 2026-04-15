@@ -1,6 +1,7 @@
 package com.arthuurdp.e_commerce.modules.comment.entity;
 
 import com.arthuurdp.e_commerce.modules.product.entity.Product;
+import com.arthuurdp.e_commerce.modules.review.entity.Review;
 import com.arthuurdp.e_commerce.modules.user.entity.User;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
@@ -30,6 +31,10 @@ public class Comment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "review_id", nullable = false, unique = true)
+    private Review review;
 
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;

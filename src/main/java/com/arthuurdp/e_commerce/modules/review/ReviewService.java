@@ -29,28 +29,25 @@ public class ReviewService {
     }
 
     @Transactional
-    public ReviewResponse createReview(CreateReviewRequest createReviewRequest, User user) {
-        Product product = productRepository.findById(createReviewRequest.getProductId()).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+    public ReviewResponse createReview(CreateReviewRequest req, User user) {
+        Product product = productRepository.findById(req.productId()).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
         if (reviewRepository.existsByUserIdAndProductId(user.getId(), product.getId())) {
             throw new ConflictException("You have already reviewed this product");
         }
 
-        Review review = new Review(user, product, createReviewRequest.getRating());
-        Review savedReview = reviewRepository.save(review);
-
-        return mapper.toReviewResponse(savedReview);
+        return mapper.toReviewResponse(new Review(user, product, req.rating()));
     }
 
     @Transactional
-    public ReviewResponse updateReview(Long reviewId, UpdateReviewRequest updateReviewRequest, User user) {
+    public ReviewResponse updateReview(Long reviewId, UpdateReviewRequest req, User user) {
         Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new ResourceNotFoundException("Review not found"));
 
         if (!review.getUser().getId().equals(user.getId())) {
             throw new AccessDeniedException("You can only update your own reviews");
         }
 
-        review.setRating(updateReviewRequest.getRating());
+        review.setRating(req.rating());
 
         return mapper.toReviewResponse(reviewRepository.save(review));
     }

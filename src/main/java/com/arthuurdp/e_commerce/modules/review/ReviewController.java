@@ -1,6 +1,9 @@
 package com.arthuurdp.e_commerce.modules.review;
 
 import com.arthuurdp.e_commerce.infrastructure.security.UserAuthenticated;
+import com.arthuurdp.e_commerce.modules.comment.CommentService;
+import com.arthuurdp.e_commerce.modules.comment.dtos.CommentResponse;
+import com.arthuurdp.e_commerce.modules.comment.dtos.CreateCommentRequest;
 import com.arthuurdp.e_commerce.modules.review.dtos.CreateReviewRequest;
 import com.arthuurdp.e_commerce.modules.review.dtos.ReviewResponse;
 import com.arthuurdp.e_commerce.modules.review.dtos.UpdateReviewRequest;
@@ -16,28 +19,40 @@ import java.util.List;
 @RequestMapping("/products")
 public class ReviewController {
     private final ReviewService reviewService;
+    private final CommentService commentService;
 
-    public ReviewController(ReviewService reviewService) {
+    public ReviewController(ReviewService reviewService, CommentService commentService) {
         this.reviewService = reviewService;
+        this.commentService = commentService;
     }
 
     @PostMapping("/reviews")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ReviewResponse> createReview(
-            @Valid @RequestBody CreateReviewRequest createReviewRequest,
+            @Valid @RequestBody CreateReviewRequest req,
             @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        return ResponseEntity.ok(reviewService.createReview(createReviewRequest, authenticatedUser.getUser()));
+        return ResponseEntity.ok(reviewService.createReview(req, authenticatedUser.getUser()));
+    }
+
+    @PostMapping("/reviews/{reviewId}/comment")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<CommentResponse> addCommentToReview(
+            @PathVariable Long reviewId,
+            @Valid @RequestBody CreateCommentRequest req,
+            @AuthenticationPrincipal UserAuthenticated authenticatedUser
+    ) {
+        return ResponseEntity.ok(commentService.addCommentToReview(reviewId, req, authenticatedUser.getUser()));
     }
 
     @PutMapping("/reviews/{reviewId}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ReviewResponse> updateReview(
             @PathVariable Long reviewId,
-            @Valid @RequestBody UpdateReviewRequest updateReviewRequest,
+            @Valid @RequestBody UpdateReviewRequest req,
             @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        return ResponseEntity.ok(reviewService.updateReview(reviewId, updateReviewRequest, authenticatedUser.getUser()));
+        return ResponseEntity.ok(reviewService.updateReview(reviewId, req, authenticatedUser.getUser()));
     }
 
     @GetMapping("/{productId}/reviews")

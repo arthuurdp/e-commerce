@@ -1,19 +1,21 @@
 package com.arthuurdp.e_commerce.modules.comment.mapper;
 
-import com.arthuurdp.e_commerce.modules.comment.dtos.CommentResponseDTO;
+import com.arthuurdp.e_commerce.modules.comment.dtos.CommentResponse;
 import com.arthuurdp.e_commerce.modules.comment.entity.Comment;
+import com.arthuurdp.e_commerce.modules.review.mapper.ReviewMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = ReviewMapper.class)
 public interface CommentMapper {
 
     @Mapping(target = "userId", source = "user.id")
     @Mapping(target = "userName", expression = "java(comment.getUser().getFirstName() + \" \" + comment.getUser().getLastName())")
+    @Mapping(target = "review", source = "review")
     @Mapping(target = "productId", source = "product.id")
-    CommentResponseDTO toCommentResponseDTO(Comment comment);
+    CommentResponse toCommentResponseDTO(Comment comment);
 
-    List<CommentResponseDTO> toCommentResponseDTOList(List<Comment> comments);
+    List<CommentResponse> toCommentResponseDTOList(List<Comment> comments);
 }

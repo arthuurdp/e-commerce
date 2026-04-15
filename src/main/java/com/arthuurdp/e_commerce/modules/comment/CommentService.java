@@ -1,12 +1,14 @@
 package com.arthuurdp.e_commerce.modules.comment;
 
-import com.arthuurdp.e_commerce.modules.comment.dtos.CommentDTO;
-import com.arthuurdp.e_commerce.modules.comment.dtos.CommentResponseDTO;
-import com.arthuurdp.e_commerce.modules.comment.dtos.UpdateCommentDTO;
+import com.arthuurdp.e_commerce.modules.comment.dtos.CreateCommentRequest;
+import com.arthuurdp.e_commerce.modules.comment.dtos.CommentResponse;
+import com.arthuurdp.e_commerce.modules.comment.dtos.UpdateCommentRequest;
 import com.arthuurdp.e_commerce.modules.comment.entity.Comment;
 import com.arthuurdp.e_commerce.modules.comment.mapper.CommentMapper;
 import com.arthuurdp.e_commerce.modules.product.ProductRepository;
 import com.arthuurdp.e_commerce.modules.product.entity.Product;
+import com.arthuurdp.e_commerce.modules.review.ReviewRepository;
+import com.arthuurdp.e_commerce.modules.review.entity.Review;
 import com.arthuurdp.e_commerce.modules.user.entity.User;
 import com.arthuurdp.e_commerce.shared.exceptions.AccessDeniedException;
 import com.arthuurdp.e_commerce.shared.exceptions.ResourceNotFoundException;
@@ -14,37 +16,45 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class CommentService {
     private final CommentRepository commentRepository;
     private final ProductRepository productRepository;
+    private final ReviewRepository reviewRepository;
     private final CommentMapper mapper;
 
-    public CommentService(CommentRepository commentRepository, ProductRepository productRepository, CommentMapper mapper) {
+    public CommentService(CommentRepository commentRepository, ProductRepository productRepository, ReviewRepository reviewRepository, CommentMapper mapper) {
         this.commentRepository = commentRepository;
         this.productRepository = productRepository;
+        this.reviewRepository = reviewRepository;
         this.mapper = mapper;
     }
 
     @Transactional
-    public CommentResponseDTO createComment(CommentDTO commentDTO, User user) {
-        Product product = productRepository.findById(commentDTO.getProductId()).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+    public CommentResponse addCommentToReview(Long id, CreateCommentRequest req, User user) {
+        Product product = productRepository.findById(req.productId()).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+        Review review = reviewRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Review not found"));
 
-        Comment comment = new Comment(user, product, commentDTO.getContent());
+        if (!review.getUser().getId().equals(user.getId())) {
+            throw new AccessDeniedException("You can only comment on your own reviews");
+        }
+
+        Comment comment = new Comment(user, product, req.content());
+        comment.setReview(review);
+
         return mapper.toCommentResponseDTO(commentRepository.save(comment));
     }
 
     @Transactional
-    public CommentResponseDTO updateComment(Long commentId, UpdateCommentDTO updateCommentDTO, User user) {
+    public CommentResponse updateComment(Long commentId, UpdateCommentRequest updateCommentRequest, User user) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
 
         if (!comment.getUser().getId().equals(user.getId())) {
             throw new AccessDeniedException("You can only update your own comments");
         }
 
-        comment.setContent(updateCommentDTO.getContent());
+        comment.setContent(updateCommentRequest.content());
         return mapper.toCommentResponseDTO(commentRepository.save(comment));
     }
 
@@ -60,7 +70,7 @@ public class CommentService {
     }
 
     @Transactional(readOnly = true)
-    public List<CommentResponseDTO> getProductComments(Long productId) {
+    public List<CommentResponse> getProductComments(Long productId) {
         if (!productRepository.existsById(productId)) {
             throw new ResourceNotFoundException("Product not found");
         }
