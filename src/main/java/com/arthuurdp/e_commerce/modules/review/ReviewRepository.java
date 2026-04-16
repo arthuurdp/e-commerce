@@ -11,10 +11,10 @@ import java.util.Optional;
 
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
-    @EntityGraph(attributePaths = {"user"})
+    @EntityGraph(attributePaths = {"user", "comment"})
     List<Review> findByProductId(Long productId);
 
-
+    @EntityGraph(attributePaths = {"user", "comment"})
     Optional<List<Review>> findByUserId(Long userId);
     
     @Query("SELECT AVG(r.rating) FROM Review r WHERE r.product.id = :productId")
