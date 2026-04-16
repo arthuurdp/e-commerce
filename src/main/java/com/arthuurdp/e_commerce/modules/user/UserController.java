@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    private final UserService service;
+    private final UserService userService;
 
-    public UserController(UserService service) {
-        this.service = service;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping
@@ -25,7 +25,7 @@ public class UserController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return ResponseEntity.ok().body(service.findAll(page, size));
+        return ResponseEntity.ok().body(userService.findAll(page, size));
     }
 
     @GetMapping("/{id}")
@@ -34,7 +34,7 @@ public class UserController {
             @PathVariable Long id,
             @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        return ResponseEntity.ok().body(service.findById(id, authenticatedUser.getUser()));
+        return ResponseEntity.ok().body(userService.findById(id, authenticatedUser.getUser()));
     }
 
     @PatchMapping("/{id}")
@@ -44,7 +44,7 @@ public class UserController {
             @RequestBody @Valid UpdateUserRequest req,
             @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        return ResponseEntity.ok().body(service.update(id, req, authenticatedUser.getUser()));
+        return ResponseEntity.ok().body(userService.update(id, req, authenticatedUser.getUser()));
     }
 
     @DeleteMapping("/{id}")
@@ -53,7 +53,7 @@ public class UserController {
             @PathVariable Long id,
             @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        service.delete(id, authenticatedUser.getUser());
+        userService.delete(id, authenticatedUser.getUser());
         return ResponseEntity.noContent().build();
     }
 
@@ -62,7 +62,7 @@ public class UserController {
     public ResponseEntity<UserResponse> findCurrentUser(
             @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        return ResponseEntity.ok().body(service.findCurrentUser(authenticatedUser.getUser()));
+        return ResponseEntity.ok().body(userService.findCurrentUser(authenticatedUser.getUser()));
     }
 
     @PatchMapping("/me")
@@ -71,7 +71,7 @@ public class UserController {
             @RequestBody @Valid UpdateUserRequest req,
             @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        return ResponseEntity.ok().body(service.updateCurrentUser(req, authenticatedUser.getUser()));
+        return ResponseEntity.ok().body(userService.updateCurrentUser(req, authenticatedUser.getUser()));
     }
 
     @DeleteMapping("/me")
@@ -79,7 +79,7 @@ public class UserController {
     public ResponseEntity<Void> deleteCurrentUser(
             @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        service.deleteCurrentUser(authenticatedUser.getUser());
+        userService.deleteCurrentUser(authenticatedUser.getUser());
         return ResponseEntity.noContent().build();
     }
 }

@@ -1,15 +1,17 @@
 package com.arthuurdp.e_commerce.modules.comment;
 
-import com.arthuurdp.e_commerce.modules.comment.dtos.CreateCommentRequest;
 import com.arthuurdp.e_commerce.modules.comment.dtos.CommentResponse;
 import com.arthuurdp.e_commerce.modules.comment.dtos.UpdateCommentRequest;
 import com.arthuurdp.e_commerce.modules.comment.entity.Comment;
 import com.arthuurdp.e_commerce.modules.comment.mapper.CommentMapper;
+import com.arthuurdp.e_commerce.modules.notification.NotificationService;
 import com.arthuurdp.e_commerce.modules.product.ProductRepository;
+import com.arthuurdp.e_commerce.modules.product.dtos.ProductResponse;
 import com.arthuurdp.e_commerce.modules.product.entity.Product;
 import com.arthuurdp.e_commerce.modules.review.ReviewRepository;
 import com.arthuurdp.e_commerce.modules.review.dtos.AddCommentToReviewRequest;
 import com.arthuurdp.e_commerce.modules.review.entity.Review;
+import com.arthuurdp.e_commerce.modules.user.UserRepository;
 import com.arthuurdp.e_commerce.modules.user.entity.User;
 import com.arthuurdp.e_commerce.shared.exceptions.AccessDeniedException;
 import com.arthuurdp.e_commerce.shared.exceptions.ConflictException;
@@ -25,12 +27,14 @@ public class CommentService {
     private final ProductRepository productRepository;
     private final ReviewRepository reviewRepository;
     private final CommentMapper mapper;
+    private final NotificationService notificationService;
 
-    public CommentService(CommentRepository commentRepository, ProductRepository productRepository, ReviewRepository reviewRepository, CommentMapper mapper) {
+    public CommentService(CommentRepository commentRepository, ProductRepository productRepository, ReviewRepository reviewRepository, CommentMapper mapper, NotificationService notificationService) {
         this.commentRepository = commentRepository;
         this.productRepository = productRepository;
         this.reviewRepository = reviewRepository;
         this.mapper = mapper;
+        this.notificationService = notificationService;
     }
 
     @Transactional
@@ -49,7 +53,10 @@ public class CommentService {
         Comment comment = new Comment(user, product, req.content());
         comment.setReview(review);
 
-        return mapper.toCommentResponseDTO(commentRepository.save(comment));
+        Comment savedComment = commentRepository.save(comment);
+        notificationService.createNotification(user, "You have added a comment in your review!");
+
+        return mapper.toCommentResponseDTO(savedComment);
     }
 
     @Transactional
@@ -73,6 +80,11 @@ public class CommentService {
         }
 
         commentRepository.delete(comment);
+    }
+
+    @Transactional(readOnly = true)
+    public List<CommentResponse> getUserComments(User user) {
+        return mapper.toCommentResponseDTOList(commentRepository.findByUserId(user.getId()).orElseThrow(() -> new ResourceNotFoundException("User not found")));
     }
 
     @Transactional(readOnly = true)

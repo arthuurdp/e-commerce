@@ -26,7 +26,7 @@ public class UserProfilePictureController {
             @RequestParam("file") MultipartFile file,
             @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        String baseUrl = "http://192.168.0.113:8080";
+        String baseUrl = "http://192.168.200.114:8080";
 
         String fileName = fileStorageService.storeFile(file);
         String imageUrl = baseUrl + "/uploads/" + fileName;

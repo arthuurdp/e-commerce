@@ -1,17 +1,15 @@
-package com.arthuurdp.e_commerce.modules.favorite.controller;
+package com.arthuurdp.e_commerce.modules.myactivity.favorite;
 
 import com.arthuurdp.e_commerce.infrastructure.security.UserAuthenticated;
-import com.arthuurdp.e_commerce.modules.favorite.service.FavoriteService;
-import com.arthuurdp.e_commerce.modules.product.dtos.ProductResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Set;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/users/me/favorites")
+@RequestMapping("/users/me/activity/favorites")
 public class FavoriteController {
     private final FavoriteService favoriteService;
 
@@ -21,12 +19,11 @@ public class FavoriteController {
 
     @PostMapping("/{productId}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Void> addFavorite(
+    public ResponseEntity<Map<String, String>> addFavorite(
             @PathVariable Long productId,
             @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        favoriteService.addFavorite(productId, authenticatedUser.getUser());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(favoriteService.addFavorite(productId, authenticatedUser.getUser()));
     }
 
     @DeleteMapping("/{productId}")
@@ -36,14 +33,6 @@ public class FavoriteController {
             @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
         favoriteService.removeFavorite(productId, authenticatedUser.getUser());
-        return ResponseEntity.ok().build();
-    }
-
-    @GetMapping
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Set<ProductResponse>> getUserFavorites(
-            @AuthenticationPrincipal UserAuthenticated authenticatedUser
-    ) {
-        return ResponseEntity.ok(favoriteService.getUserFavorites(authenticatedUser.getUser()));
+        return ResponseEntity.noContent().build();
     }
 }

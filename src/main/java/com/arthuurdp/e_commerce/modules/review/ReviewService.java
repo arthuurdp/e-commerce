@@ -2,6 +2,7 @@ package com.arthuurdp.e_commerce.modules.review;
 
 import com.arthuurdp.e_commerce.modules.comment.CommentRepository;
 import com.arthuurdp.e_commerce.modules.comment.entity.Comment;
+import com.arthuurdp.e_commerce.modules.notification.NotificationService;
 import com.arthuurdp.e_commerce.modules.product.ProductRepository;
 import com.arthuurdp.e_commerce.modules.product.entity.Product;
 import com.arthuurdp.e_commerce.modules.review.dtos.CreateReviewRequest;
@@ -24,12 +25,14 @@ public class ReviewService {
     private final ProductRepository productRepository;
     private final CommentRepository commentRepository;
     private final ReviewMapper mapper;
+    private final NotificationService notificationService;
 
-    public ReviewService(ReviewRepository reviewRepository, ProductRepository productRepository, CommentRepository commentRepository, ReviewMapper mapper) {
+    public ReviewService(ReviewRepository reviewRepository, ProductRepository productRepository, CommentRepository commentRepository, ReviewMapper mapper, NotificationService notificationService) {
         this.reviewRepository = reviewRepository;
         this.productRepository = productRepository;
         this.commentRepository = commentRepository;
         this.mapper = mapper;
+        this.notificationService = notificationService;
     }
 
     @Transactional
@@ -41,11 +44,13 @@ public class ReviewService {
         }
 
         Review review = reviewRepository.save(new Review(user, product, req.rating()));
+        notificationService.createNotification(user, "You have added a review to " + product.getName() + "!");
 
         if (req.comment() != null) {
             Comment comment = new Comment(user, product, req.comment().content());
             review.setComment(comment);
             commentRepository.save(comment);
+            notificationService.createNotification(user, "You have added a comment in your review!");
         }
 
         return mapper.toReviewResponse(review);
@@ -72,6 +77,11 @@ public class ReviewService {
         }
 
         reviewRepository.delete(review);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReviewResponse> getUserReviews(User user) {
+        return mapper.toReviewResponseList(reviewRepository.findByUserId(user.getId()).orElseThrow(() -> new ResourceNotFoundException("User not found")));
     }
     @Transactional(readOnly = true)
     public List<ReviewResponse> getProductReviews(Long productId) {
