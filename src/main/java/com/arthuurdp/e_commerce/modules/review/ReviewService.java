@@ -1,5 +1,7 @@
 package com.arthuurdp.e_commerce.modules.review;
 
+import com.arthuurdp.e_commerce.modules.comment.CommentRepository;
+import com.arthuurdp.e_commerce.modules.comment.entity.Comment;
 import com.arthuurdp.e_commerce.modules.product.ProductRepository;
 import com.arthuurdp.e_commerce.modules.product.entity.Product;
 import com.arthuurdp.e_commerce.modules.review.dtos.CreateReviewRequest;
@@ -20,11 +22,13 @@ import java.util.List;
 public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final ProductRepository productRepository;
+    private final CommentRepository commentRepository;
     private final ReviewMapper mapper;
 
-    public ReviewService(ReviewRepository reviewRepository, ProductRepository productRepository, ReviewMapper mapper) {
+    public ReviewService(ReviewRepository reviewRepository, ProductRepository productRepository, CommentRepository commentRepository, ReviewMapper mapper) {
         this.reviewRepository = reviewRepository;
         this.productRepository = productRepository;
+        this.commentRepository = commentRepository;
         this.mapper = mapper;
     }
 
@@ -36,9 +40,16 @@ public class ReviewService {
             throw new ConflictException("You have already reviewed this product");
         }
 
-        return mapper.toReviewResponse(new Review(user, product, req.rating()));
-    }
+        Review review = reviewRepository.save(new Review(user, product, req.rating()));
 
+        if (req.comment() != null) {
+            Comment comment = new Comment(user, product, req.comment().content());
+            review.setComment(comment);
+            commentRepository.save(comment);
+        }
+
+        return mapper.toReviewResponse(review);
+    }
     @Transactional
     public ReviewResponse updateReview(Long reviewId, UpdateReviewRequest req, User user) {
         Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new ResourceNotFoundException("Review not found"));
@@ -52,6 +63,16 @@ public class ReviewService {
         return mapper.toReviewResponse(reviewRepository.save(review));
     }
 
+    @Transactional
+    public void deleteReview(Long reviewId, User user) {
+        Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new ResourceNotFoundException("Review not found"));
+
+        if (!review.getUser().getId().equals(user.getId())) {
+            throw new AccessDeniedException("You can only update your own reviews");
+        }
+
+        reviewRepository.delete(review);
+    }
     @Transactional(readOnly = true)
     public List<ReviewResponse> getProductReviews(Long productId) {
         if (!productRepository.existsById(productId)) {

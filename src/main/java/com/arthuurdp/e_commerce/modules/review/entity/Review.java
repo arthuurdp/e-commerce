@@ -35,6 +35,9 @@ public class Review {
     @Column(name = "rating", nullable = false)
     private Integer rating;
 
+    @OneToOne(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Comment comment;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
@@ -47,5 +50,15 @@ public class Review {
         this.user = user;
         this.product = product;
         this.rating = rating;
+    }
+
+    public void setComment(Comment comment) {
+        if (comment != null && comment.getReview() != this) {
+            this.comment = comment;
+
+            if (comment.getReview() != this) {
+                comment.setReview(this);
+            }
+        }
     }
 }

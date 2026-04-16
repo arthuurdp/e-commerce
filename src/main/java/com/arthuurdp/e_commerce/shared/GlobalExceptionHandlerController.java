@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandlerController {
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ResponseEntity<StandardError> HttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
+    public ResponseEntity<StandardError> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
         return build(HttpStatus.BAD_REQUEST, "Method Not Allowed", ex.getMessage());
     }
 

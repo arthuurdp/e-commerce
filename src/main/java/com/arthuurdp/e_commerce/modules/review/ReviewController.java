@@ -4,6 +4,7 @@ import com.arthuurdp.e_commerce.infrastructure.security.UserAuthenticated;
 import com.arthuurdp.e_commerce.modules.comment.CommentService;
 import com.arthuurdp.e_commerce.modules.comment.dtos.CommentResponse;
 import com.arthuurdp.e_commerce.modules.comment.dtos.CreateCommentRequest;
+import com.arthuurdp.e_commerce.modules.review.dtos.AddCommentToReviewRequest;
 import com.arthuurdp.e_commerce.modules.review.dtos.CreateReviewRequest;
 import com.arthuurdp.e_commerce.modules.review.dtos.ReviewResponse;
 import com.arthuurdp.e_commerce.modules.review.dtos.UpdateReviewRequest;
@@ -39,7 +40,7 @@ public class ReviewController {
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<CommentResponse> addCommentToReview(
             @PathVariable Long reviewId,
-            @Valid @RequestBody CreateCommentRequest req,
+            @Valid @RequestBody AddCommentToReviewRequest req,
             @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
         return ResponseEntity.ok(commentService.addCommentToReview(reviewId, req, authenticatedUser.getUser()));
@@ -53,6 +54,16 @@ public class ReviewController {
             @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
         return ResponseEntity.ok(reviewService.updateReview(reviewId, req, authenticatedUser.getUser()));
+    }
+
+    @DeleteMapping("/reviews/{reviewId}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Void> deleteReview(
+            @PathVariable Long reviewId,
+            @AuthenticationPrincipal UserAuthenticated authenticatedUser
+    ) {
+        reviewService.deleteReview(reviewId, authenticatedUser.getUser());
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{productId}/reviews")

@@ -24,6 +24,11 @@ public class CustomAuthEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
+        System.out.println("Auth failed - URI: " + request.getRequestURI());
+        System.out.println("Auth failed - Method: " + request.getMethod());
+        System.out.println("Auth failed - Exception: " + authException.getMessage());
+        System.out.println("Auth failed - Authorization header: " + request.getHeader("Authorization"));
+
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

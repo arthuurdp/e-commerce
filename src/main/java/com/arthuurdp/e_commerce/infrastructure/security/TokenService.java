@@ -43,6 +43,7 @@ public class TokenService {
                     .verify(token)
                     .getSubject();
         } catch (JWTVerificationException exception) {
+            System.out.println("Token validation failed: " + exception.getMessage());
             return null;
         }
     }

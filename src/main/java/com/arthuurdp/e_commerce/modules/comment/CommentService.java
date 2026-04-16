@@ -8,9 +8,11 @@ import com.arthuurdp.e_commerce.modules.comment.mapper.CommentMapper;
 import com.arthuurdp.e_commerce.modules.product.ProductRepository;
 import com.arthuurdp.e_commerce.modules.product.entity.Product;
 import com.arthuurdp.e_commerce.modules.review.ReviewRepository;
+import com.arthuurdp.e_commerce.modules.review.dtos.AddCommentToReviewRequest;
 import com.arthuurdp.e_commerce.modules.review.entity.Review;
 import com.arthuurdp.e_commerce.modules.user.entity.User;
 import com.arthuurdp.e_commerce.shared.exceptions.AccessDeniedException;
+import com.arthuurdp.e_commerce.shared.exceptions.ConflictException;
 import com.arthuurdp.e_commerce.shared.exceptions.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,12 +34,16 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentResponse addCommentToReview(Long id, CreateCommentRequest req, User user) {
-        Product product = productRepository.findById(req.productId()).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
-        Review review = reviewRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Review not found"));
+    public CommentResponse addCommentToReview(Long reviewId, AddCommentToReviewRequest req, User user) {
+        Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new ResourceNotFoundException("Review not found"));
+        Product product = review.getProduct();
 
         if (!review.getUser().getId().equals(user.getId())) {
             throw new AccessDeniedException("You can only comment on your own reviews");
+        }
+
+        if (commentRepository.existsByReviewId(review.getId())) {
+            throw new ConflictException("This review already has a comment");
         }
 
         Comment comment = new Comment(user, product, req.content());
@@ -47,14 +53,14 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentResponse updateComment(Long commentId, UpdateCommentRequest updateCommentRequest, User user) {
+    public CommentResponse updateComment(Long commentId, UpdateCommentRequest req, User user) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
 
         if (!comment.getUser().getId().equals(user.getId())) {
             throw new AccessDeniedException("You can only update your own comments");
         }
 
-        comment.setContent(updateCommentRequest.content());
+        comment.setContent(req.content());
         return mapper.toCommentResponseDTO(commentRepository.save(comment));
     }
 

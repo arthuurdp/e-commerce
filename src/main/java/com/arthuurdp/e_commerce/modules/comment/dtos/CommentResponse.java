@@ -7,7 +7,6 @@ public record CommentResponse (
     Long id,
     Long userId,
      String userName,
-     ReviewResponse review,
      Long productId,
      String content,
      LocalDateTime createdAt
