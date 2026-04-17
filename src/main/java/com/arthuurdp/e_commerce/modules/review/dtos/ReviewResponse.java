@@ -7,8 +7,9 @@ import java.time.LocalDateTime;
 public record ReviewResponse(
         Long id,
         Long userId,
-        String userName,
         Long productId,
+        String productName,
+        String userName,
         Integer rating,
         CommentResponse comment,
         String userProfilePictureUrl,
