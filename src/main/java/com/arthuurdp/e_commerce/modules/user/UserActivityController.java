@@ -9,6 +9,7 @@ import com.arthuurdp.e_commerce.modules.review.dtos.ReviewResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,6 +32,15 @@ public class UserActivityController {
             @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
         return ResponseEntity.ok(service.getRecentActivity(authenticatedUser.getUser()));
+    }
+
+    @DeleteMapping
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Void> clearRecentActivity(
+            @AuthenticationPrincipal UserAuthenticated authenticatedUser
+    ) {
+        service.clearRecentActivity(authenticatedUser.getUser());
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/reviews")

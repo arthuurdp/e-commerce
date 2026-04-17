@@ -53,4 +53,9 @@ public class MyActivityService {
     public Set<ProductResponse> getUserFavorites(User user) {
         return favoriteService.getUserFavorites(user);
     }
+
+    @Transactional
+    public void clearRecentActivity(User user) {
+        notificationService.clearRecentActivity(user);
+    }
 }

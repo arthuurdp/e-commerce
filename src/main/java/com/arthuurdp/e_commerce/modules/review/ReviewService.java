@@ -36,21 +36,21 @@ public class ReviewService {
     }
 
     @Transactional
-    public ReviewResponse createReview(CreateReviewRequest req, User user) {
-        Product product = productRepository.findById(req.productId()).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+    public ReviewResponse createReview(Long productId, CreateReviewRequest req, User user) {
+        Product product = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
         if (reviewRepository.existsByUserIdAndProductId(user.getId(), product.getId())) {
             throw new ConflictException("You have already reviewed this product");
         }
 
         Review review = reviewRepository.save(new Review(user, product, req.rating()));
-        notificationService.createNotification(user, "You have added a review to " + product.getName() + "!");
+        notificationService.createNotification(user, "You have added a review to " + product.getName() + "!", "REVIEW");
 
         if (req.comment() != null) {
             Comment comment = new Comment(user, product, req.comment().content());
             review.setComment(comment);
             commentRepository.save(comment);
-            notificationService.createNotification(user, "You have added a comment in your review!");
+            notificationService.createNotification(user, "You have added a comment in your review!", "COMMENT");
         }
 
         return mapper.toReviewResponse(review);

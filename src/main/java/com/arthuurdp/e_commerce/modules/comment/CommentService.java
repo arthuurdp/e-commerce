@@ -54,7 +54,7 @@ public class CommentService {
         comment.setReview(review);
 
         Comment savedComment = commentRepository.save(comment);
-        notificationService.createNotification(user, "You have added a comment in your review!");
+        notificationService.createNotification(user, "You have added a comment in your review!", "COMMENT");
 
         return mapper.toCommentResponseDTO(savedComment);
     }

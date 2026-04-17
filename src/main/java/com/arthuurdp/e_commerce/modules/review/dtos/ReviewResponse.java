@@ -11,5 +11,6 @@ public record ReviewResponse(
         Long productId,
         Integer rating,
         CommentResponse comment,
+        String userProfilePictureUrl,
         LocalDateTime createdAt
 ) {}

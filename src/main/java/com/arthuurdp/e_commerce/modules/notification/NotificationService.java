@@ -20,10 +20,11 @@ public class NotificationService {
     }
 
     @Transactional
-    public void createNotification(User user, String message) {
+    public void createNotification(User user, String message, String type) {
         Notification notification = new Notification();
         notification.setUser(user);
         notification.setMessage(message);
+        notification.setType(type);
         notification.setCreatedAt(LocalDateTime.now());
         notificationRepository.save(notification);
     }
@@ -31,5 +32,10 @@ public class NotificationService {
     @Transactional(readOnly = true)
     public List<NotificationResponse> getMyNotifications(User user) {
         return mapper.toNotificationResponseList(notificationRepository.findByUserIdOrderByCreatedAtDesc(user.getId()));
+    }
+
+    @Transactional
+    public void clearRecentActivity(User user) {
+        notificationRepository.deleteByUserId(user.getId());
     }
 }

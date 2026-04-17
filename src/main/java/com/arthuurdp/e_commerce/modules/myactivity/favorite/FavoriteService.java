@@ -40,7 +40,7 @@ public class FavoriteService {
         }
 
         favoriteRepository.save(new Favorite(user, product));
-        notificationService.createNotification(user, "You have added " + product.getName() + " to your favorites!");
+        notificationService.createNotification(user, "You have added " + product.getName() + " to your favorites!", "FAVORITE");
 
         return Map.of("message", "Product added to favorites!");
     }

@@ -3,7 +3,6 @@ package com.arthuurdp.e_commerce.modules.review;
 import com.arthuurdp.e_commerce.infrastructure.security.UserAuthenticated;
 import com.arthuurdp.e_commerce.modules.comment.CommentService;
 import com.arthuurdp.e_commerce.modules.comment.dtos.CommentResponse;
-import com.arthuurdp.e_commerce.modules.comment.dtos.CreateCommentRequest;
 import com.arthuurdp.e_commerce.modules.review.dtos.AddCommentToReviewRequest;
 import com.arthuurdp.e_commerce.modules.review.dtos.CreateReviewRequest;
 import com.arthuurdp.e_commerce.modules.review.dtos.ReviewResponse;
@@ -27,13 +26,14 @@ public class ReviewController {
         this.commentService = commentService;
     }
 
-    @PostMapping("/reviews")
+    @PostMapping("/{productId}/reviews")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ReviewResponse> createReview(
+            @PathVariable Long productId,
             @Valid @RequestBody CreateReviewRequest req,
             @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        return ResponseEntity.ok(reviewService.createReview(req, authenticatedUser.getUser()));
+        return ResponseEntity.ok(reviewService.createReview(productId, req, authenticatedUser.getUser()));
     }
 
     @PostMapping("/reviews/{reviewId}/comment")

@@ -27,6 +27,9 @@ public class Notification {
     @Column(name = "message")
     private String message;
 
+    @Column(name = "type")
+    private String type;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
