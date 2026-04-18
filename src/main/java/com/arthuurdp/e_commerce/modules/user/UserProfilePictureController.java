@@ -26,12 +26,9 @@ public class UserProfilePictureController {
             @RequestParam("file") MultipartFile file,
             @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        String baseUrl = "http://192.168.18.61:8080";
-
         String fileName = fileStorageService.storeFile(file);
-        String imageUrl = baseUrl + "/uploads/" + fileName;
 
-        return ResponseEntity.ok().body(service.updateProfilePicture(imageUrl, authenticatedUser.getUser()));
+        return ResponseEntity.ok().body(service.updateProfilePicture(fileName, authenticatedUser.getUser()));
     }
 
     @DeleteMapping
