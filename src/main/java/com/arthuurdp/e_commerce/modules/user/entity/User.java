@@ -1,14 +1,14 @@
 package com.arthuurdp.e_commerce.modules.user.entity;
 
-import com.arthuurdp.e_commerce.modules.myactivity.favorite.entity.Favorite;
 import com.arthuurdp.e_commerce.modules.address.entity.Address;
 import com.arthuurdp.e_commerce.modules.cart.entity.Cart;
-import com.arthuurdp.e_commerce.modules.product.entity.Product;
+import com.arthuurdp.e_commerce.modules.comment.entity.Comment;
 import com.arthuurdp.e_commerce.modules.email.entity.EmailVerificationToken;
 import com.arthuurdp.e_commerce.modules.email.entity.PasswordVerificationToken;
+import com.arthuurdp.e_commerce.modules.myactivity.favorite.entity.Favorite;
+import com.arthuurdp.e_commerce.modules.order.entity.Order;
 import com.arthuurdp.e_commerce.modules.user.enums.Gender;
 import com.arthuurdp.e_commerce.modules.user.enums.Role;
-import com.arthuurdp.e_commerce.modules.order.entity.Order;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -25,6 +25,7 @@ import java.util.*;
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -62,33 +63,78 @@ public class User {
     @Column(name = "password_change_verified", nullable = false)
     private boolean passwordChangeVerified = false;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
-    @Enumerated(value = EnumType.STRING)
     private Role role;
 
     @Column(name = "profile_picture_url")
     private String profilePictureUrl;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = true
+    )
     @JoinColumn(name = "cart_id", nullable = false)
     private Cart cart;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
     private Set<Order> orders = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
     private Set<Address> addresses = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     private List<EmailVerificationToken> emailTokens = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     private List<PasswordVerificationToken> passwordTokens = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
     private Set<Favorite> favorites = new HashSet<>();
 
-    public User(String firstName, String lastName, String email, String password, String cpf, String phone, LocalDate birthDate, Gender gender, Role role) {
+    public User(
+            String firstName,
+            String lastName,
+            String email,
+            String password,
+            String cpf,
+            String phone,
+            LocalDate birthDate,
+            Gender gender,
+            Role role
+    ) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;

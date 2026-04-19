@@ -26,15 +26,11 @@ public class ProductImageController {
             @PathVariable Long id,
             @RequestParam("files") List<MultipartFile> files
     ) {
-
-        String baseUrl = "http://192.168.200.114:8080";
-
-        List<String> imageUrls = files.stream()
+        List<String> fileNames = files.stream()
                 .map(fileStorageService::storeFile)
-                .map(fileName -> baseUrl + "/uploads/" + fileName)
                 .toList();
 
-        return ResponseEntity.ok().body(service.addImages(id, imageUrls));
+        return ResponseEntity.ok().body(service.addImages(id, fileNames));
     }
 
     @PatchMapping("/{mainImageId}")
