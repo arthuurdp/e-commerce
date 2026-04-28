@@ -33,9 +33,10 @@ public class UserProfilePictureController {
 
     @DeleteMapping
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<UserResponse> deleteProfilePicture(
+    public ResponseEntity<Void> deleteProfilePicture(
             @AuthenticationPrincipal UserAuthenticated authenticatedUser
     ) {
-        return ResponseEntity.ok().body(service.deleteProfilePicture(authenticatedUser.getUser()));
+        service.deleteProfilePicture(authenticatedUser.getUser());
+        return ResponseEntity.noContent().build();
     }
 }
